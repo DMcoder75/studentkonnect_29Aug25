@@ -1,0 +1,58 @@
+{
+  "total_pathways": 59,
+  "accounting_business_pathways": [
+    {
+      "id": 59,
+      "name": "Accounting and Business",
+      "description": "Pathways tailored for students aiming to enter accounting, finance, and business degrees. These typically include foundation programs, diploma courses, and enabling programs that cover core business subjects such as accounting principles, economics, finance, and management. Successful completion often guarantees progression into bachelor or postgraduate business-related degrees.",
+      "duration": null,
+      "typical_progression": null
+    },
+    {
+      "id": 13,
+      "name": "Accounting and Business Pathways",
+      "description": "Diploma or foundation studies in business, commerce, or accounting.",
+      "duration": null,
+      "typical_progression": null
+    }
+  ],
+  "exact_matches": {
+    "accounting_and_business": {
+      "id": 59,
+      "name": "Accounting and Business",
+      "description": "Pathways tailored for students aiming to enter accounting, finance, and business degrees. These typically include foundation programs, diploma courses, and enabling programs that cover core business subjects such as accounting principles, economics, finance, and management. Successful completion often guarantees progression into bachelor or postgraduate business-related degrees.",
+      "duration": null,
+      "typical_progression": null
+    }
+  },
+  "similar_pathways": [
+    {
+      "id": 31,
+      "name": "Kaplan Business School Hospitality Diploma",
+      "description": "NULL",
+      "duration": null,
+      "typical_progression": null
+    },
+    {
+      "id": 16,
+      "name": "La Trobe College Business Diploma",
+      "description": "NULL",
+      "duration": null,
+      "typical_progression": null
+    },
+    {
+      "id": 15,
+      "name": "Monash College Diploma of Business",
+      "description": "NULL",
+      "duration": null,
+      "typical_progression": null
+    },
+    {
+      "id": 14,
+      "name": "These pathways provide core business knowledge and guarantee progression into related bachelor degrees, often with credit.",
+      "description": "NULL",
+      "duration": null,
+      "typical_progression": null
+    }
+  ]
+}
