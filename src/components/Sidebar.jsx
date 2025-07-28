@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -13,14 +13,25 @@ import {
   Calculator,
   ChevronDown,
   ChevronRight,
-  X
+  X,
+  FileText,
+  Award,
+  Globe,
+  HelpCircle,
+  BarChart3,
+  MessageCircle,
+  Plane,
+  Users
 } from 'lucide-react'
 
 export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen, onMobileMenuClose }) {
   const [expandedItems, setExpandedItems] = useState({})
   const location = useLocation()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
+
+  // Check if user is a counselor
+  const isCounselor = user?.user_type === 'counselor' || user?.role === 'counselor'
 
   const toggleExpanded = (itemId) => {
     setExpandedItems(prev => ({
@@ -30,6 +41,71 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
   }
 
   const menuItems = [
+    // Student-related items first (when authenticated)
+    ...(isAuthenticated() ? [
+      {
+        id: 'student-dashboard',
+        name: 'My Dashboard',
+        path: '/student/dashboard',
+        icon: BarChart3,
+        badge: null
+      },
+      {
+        id: 'my-profile',
+        name: 'My Profile',
+        path: '/student/profile',
+        icon: User,
+        badge: null
+      },
+      {
+        id: 'my-connections',
+        name: 'My Connections',
+        path: '/student/connections',
+        icon: MessageCircle,
+        badge: '2'
+      },
+      // Show full Counselor Connect menu only for counselors
+      ...(isCounselor ? [{
+        id: 'counselor-connect',
+        name: 'Counselor Connect',
+        icon: User,
+        badge: null,
+        submenu: [
+          { name: 'Find Counselors', path: '/counselor/directory' },
+          { name: 'Become a Counselor', path: '/counselor/register' },
+          { name: 'Counselor Dashboard', path: '/counselor/dashboard' }
+        ]
+      }] : []),
+      {
+        id: 'student-forums',
+        name: 'Student Forums',
+        path: '/student-forums',
+        icon: Users,
+        badge: '24'
+      },
+      {
+        id: 'alumni-network',
+        name: 'Alumni Network',
+        path: '/alumni-network',
+        icon: Users,
+        badge: null
+      },
+      {
+        id: 'travel-help',
+        name: 'Travel Help',
+        path: '/travel-help',
+        icon: Plane,
+        badge: null
+      },
+      {
+        id: 'accommodation-help',
+        name: 'Accommodation Help',
+        path: '/accommodation-help',
+        icon: Home,
+        badge: null
+      }
+    ] : []),
+    // General navigation items
     {
       id: 'home',
       name: 'Home',
@@ -37,49 +113,63 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
       icon: Home,
       badge: null
     },
+    // AUS Functions - Parent menu for Universities, Pathways, and Courses
     {
-      id: 'universities',
-      name: 'Universities',
+      id: 'aus-functions',
+      name: 'AUS Functions',
       icon: GraduationCap,
-      badge: '84',
+      badge: null,
       submenu: [
-        { name: 'All Universities', path: '/universities' },
-        { name: 'Group of Eight', path: '/universities?type=go8' },
-        { name: 'Technology Network', path: '/universities?type=tech' },
-        { name: 'Regional Universities', path: '/universities?type=regional' }
+        {
+          name: 'Universities',
+          path: '/universities',
+          badge: '850+',
+          submenu: [
+            { name: 'All Universities', path: '/universities' },
+            { name: 'Group of Eight', path: '/universities?type=go8' },
+            { name: 'Technology Network', path: '/universities?type=tech' },
+            { name: 'Regional Universities', path: '/universities?type=regional' }
+          ]
+        },
+        {
+          name: 'Pathways',
+          path: '/pathways',
+          badge: '2400+',
+          submenu: [
+            { name: 'All Pathways', path: '/pathways' },
+            { name: 'Business & Finance', path: '/pathways?category=business' },
+            { name: 'Engineering & Tech', path: '/pathways?category=engineering' },
+            { name: 'Health & Medicine', path: '/pathways?category=health' },
+            { name: 'Arts & Creative', path: '/pathways?category=arts' }
+          ]
+        },
+        {
+          name: 'Courses',
+          path: '/courses',
+          badge: '12500+',
+          submenu: [
+            { name: 'All Courses', path: '/courses' },
+            { name: 'Undergraduate', path: '/courses?level=undergraduate' },
+            { name: 'Postgraduate', path: '/courses?level=postgraduate' },
+            { name: 'Research', path: '/courses?level=research' }
+          ]
+        }
       ]
     },
+    // Find Counselors - Always visible for all users, positioned after Courses
     {
-      id: 'pathways',
-      name: 'Pathways',
-      icon: Route,
-      badge: '407',
-      submenu: [
-        { name: 'All Pathways', path: '/pathways' },
-        { name: 'Business & Finance', path: '/pathways?category=business' },
-        { name: 'Engineering & Tech', path: '/pathways?category=engineering' },
-        { name: 'Health & Medicine', path: '/pathways?category=health' },
-        { name: 'Arts & Creative', path: '/pathways?category=arts' }
-      ]
-    },
-    {
-      id: 'courses',
-      name: 'Courses',
-      icon: BookOpen,
-      badge: '1000+',
-      submenu: [
-        { name: 'All Courses', path: '/courses' },
-        { name: 'Undergraduate', path: '/courses?level=undergraduate' },
-        { name: 'Postgraduate', path: '/courses?level=postgraduate' },
-        { name: 'Research', path: '/courses?level=research' }
-      ]
+      id: 'find-counselors',
+      name: 'Find Counselors',
+      path: '/counselor/directory',
+      icon: User,
+      badge: null
     },
     {
       id: 'atar-calculator',
       name: 'ATAR Calculator',
       path: '/atar-calculator',
       icon: Calculator,
-      badge: 'New'
+      badge: null
     },
     {
       id: 'career-insights',
@@ -88,13 +178,50 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
       icon: TrendingUp,
       badge: null
     },
-    ...(isAuthenticated() ? [{
-      id: 'profile',
-      name: 'Profile',
-      path: '/profile',
-      icon: User,
-      badge: null
-    }] : [])
+    {
+      id: 'smart-apply',
+      name: 'Smart Apply',
+      icon: FileText,
+      badge: null,
+      submenu: [
+        { name: 'SOP Builder', path: '/smart-apply/sop-builder' },
+        { name: 'Resume Builder', path: '/smart-apply/resume-builder' },
+        { name: 'Reference Letter Toolkit', path: '/smart-apply/reference-letter-toolkit' }
+      ]
+    },
+    {
+      id: 'scholarships-assist',
+      name: 'Scholarships Assist',
+      icon: Award,
+      badge: null,
+      submenu: [
+        { name: 'Scholarship Finder', path: '/scholarships-assist/scholarship-finder' },
+        { name: 'Eligibility Checker', path: '/scholarships-assist/eligibility-checker' },
+        { name: 'Application Assistance', path: '/scholarships-assist/application-assistance' }
+      ]
+    },
+    {
+      id: 'visa-international',
+      name: 'Visa & International Students',
+      icon: Globe,
+      badge: null,
+      submenu: [
+        { name: 'GTE & Visa Statement Builder', path: '/visa-international/gte-visa-statement-builder' },
+        { name: 'Visa Document Checklist', path: '/visa-international/visa-document-checklist' },
+        { name: 'Test Preparation Resources', path: '/visa-international/test-preparation-resources' }
+      ]
+    },
+    {
+      id: 'help-resources',
+      name: 'Help & Resources',
+      icon: HelpCircle,
+      badge: null,
+      submenu: [
+        { name: 'FAQ', path: '/faq' },
+        { name: 'Contact Us', path: '/contact-us' },
+        { name: 'Tutorials and Guides', path: '/help-resources/tutorials-guides' }
+      ]
+    }
   ]
 
   const isActive = (path) => {
@@ -115,26 +242,32 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
     }
   }
 
-  const handleSubmenuClick = (path) => {
-    navigate(path)
-    if (onMobileMenuClose) {
-      onMobileMenuClose()
+  const handleSubmenuClick = (subItem) => {
+    if (subItem.submenu) {
+      // Handle nested submenu expansion
+      const nestedId = `${subItem.name.toLowerCase().replace(/\s+/g, '-')}`
+      toggleExpanded(nestedId)
+    } else if (subItem.path) {
+      navigate(subItem.path)
+      if (onMobileMenuClose) {
+        onMobileMenuClose()
+      }
     }
   }
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-64 bg-white border-r border-gray-200 transition-all duration-300">
-        <div className="p-6">
+      <aside className="hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-white via-purple-50/30 to-cyan-50/30 border-r border-gray-200 transition-all duration-300 h-screen backdrop-blur-sm">
+        <div className="p-6 flex-1 overflow-y-auto">
           <div 
             className="flex items-center mb-6 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/')}
           >
-            <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-lg p-2 font-bold text-lg mr-3">
-              UP
+            <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-lg p-2 font-bold text-lg mr-3 shadow-lg">
+              SK
             </div>
-            <span className="text-xl font-bold text-gray-800">Your Uni Pathway</span>
+            <span className="text-xl font-bold text-gray-800">StudentKonnect</span>
           </div>
           
           <nav className="space-y-2">
@@ -156,10 +289,10 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
                     {item.badge && (
                       <Badge 
                         variant="secondary" 
-                        className={`mr-2 text-xs ${
+                        className={`mr-2 text-xs font-semibold ${
                           item.badge === 'New' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200 shadow-sm' 
+                            : 'bg-gradient-to-r from-purple-100 to-cyan-100 text-purple-700 border border-purple-200 shadow-sm'
                         }`}
                       >
                         {item.badge}
@@ -176,17 +309,51 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
                 {item.submenu && expandedItems[item.id] && (
                   <div className="ml-8 mt-2 space-y-1">
                     {item.submenu.map((subItem, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSubmenuClick(subItem.path)}
-                        className={`w-full text-left px-4 py-2 text-sm rounded-md transition-colors ${
-                          isActive(subItem.path)
-                            ? 'bg-purple-50 text-purple-600'
-                            : 'text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        {subItem.name}
-                      </button>
+                      <div key={index}>
+                        <button
+                          onClick={() => handleSubmenuClick(subItem)}
+                          className={`w-full flex items-center justify-between px-4 py-2 text-sm rounded-md transition-colors ${
+                            isActive(subItem.path)
+                              ? 'bg-purple-50 text-purple-600'
+                              : 'text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <span>{subItem.name}</span>
+                            {subItem.badge && (
+                              <Badge 
+                                variant="secondary" 
+                                className="ml-2 text-xs bg-gray-100 text-gray-600"
+                              >
+                                {subItem.badge}
+                              </Badge>
+                            )}
+                          </div>
+                          {subItem.submenu && (
+                            expandedItems[`${subItem.name.toLowerCase().replace(/\s+/g, '-')}`] ? 
+                              <ChevronDown className="h-3 w-3" /> : 
+                              <ChevronRight className="h-3 w-3" />
+                          )}
+                        </button>
+                        
+                        {subItem.submenu && expandedItems[`${subItem.name.toLowerCase().replace(/\s+/g, '-')}`] && (
+                          <div className="ml-6 mt-1 space-y-1">
+                            {subItem.submenu.map((nestedItem, nestedIndex) => (
+                              <button
+                                key={nestedIndex}
+                                onClick={() => navigate(nestedItem.path)}
+                                className={`w-full text-left px-3 py-1 text-xs rounded-md transition-colors ${
+                                  isActive(nestedItem.path)
+                                    ? 'bg-purple-50 text-purple-600'
+                                    : 'text-gray-500 hover:bg-gray-50'
+                                }`}
+                              >
+                                {nestedItem.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -201,7 +368,7 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={onMobileMenuClose}></div>
           
-          <div className="fixed top-0 left-0 bottom-0 w-80 bg-white shadow-xl">
+          <div className="fixed top-0 left-0 bottom-0 w-80 bg-gradient-to-b from-white via-purple-50/30 to-cyan-50/30 shadow-xl backdrop-blur-sm">
             {/* Mobile Menu Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div 
@@ -211,10 +378,10 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
                   onMobileMenuClose()
                 }}
               >
-                <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-lg p-2 font-bold text-lg mr-3">
-                  UP
+                <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-lg p-2 font-bold text-lg mr-3 shadow-lg">
+                  SK
                 </div>
-                <span className="text-xl font-bold text-gray-800">Your Uni Pathway</span>
+                <span className="text-xl font-bold text-gray-800">StudentKonnect</span>
               </div>
               <Button
                 variant="ghost"
@@ -227,7 +394,7 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
             </div>
 
             {/* Mobile Menu Content */}
-            <div className="p-6 overflow-y-auto h-full">
+            <div className="flex-1 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 100px)' }}>
               <nav className="space-y-2">
                 {menuItems.map((item) => (
                   <div key={item.id}>
@@ -267,17 +434,54 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
                     {item.submenu && expandedItems[item.id] && (
                       <div className="ml-8 mt-2 space-y-1">
                         {item.submenu.map((subItem, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleSubmenuClick(subItem.path)}
-                            className={`w-full text-left px-4 py-2 text-sm rounded-md transition-colors ${
-                              isActive(subItem.path)
-                                ? 'bg-purple-50 text-purple-600'
-                                : 'text-gray-600 hover:bg-gray-50'
-                            }`}
-                          >
-                            {subItem.name}
-                          </button>
+                          <div key={index}>
+                            <button
+                              onClick={() => handleSubmenuClick(subItem)}
+                              className={`w-full flex items-center justify-between px-4 py-2 text-sm rounded-md transition-colors ${
+                                isActive(subItem.path)
+                                  ? 'bg-purple-50 text-purple-600'
+                                  : 'text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              <div className="flex items-center">
+                                <span>{subItem.name}</span>
+                                {subItem.badge && (
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="ml-2 text-xs bg-gray-100 text-gray-600"
+                                  >
+                                    {subItem.badge}
+                                  </Badge>
+                                )}
+                              </div>
+                              {subItem.submenu && (
+                                expandedItems[`${subItem.name.toLowerCase().replace(/\s+/g, '-')}`] ? 
+                                  <ChevronDown className="h-3 w-3" /> : 
+                                  <ChevronRight className="h-3 w-3" />
+                              )}
+                            </button>
+                            
+                            {subItem.submenu && expandedItems[`${subItem.name.toLowerCase().replace(/\s+/g, '-')}`] && (
+                              <div className="ml-6 mt-1 space-y-1">
+                                {subItem.submenu.map((nestedItem, nestedIndex) => (
+                                  <button
+                                    key={nestedIndex}
+                                    onClick={() => {
+                                      navigate(nestedItem.path)
+                                      onMobileMenuClose()
+                                    }}
+                                    className={`w-full text-left px-3 py-1 text-xs rounded-md transition-colors ${
+                                      isActive(nestedItem.path)
+                                        ? 'bg-purple-50 text-purple-600'
+                                        : 'text-gray-500 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    {nestedItem.name}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}

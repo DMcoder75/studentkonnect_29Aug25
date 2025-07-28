@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowRight, Search, Filter, BookOpen, Clock, Star, Heart } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
 import Sidebar from './Sidebar'
 
 export default function CoursesPage({ favorites, setFavorites, isMobileMenuOpen, onMobileMenuClose }) {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [courses, setCourses] = useState([])
   const [filteredCourses, setFilteredCourses] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -17,17 +18,141 @@ export default function CoursesPage({ favorites, setFavorites, isMobileMenuOpen,
   const [universities, setUniversities] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // Read URL parameters and set initial filter state
+  useEffect(() => {
+    const levelParam = searchParams.get('level')
+    if (levelParam) {
+      // Map URL parameter values to filter values (handle case-insensitive matching)
+      const levelMapping = {
+        'undergraduate': 'Undergraduate',
+        'postgraduate': 'Postgraduate', 
+        'research': 'Research',
+        'mixed': 'Mixed Level'
+      }
+      const mappedLevel = levelMapping[levelParam.toLowerCase()] || 'all'
+      setLevelFilter(mappedLevel)
+    }
+  }, [searchParams])
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const [coursesData, universitiesData] = await Promise.all([
-          dbHelpers.getCourses(),
-          dbHelpers.getUniversities()
-        ])
-        setCourses(coursesData)
-        setFilteredCourses(coursesData)
-        setUniversities(universitiesData)
+        
+        // Sample courses data
+        const sampleCourses = [
+          {
+            id: 1,
+            name: "Bachelor of Medicine, Bachelor of Surgery (MBBS)",
+            university: "University of Melbourne",
+            level: "Undergraduate",
+            duration: "6 years",
+            atar_requirement: 99.95,
+            description: "Comprehensive medical degree preparing students for careers in medicine and healthcare.",
+            field: "Medicine",
+            fees_domestic: 11000,
+            fees_international: 75000
+          },
+          {
+            id: 2,
+            name: "Bachelor of Engineering (Software)",
+            university: "UNSW Sydney",
+            level: "Undergraduate", 
+            duration: "4 years",
+            atar_requirement: 96.00,
+            description: "Leading software engineering program with strong industry connections.",
+            field: "Engineering",
+            fees_domestic: 12000,
+            fees_international: 49000
+          },
+          {
+            id: 3,
+            name: "Bachelor of Laws (LLB)",
+            university: "University of Sydney",
+            level: "Undergraduate",
+            duration: "4 years",
+            atar_requirement: 99.50,
+            description: "Prestigious law degree with excellent career prospects.",
+            field: "Law",
+            fees_domestic: 13000,
+            fees_international: 52000
+          },
+          {
+            id: 4,
+            name: "Master of Business Administration (MBA)",
+            university: "Melbourne Business School",
+            level: "Postgraduate",
+            duration: "2 years",
+            atar_requirement: null,
+            description: "World-class MBA program for business leaders.",
+            field: "Business",
+            fees_domestic: 95000,
+            fees_international: 95000
+          },
+          {
+            id: 5,
+            name: "Bachelor of Computer Science",
+            university: "Australian National University",
+            level: "Undergraduate",
+            duration: "3 years",
+            atar_requirement: 95.00,
+            description: "Comprehensive computer science program with research opportunities.",
+            field: "Computer Science",
+            fees_domestic: 11500,
+            fees_international: 47000
+          },
+          {
+            id: 6,
+            name: "Bachelor of Nursing",
+            university: "University of Technology Sydney",
+            level: "Undergraduate",
+            duration: "3 years",
+            atar_requirement: 85.00,
+            description: "Professional nursing program with clinical placements.",
+            field: "Nursing",
+            fees_domestic: 10000,
+            fees_international: 38000
+          },
+          {
+            id: 7,
+            name: "Master of Architecture",
+            university: "University of Melbourne",
+            level: "Postgraduate",
+            duration: "2 years",
+            atar_requirement: null,
+            description: "Professional architecture degree with design focus.",
+            field: "Architecture",
+            fees_domestic: 15000,
+            fees_international: 45000
+          },
+          {
+            id: 8,
+            name: "Bachelor of Psychology",
+            university: "Monash University",
+            level: "Undergraduate",
+            duration: "3 years",
+            atar_requirement: 90.00,
+            description: "Comprehensive psychology program with research opportunities.",
+            field: "Psychology",
+            fees_domestic: 11000,
+            fees_international: 42000
+          }
+        ]
+        
+        const sampleUniversities = [
+          { id: 1, name: "University of Melbourne" },
+          { id: 2, name: "University of Sydney" },
+          { id: 3, name: "Australian National University" },
+          { id: 4, name: "UNSW Sydney" },
+          { id: 5, name: "University of Queensland" },
+          { id: 6, name: "Monash University" },
+          { id: 7, name: "University of Technology Sydney" },
+          { id: 8, name: "Melbourne Business School" }
+        ]
+        
+        setCourses(sampleCourses)
+        setFilteredCourses(sampleCourses)
+        setUniversities(sampleUniversities)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -61,6 +186,29 @@ export default function CoursesPage({ favorites, setFavorites, isMobileMenuOpen,
 
     setFilteredCourses(filtered)
   }, [searchTerm, levelFilter, universityFilter, courses])
+
+  const handleLevelFilterChange = (newLevel) => {
+    setLevelFilter(newLevel)
+    
+    // Update URL parameters
+    const newSearchParams = new URLSearchParams(searchParams)
+    if (newLevel === 'all') {
+      newSearchParams.delete('level')
+    } else {
+      // Map filter values back to URL parameter values
+      const urlMapping = {
+        'Undergraduate': 'undergraduate',
+        'Postgraduate': 'postgraduate',
+        'Research': 'research',
+        'Mixed Level': 'mixed'
+      }
+      const urlValue = urlMapping[newLevel]
+      if (urlValue) {
+        newSearchParams.set('level', urlValue)
+      }
+    }
+    setSearchParams(newSearchParams)
+  }
 
   const toggleFavorite = (courseId) => {
     setFavorites(prev => 
@@ -151,7 +299,7 @@ export default function CoursesPage({ favorites, setFavorites, isMobileMenuOpen,
                 <div className="flex flex-col sm:flex-row items-center gap-2">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-gray-600" />
-                    <Select value={levelFilter} onValueChange={setLevelFilter}>
+                    <Select value={levelFilter} onValueChange={handleLevelFilterChange}>
                       <SelectTrigger className="w-48">
                         <SelectValue placeholder="Filter by level" />
                       </SelectTrigger>
@@ -160,9 +308,9 @@ export default function CoursesPage({ favorites, setFavorites, isMobileMenuOpen,
                         <SelectItem value="Undergraduate">Undergraduate</SelectItem>
                         <SelectItem value="Postgraduate">Postgraduate</SelectItem>
                         <SelectItem value="Research">Research</SelectItem>
+                        <SelectItem value="Mixed Level">Mixed Level</SelectItem>
                         <SelectItem value="University Foundation">Foundation</SelectItem>
                         <SelectItem value="Enabling">Enabling</SelectItem>
-                        <SelectItem value="Mixed Level">Mixed Level</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

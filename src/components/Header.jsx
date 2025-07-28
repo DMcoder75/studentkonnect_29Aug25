@@ -1,13 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Search, User, Heart, Bell, Menu, LogOut } from 'lucide-react'
+import { Search, User, Heart, Bell, Menu, LogOut, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { dbHelpers } from '../lib/supabase'
 
-export default function Header({ onMobileMenuToggle }) {
+export default function Header({ onMobileMenuToggle, onLogout }) {
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
@@ -32,7 +31,6 @@ export default function Header({ onMobileMenuToggle }) {
       if (searchQuery.trim().length > 2) {
         setIsSearching(true)
         try {
-          const results = await dbHelpers.searchAll(searchQuery)
           setSearchResults(results)
           setShowResults(true)
         } catch (error) {
@@ -57,7 +55,11 @@ export default function Header({ onMobileMenuToggle }) {
   }
 
   const handleLogout = () => {
-    logout()
+    if (onLogout) {
+      onLogout()
+    } else {
+      logout()
+    }
     navigate('/')
   }
 
@@ -74,13 +76,13 @@ export default function Header({ onMobileMenuToggle }) {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div 
-            className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/')}
           >
-            <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-lg p-2 font-bold text-lg">
-              UP
+            <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-lg p-2 font-bold text-lg shadow-lg">
+              SK
             </div>
-            <span className="text-xl font-bold text-gray-800 hidden sm:block">Your Uni Pathway</span>
+            <span className="text-xl font-bold text-gray-800 hidden sm:block">StudentKonnect</span>
           </div>
 
           {/* Global Search - Visible on all devices */}
@@ -223,7 +225,7 @@ export default function Header({ onMobileMenuToggle }) {
                 >
                   <User className="h-5 w-5 md:mr-2" />
                   <span className="hidden md:inline">
-                    {user?.firstName || 'Profile'}
+                    {user?.first_name ? `Hi ${user.first_name}!` : 'Profile'}
                   </span>
                 </Button>
 
@@ -241,15 +243,28 @@ export default function Header({ onMobileMenuToggle }) {
             )}
 
             {!isAuthenticated() && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                onClick={() => navigate('/sign-in')}
-              >
-                <User className="h-5 w-5 md:mr-2" />
-                <span className="hidden md:inline">Sign In</span>
-              </Button>
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                  onClick={() => navigate('/sign-in')}
+                >
+                  <User className="h-5 w-5 md:mr-2" />
+                  <span className="hidden md:inline">Sign In</span>
+                </Button>
+                
+                {/* Admin Button */}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Shield className="h-5 w-5 md:mr-2" />
+                  <span className="hidden md:inline">Admin</span>
+                </Button>
+              </>
             )}
 
             {/* Mobile Menu Button - Positioned on the right */}

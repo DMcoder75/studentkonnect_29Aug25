@@ -17,9 +17,9 @@ import {
   CheckCircle,
   AlertCircle,
   GraduationCap,
-  BarChart3
+  BarChart3,
+  MapPin
 } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
 import Sidebar from './Sidebar'
 
 export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose }) {
@@ -31,9 +31,22 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
   const [allCourses, setAllCourses] = useState([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('calculator')
+  const [availableSubjects, setAvailableSubjects] = useState([])
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState('')
+  const [availableJurisdictions, setAvailableJurisdictions] = useState([])
 
-  // Australian subject list with scaling factors
-  const australianSubjects = [
+  // Jurisdiction display names
+  const jurisdictionNames = {
+    'NSW-HSC': 'NSW (HSC)',
+    'VIC-VCE': 'VIC (VCE)',
+    'QLD-QCAA': 'QLD (QCAA)',
+    'SA-SACE': 'SA (SACE)',
+    'WA-WACE': 'WA (WACE)',
+    'TAS-TASC': 'TAS (TASC)'
+  }
+
+  // Australian subject list with scaling factors (fallback if database fails)
+  const fallbackSubjects = [
     { name: 'English (Standard)', scaling: 1.0, isEnglish: true },
     { name: 'English (Advanced)', scaling: 1.05, isEnglish: true },
     { name: 'English Extension 1', scaling: 1.1, isEnglish: true },
@@ -62,6 +75,12 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
     { name: 'Textiles and Design', scaling: 0.85 }
   ]
 
+  // Get scaling and English status for a subject
+  const getSubjectData = (subjectName) => {
+    const fallback = fallbackSubjects.find(s => s.name === subjectName)
+    return fallback || { scaling: 1.0, isEnglish: false }
+  }
+
   // Grade to mark conversion
   const gradeToMark = {
     'A': 90,
@@ -73,16 +92,132 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
   }
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchInitialData = async () => {
       try {
-        const coursesData = await dbHelpers.getCourses()
+        // Fetch courses
         setAllCourses(coursesData)
+        
+        // Fetch available jurisdictions
+        console.log('Fetched jurisdictions:', jurisdictionsData)
+        setAvailableJurisdictions(jurisdictionsData)
+        
+        // Set default jurisdiction to NSW-HSC if available
+        if (jurisdictionsData.length > 0) {
+          const defaultJurisdiction = jurisdictionsData.includes('NSW-HSC') ? 'NSW-HSC' : jurisdictionsData[0]
+          setSelectedJurisdiction(defaultJurisdiction)
+        }
+        
       } catch (error) {
-        console.error('Error fetching courses:', error)
+        console.error('Error fetching initial data:', error)
       }
     }
-    fetchCourses()
+    fetchInitialData()
   }, [])
+
+  // Organize subjects: key subjects first, then languages
+  const organizeSubjects = (subjects) => {
+    if (!subjects || subjects.length === 0) return []
+    
+    // Define key subjects that should appear first
+    const keySubjectKeywords = [
+      'english', 'mathematics', 'math', 'biology', 'chemistry', 'physics', 
+      'history', 'geography', 'economics', 'business', 'accounting', 
+      'psychology', 'sociology', 'philosophy', 'art', 'music', 'drama',
+      'computing', 'information', 'technology', 'science', 'studies'
+    ]
+    
+    // Define language keywords
+    const languageKeywords = [
+      'chinese', 'japanese', 'korean', 'french', 'german', 'italian', 'spanish',
+      'arabic', 'hindi', 'indonesian', 'vietnamese', 'greek', 'latin',
+      'albanian', 'armenian', 'bosnian', 'bulgarian', 'croatian', 'dutch',
+      'hebrew', 'hungarian', 'macedonian', 'polish', 'portuguese', 'russian',
+      'serbian', 'slovenian', 'turkish', 'ukrainian', 'auslan'
+    ]
+    
+    const keySubjects = []
+    const languageSubjects = []
+    const otherSubjects = []
+    
+    subjects.forEach(subject => {
+      const subjectNameLower = subject.name.toLowerCase()
+      
+      // Check if it's a language subject
+      const isLanguage = languageKeywords.some(keyword => 
+        subjectNameLower.includes(keyword)
+      )
+      
+      // Check if it's a key subject
+      const isKeySubject = keySubjectKeywords.some(keyword => 
+        subjectNameLower.includes(keyword)
+      )
+      
+      if (isLanguage) {
+        languageSubjects.push(subject)
+      } else if (isKeySubject) {
+        keySubjects.push(subject)
+      } else {
+        otherSubjects.push(subject)
+      }
+    })
+    
+    // Sort each category alphabetically
+    keySubjects.sort((a, b) => a.name.localeCompare(b.name))
+    languageSubjects.sort((a, b) => a.name.localeCompare(b.name))
+    otherSubjects.sort((a, b) => a.name.localeCompare(b.name))
+    
+    // Return organized subjects: key subjects first, then others, then languages
+    return [...keySubjects, ...otherSubjects, ...languageSubjects]
+  }
+
+  // Fetch subjects when jurisdiction changes
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      if (!selectedJurisdiction) return
+      
+      try {
+        // Fetch subjects for selected jurisdiction
+        console.log(`Fetched subjects for ${selectedJurisdiction}:`, subjectsData)
+        
+        if (subjectsData && subjectsData.length > 0) {
+          // Map database subjects to include scaling and English status
+          const mappedSubjects = subjectsData.map(dbSubject => {
+            const subjectData = getSubjectData(dbSubject.name)
+            return {
+              name: dbSubject.name,
+              code: dbSubject.code,
+              jurisdiction: dbSubject.jurisdiction,
+              scaling: subjectData.scaling,
+              isEnglish: subjectData.isEnglish
+            }
+          })
+          
+          // Organize subjects: key subjects first, then languages
+          const organizedSubjects = organizeSubjects(mappedSubjects)
+          setAvailableSubjects(organizedSubjects)
+          console.log(`Using ${organizedSubjects.length} organized subjects from database for ${selectedJurisdiction}`)
+        } else {
+          // Fallback to hardcoded subjects if database is empty
+          const organizedFallback = organizeSubjects(fallbackSubjects)
+          setAvailableSubjects(organizedFallback)
+          console.log('Using organized fallback subjects')
+        }
+        
+        // Reset subjects when jurisdiction changes
+        setSubjects([{ id: 1, name: '', grade: '', scaledScore: 0, isEnglish: false }])
+        setCalculatedATAR(null)
+        setRecommendedCourses([])
+        
+      } catch (error) {
+        console.error('Error fetching subjects:', error)
+        // Use fallback subjects on error
+        setAvailableSubjects(fallbackSubjects)
+        console.log('Using fallback subjects due to error')
+      }
+    }
+    
+    fetchSubjects()
+  }, [selectedJurisdiction])
 
   const addSubject = () => {
     const newId = Math.max(...subjects.map(s => s.id)) + 1
@@ -101,7 +236,7 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
         const updated = { ...subject, [field]: value }
         
         if (field === 'name') {
-          const subjectData = australianSubjects.find(s => s.name === value)
+          const subjectData = availableSubjects.find(s => s.name === value)
           updated.isEnglish = subjectData?.isEnglish || false
         }
         
@@ -118,68 +253,157 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
   const calculateScaledScore = (subjectName, grade) => {
     if (!subjectName || !grade) return 0
     
-    const subject = australianSubjects.find(s => s.name === subjectName)
+    const subject = availableSubjects.find(s => s.name === subjectName)
     const baseMark = gradeToMark[grade] || 0
     const scaling = subject?.scaling || 1.0
     
     return Math.round(baseMark * scaling)
   }
-
   const calculateATAR = () => {
     setLoading(true)
     
-    // Validate inputs
-    const validSubjects = subjects.filter(s => s.name && s.grade)
-    
-    if (validSubjects.length < 4) {
-      alert('Please enter at least 4 subjects with grades')
+    setTimeout(() => {
+      try {
+        const validSubjects = subjects.filter(s => s.name && s.grade)
+        
+        if (validSubjects.length < 4) {
+          alert('Please enter at least 4 subjects to calculate ATAR')
+          setLoading(false)
+          return
+        }
+
+        // State-specific ATAR calculation
+        let atar = 0
+        
+        switch (selectedJurisdiction) {
+          case 'NSW-HSC':
+            atar = calculateNSWATAR(validSubjects)
+            break
+          case 'VIC-VCE':
+            atar = calculateVICATAR(validSubjects)
+            break
+          case 'QLD-QCAA':
+            atar = calculateQLDATAR(validSubjects)
+            break
+          case 'SA-SACE':
+            atar = calculateSAATAR(validSubjects)
+            break
+          case 'WA-WACE':
+            atar = calculateWAATAR(validSubjects)
+            break
+          case 'TAS-TASC':
+            atar = calculateTASATAR(validSubjects)
+            break
+          default:
+            atar = calculateNSWATAR(validSubjects) // Default to NSW
+        }
+        
+        setCalculatedATAR(Math.round(atar * 100) / 100)
+        
+        // Get recommended courses based on ATAR
+        const eligibleCourses = allCourses.filter(course => 
+          course.atar_cutoff && course.atar_cutoff <= atar
+        ).sort((a, b) => b.atar_cutoff - a.atar_cutoff).slice(0, 10)
+        
+        setRecommendedCourses(eligibleCourses)
+        setActiveTab('results')
+      } catch (error) {
+        console.error('Error calculating ATAR:', error)
+        alert('Error calculating ATAR. Please check your inputs.')
+      }
+      
       setLoading(false)
-      return
+    }, 1500)
+  }
+
+  // NSW HSC ATAR Calculation
+  const calculateNSWATAR = (validSubjects) => {
+    // NSW uses best 10 units (5 subjects), with English mandatory
+    const englishSubjects = validSubjects.filter(s => s.isEnglish)
+    const nonEnglishSubjects = validSubjects.filter(s => !s.isEnglish)
+    
+    if (englishSubjects.length === 0) {
+      throw new Error('English is mandatory for NSW HSC ATAR calculation')
     }
+    
+    // Take best English subject and best 4 other subjects
+    const bestEnglish = englishSubjects.sort((a, b) => b.scaledScore - a.scaledScore)[0]
+    const bestOthers = nonEnglishSubjects.sort((a, b) => b.scaledScore - a.scaledScore).slice(0, 4)
+    
+    const selectedSubjects = [bestEnglish, ...bestOthers]
+    const totalScore = selectedSubjects.reduce((sum, s) => sum + s.scaledScore, 0)
+    
+    // Convert to ATAR (simplified calculation)
+    return Math.min(99.95, Math.max(0, (totalScore / 500) * 99.95))
+  }
 
-    // Check for English requirement
-    const hasEnglish = validSubjects.some(s => s.isEnglish)
-    if (!hasEnglish) {
-      alert('At least one English subject is required for ATAR calculation')
-      setLoading(false)
-      return
+  // VIC VCE ATAR Calculation
+  const calculateVICATAR = (validSubjects) => {
+    // VIC uses best 4 subjects plus 10% of 5th and 6th subjects
+    const sortedSubjects = validSubjects.sort((a, b) => b.scaledScore - a.scaledScore)
+    
+    let totalScore = 0
+    for (let i = 0; i < Math.min(4, sortedSubjects.length); i++) {
+      totalScore += sortedSubjects[i].scaledScore
     }
+    
+    // Add 10% of 5th and 6th subjects if available
+    if (sortedSubjects.length > 4) totalScore += sortedSubjects[4].scaledScore * 0.1
+    if (sortedSubjects.length > 5) totalScore += sortedSubjects[5].scaledScore * 0.1
+    
+    return Math.min(99.95, Math.max(0, (totalScore / 400) * 99.95))
+  }
 
-    // Calculate ATAR using simplified Australian method
-    const sortedScores = validSubjects
-      .map(s => s.scaledScore)
-      .sort((a, b) => b - a)
-      .slice(0, 10) // Top 10 units
+  // QLD QCAA ATAR Calculation
+  const calculateQLDATAR = (validSubjects) => {
+    // QLD uses best 5 subjects with English mandatory
+    const englishSubjects = validSubjects.filter(s => s.isEnglish)
+    
+    if (englishSubjects.length === 0) {
+      throw new Error('English is mandatory for QLD ATAR calculation')
+    }
+    
+    const sortedSubjects = validSubjects.sort((a, b) => b.scaledScore - a.scaledScore)
+    const best5 = sortedSubjects.slice(0, 5)
+    const totalScore = best5.reduce((sum, s) => sum + s.scaledScore, 0)
+    
+    return Math.min(99.95, Math.max(0, (totalScore / 500) * 99.95))
+  }
 
-    // Ensure English is included (best English score)
-    const englishScores = validSubjects
-      .filter(s => s.isEnglish)
-      .map(s => s.scaledScore)
-      .sort((a, b) => b - a)
+  // SA SACE ATAR Calculation
+  const calculateSAATAR = (validSubjects) => {
+    // SA uses best 4 subjects
+    const sortedSubjects = validSubjects.sort((a, b) => b.scaledScore - a.scaledScore)
+    const best4 = sortedSubjects.slice(0, 4)
+    const totalScore = best4.reduce((sum, s) => sum + s.scaledScore, 0)
     
-    const bestEnglishScore = englishScores[0] || 0
+    return Math.min(99.95, Math.max(0, (totalScore / 400) * 99.95))
+  }
+
+  // WA WACE ATAR Calculation
+  const calculateWAATAR = (validSubjects) => {
+    // WA uses best 4 subjects with English mandatory
+    const englishSubjects = validSubjects.filter(s => s.isEnglish)
     
-    // Take best 4 subjects including English
-    const topScores = [bestEnglishScore, ...sortedScores.filter(score => score !== bestEnglishScore).slice(0, 3)]
+    if (englishSubjects.length === 0) {
+      throw new Error('English is mandatory for WA ATAR calculation')
+    }
     
-    // Calculate aggregate (simplified)
-    const aggregate = topScores.reduce((sum, score) => sum + score, 0)
+    const sortedSubjects = validSubjects.sort((a, b) => b.scaledScore - a.scaledScore)
+    const best4 = sortedSubjects.slice(0, 4)
+    const totalScore = best4.reduce((sum, s) => sum + s.scaledScore, 0)
     
-    // Convert to ATAR (simplified conversion)
-    let atar = Math.round((aggregate / 400) * 100)
-    atar = Math.min(99.95, Math.max(30, atar)) // ATAR range 30-99.95
+    return Math.min(99.95, Math.max(0, (totalScore / 400) * 99.95))
+  }
+
+  // TAS TASC ATAR Calculation
+  const calculateTASATAR = (validSubjects) => {
+    // TAS uses best 5 subjects
+    const sortedSubjects = validSubjects.sort((a, b) => b.scaledScore - a.scaledScore)
+    const best5 = sortedSubjects.slice(0, 5)
+    const totalScore = best5.reduce((sum, s) => sum + s.scaledScore, 0)
     
-    setCalculatedATAR(atar)
-    
-    // Find recommended courses
-    const eligibleCourses = allCourses
-      .filter(course => course.atar_cutoff && course.atar_cutoff <= atar)
-      .sort((a, b) => b.atar_cutoff - a.atar_cutoff)
-      .slice(0, 20)
-    
-    setRecommendedCourses(eligibleCourses)
-    setActiveTab('results')
-    setLoading(false)
+    return Math.min(99.95, Math.max(0, (totalScore / 500) * 99.95))
   }
 
   const getATARColor = (atar) => {
@@ -240,14 +464,60 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
 
               {/* Calculator Tab */}
               <TabsContent value="calculator" className="space-y-6">
+                {/* Jurisdiction Selector */}
                 <Card className="shadow-lg border-0">
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <Target className="h-6 w-6 mr-2 text-purple-600" />
-                      Enter Your Subjects and Grades
+                      <MapPin className="h-6 w-6 mr-2 text-purple-600" />
+                      Select Your State/Territory
                     </CardTitle>
+                    <p className="text-sm text-gray-600">
+                      Choose your state to load the correct subjects and ATAR calculation method.
+                    </p>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">State/Territory</label>
+                      <Select 
+                        value={selectedJurisdiction} 
+                        onValueChange={setSelectedJurisdiction}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select your state/territory" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableJurisdictions.map((jurisdiction) => (
+                            <SelectItem key={jurisdiction} value={jurisdiction}>
+                              {jurisdictionNames[jurisdiction] || jurisdiction}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {selectedJurisdiction && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-700">
+                          <strong>{jurisdictionNames[selectedJurisdiction]}</strong> selected. 
+                          Subjects and ATAR calculation will be specific to this jurisdiction.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Subjects Entry */}
+                {selectedJurisdiction && (
+                  <Card className="shadow-lg border-0">
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Target className="h-6 w-6 mr-2 text-purple-600" />
+                        Enter Your Subjects and Grades
+                      </CardTitle>
+                      <p className="text-sm text-gray-600">
+                        Showing subjects for {jurisdictionNames[selectedJurisdiction]}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                     {subjects.map((subject, index) => (
                       <div key={subject.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
                         <div className="space-y-2">
@@ -260,7 +530,7 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
                               <SelectValue placeholder="Select subject" />
                             </SelectTrigger>
                             <SelectContent>
-                              {australianSubjects.map((subj) => (
+                              {availableSubjects.map((subj) => (
                                 <SelectItem key={subj.name} value={subj.name}>
                                   {subj.name} {subj.isEnglish && '(English)'}
                                 </SelectItem>
@@ -334,6 +604,7 @@ export default function ATARCalculatorPage({ isMobileMenuOpen, onMobileMenuClose
                     </div>
                   </CardContent>
                 </Card>
+                )}
               </TabsContent>
 
               {/* Results Tab */}

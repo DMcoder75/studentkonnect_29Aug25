@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { dbHelpers } from '../lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -88,21 +87,24 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
         // For demo purposes, show available demo accounts
         setSuccess(`Account creation is disabled in demo mode. Please use one of these demo accounts:
         
-        Student: student@unipath.com / password@123
-        Professor: professor@unipath.com / password@123
-        Authority: authority@unipath.com / password@123
-        Admin: admin@unipath.com / password@123`)
+        priya.dubey@email.com / student123
+        tanvi.kulkarni@email.com / student123
+        pranav.joshi@email.com / student123
+        rohit.gupta@email.com / student123
+        
+        And 16 more student accounts with password: student123`)
         setIsSignUp(false)
         setFormData({
-          email: 'student@unipath.com',
+          email: 'priya.dubey@email.com',
           password: '',
           confirmPassword: '',
           firstName: '',
           lastName: ''
         })
       } else {
-        // Use database authentication with role support
-        const result = await dbHelpers.loginUser(formData.email, formData.password)
+        // Import and use database authentication
+        const { authService } = await import('../services/authService')
+        const result = await authService.authenticateUser(formData.email, formData.password)
         
         if (result.error) {
           setError(result.error)
@@ -112,16 +114,17 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
         if (result.user) {
           // Use the login function from auth context
           login(result.user)
-          setSuccess(`Sign in successful as ${result.user.role_name}! Redirecting...`)
+          setSuccess(`Welcome back, ${result.user.firstName}! Redirecting to your dashboard...`)
           
           setTimeout(() => {
-            navigate('/')
-          }, 1000)
+            navigate('/student/profile')
+          }, 1500)
         } else {
           setError('Invalid credentials')
         }
       }
     } catch (err) {
+      console.error('Authentication error:', err)
       setError('An error occurred. Please try again.')
     } finally {
       setLoading(false)

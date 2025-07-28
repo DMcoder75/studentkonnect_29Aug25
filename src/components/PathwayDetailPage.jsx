@@ -21,7 +21,6 @@ import {
   Calendar,
   DollarSign
 } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
 import Sidebar from './Sidebar'
 
 export default function PathwayDetailPage({ isMobileMenuOpen, onMobileMenuClose }) {
@@ -39,7 +38,6 @@ export default function PathwayDetailPage({ isMobileMenuOpen, onMobileMenuClose 
         setLoading(true)
         
         // Fetch pathway details
-        const pathways = await dbHelpers.getPathways()
         const pathwayData = pathways.find(p => p.id === parseInt(id))
         
         if (!pathwayData) {
@@ -51,8 +49,6 @@ export default function PathwayDetailPage({ isMobileMenuOpen, onMobileMenuClose 
         
         // Fetch related courses and professions
         const [coursesData, professionsData] = await Promise.all([
-          dbHelpers.getCourses(),
-          dbHelpers.getProfessions()
         ])
         
         // Filter related courses based on pathway name keywords

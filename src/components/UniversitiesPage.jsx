@@ -1,27 +1,186 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowRight, Star, Heart, Search, Filter, GraduationCap } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
 import Sidebar from './Sidebar'
 
 export default function UniversitiesPage({ favorites, setFavorites, isMobileMenuOpen, onMobileMenuClose }) {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [universities, setUniversities] = useState([])
   const [filteredUniversities, setFilteredUniversities] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [loading, setLoading] = useState(true)
 
+  // Read URL parameters and set initial filter state
+  useEffect(() => {
+    const typeParam = searchParams.get('type')
+    if (typeParam) {
+      setTypeFilter(typeParam)
+    } else {
+      setTypeFilter('all')
+    }
+  }, [searchParams])
+
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
         setLoading(true)
-        const data = await dbHelpers.getUniversities()
-        setUniversities(data)
-        setFilteredUniversities(data)
+        
+        // Sample universities data
+        const sampleData = [
+          {
+            id: 1,
+            name: "University of Melbourne",
+            type: "Group of Eight",
+            global_ranking: 33,
+            location: "Melbourne, VIC",
+            website_url: "https://www.unimelb.edu.au",
+            description: "Australia's leading university with world-class research and teaching excellence.",
+            established: 1853,
+            student_count: 50000,
+            international_students: 18000
+          },
+          {
+            id: 2,
+            name: "University of Sydney",
+            type: "Group of Eight",
+            global_ranking: 41,
+            location: "Sydney, NSW",
+            website_url: "https://www.sydney.edu.au",
+            description: "Australia's first university, established in 1850 with a rich history of academic excellence.",
+            established: 1850,
+            student_count: 52000,
+            international_students: 22000
+          },
+          {
+            id: 3,
+            name: "Australian National University",
+            type: "Group of Eight",
+            global_ranking: 30,
+            location: "Canberra, ACT",
+            website_url: "https://www.anu.edu.au",
+            description: "Australia's national university with excellence in research and education.",
+            established: 1946,
+            student_count: 25000,
+            international_students: 12000
+          },
+          {
+            id: 4,
+            name: "UNSW Sydney",
+            type: "Group of Eight",
+            global_ranking: 45,
+            location: "Sydney, NSW",
+            website_url: "https://www.unsw.edu.au",
+            description: "Leading university in engineering, business and medicine with strong industry connections.",
+            established: 1949,
+            student_count: 65000,
+            international_students: 25000
+          },
+          {
+            id: 5,
+            name: "University of Queensland",
+            type: "Group of Eight",
+            global_ranking: 50,
+            location: "Brisbane, QLD",
+            website_url: "https://www.uq.edu.au",
+            description: "Premier research university in Queensland with beautiful campus and excellent facilities.",
+            established: 1909,
+            student_count: 55000,
+            international_students: 20000
+          },
+          {
+            id: 6,
+            name: "Monash University",
+            type: "Group of Eight",
+            global_ranking: 57,
+            location: "Melbourne, VIC",
+            website_url: "https://www.monash.edu",
+            description: "Global university with campuses worldwide and strong research focus.",
+            established: 1958,
+            student_count: 80000,
+            international_students: 30000
+          },
+          {
+            id: 7,
+            name: "University of Western Australia",
+            type: "Group of Eight",
+            global_ranking: 90,
+            location: "Perth, WA",
+            website_url: "https://www.uwa.edu.au",
+            description: "Leading university in Western Australia with beautiful campus and strong research programs.",
+            established: 1911,
+            student_count: 25000,
+            international_students: 8000
+          },
+          {
+            id: 8,
+            name: "University of Adelaide",
+            type: "Group of Eight",
+            global_ranking: 106,
+            location: "Adelaide, SA",
+            website_url: "https://www.adelaide.edu.au",
+            description: "Historic university with strong traditions in research and education.",
+            established: 1874,
+            student_count: 27000,
+            international_students: 9000
+          },
+          {
+            id: 9,
+            name: "University of Technology Sydney",
+            type: "Technology Network",
+            global_ranking: 133,
+            location: "Sydney, NSW",
+            website_url: "https://www.uts.edu.au",
+            description: "Modern technology-focused university with strong industry partnerships.",
+            established: 1988,
+            student_count: 45000,
+            international_students: 15000
+          },
+          {
+            id: 10,
+            name: "Queensland University of Technology",
+            type: "Technology Network",
+            global_ranking: 213,
+            location: "Brisbane, QLD",
+            website_url: "https://www.qut.edu.au",
+            description: "Technology-focused university with practical, career-oriented programs.",
+            established: 1989,
+            student_count: 50000,
+            international_students: 12000
+          },
+          {
+            id: 11,
+            name: "Griffith University",
+            type: "Regional",
+            global_ranking: 300,
+            location: "Gold Coast, QLD",
+            website_url: "https://www.griffith.edu.au",
+            description: "Innovative university with strong focus on sustainability and social justice.",
+            established: 1971,
+            student_count: 50000,
+            international_students: 15000
+          },
+          {
+            id: 12,
+            name: "Macquarie University",
+            type: "Regional",
+            global_ranking: 195,
+            location: "Sydney, NSW",
+            website_url: "https://www.mq.edu.au",
+            description: "Research-intensive university with beautiful campus and strong business programs.",
+            established: 1964,
+            student_count: 45000,
+            international_students: 18000
+          }
+        ]
+        
+        setUniversities(sampleData)
+        setFilteredUniversities(sampleData)
       } catch (error) {
         console.error('Error fetching universities:', error)
       } finally {
@@ -55,6 +214,19 @@ export default function UniversitiesPage({ favorites, setFavorites, isMobileMenu
 
     setFilteredUniversities(filtered)
   }, [searchTerm, typeFilter, universities])
+
+  const handleTypeFilterChange = (newType) => {
+    setTypeFilter(newType)
+    
+    // Update URL parameters
+    const newSearchParams = new URLSearchParams(searchParams)
+    if (newType === 'all') {
+      newSearchParams.delete('type')
+    } else {
+      newSearchParams.set('type', newType)
+    }
+    setSearchParams(newSearchParams)
+  }
 
   const toggleFavorite = (universityId) => {
     setFavorites(prev => 
@@ -120,7 +292,7 @@ export default function UniversitiesPage({ favorites, setFavorites, isMobileMenu
                 </div>
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-600" />
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <Select value={typeFilter} onValueChange={handleTypeFilterChange}>
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Filter by type" />
                     </SelectTrigger>

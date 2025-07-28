@@ -1,29 +1,139 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowRight, Search, Filter, Route, BookOpen } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
 import Sidebar from './Sidebar'
 
 export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [pathways, setPathways] = useState([])
   const [filteredPathways, setFilteredPathways] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [loading, setLoading] = useState(true)
 
+  // Read URL parameters and set initial filter state
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    if (categoryParam) {
+      setCategoryFilter(categoryParam)
+    } else {
+      setCategoryFilter('all')
+    }
+  }, [searchParams])
+
   useEffect(() => {
     const fetchPathways = async () => {
       try {
         setLoading(true)
-        const data = await dbHelpers.getPathways()
-        setPathways(data)
-        setFilteredPathways(data)
+        
+        // Sample pathways data
+        const sampleData = [
+          {
+            id: 1,
+            title: "Medicine & Health Sciences",
+            category: "Health",
+            description: "Comprehensive pathway to medical careers including medicine, nursing, pharmacy, and allied health professions with multiple entry points and specialization options.",
+            duration: "3-8 years",
+            entry_requirements: "ATAR 85-99.95",
+            career_prospects: "Doctor, Nurse, Pharmacist, Physiotherapist, Dentist",
+            average_salary: "$85,000 - $200,000",
+            universities: ["University of Melbourne", "University of Sydney", "Monash University"],
+            courses_count: 45
+          },
+          {
+            id: 2,
+            title: "Engineering & Technology",
+            category: "Engineering",
+            description: "Diverse engineering disciplines from civil to software engineering, preparing students for the future of technology and innovation.",
+            duration: "4-5 years",
+            entry_requirements: "ATAR 80-96",
+            career_prospects: "Software Engineer, Civil Engineer, Mechanical Engineer, Data Scientist",
+            average_salary: "$75,000 - $150,000",
+            universities: ["UNSW Sydney", "University of Melbourne", "University of Queensland"],
+            courses_count: 38
+          },
+          {
+            id: 3,
+            title: "Business & Commerce",
+            category: "Business",
+            description: "Business pathways covering finance, marketing, management, and entrepreneurship with strong industry connections and practical experience.",
+            duration: "3-4 years",
+            entry_requirements: "ATAR 70-95",
+            career_prospects: "Business Analyst, Marketing Manager, Financial Advisor, Consultant",
+            average_salary: "$65,000 - $120,000",
+            universities: ["University of Melbourne", "University of Sydney", "Monash University"],
+            courses_count: 52
+          },
+          {
+            id: 4,
+            title: "Law & Legal Studies",
+            category: "Law",
+            description: "Legal education pathways from undergraduate law to specialized postgraduate programs in various areas of legal practice.",
+            duration: "4-6 years",
+            entry_requirements: "ATAR 95-99.5",
+            career_prospects: "Lawyer, Barrister, Legal Advisor, Judge, Corporate Counsel",
+            average_salary: "$80,000 - $180,000",
+            universities: ["University of Melbourne", "University of Sydney", "ANU"],
+            courses_count: 28
+          },
+          {
+            id: 5,
+            title: "Education & Teaching",
+            category: "Education",
+            description: "Teaching pathways for primary, secondary, and tertiary education with specializations in various subjects and age groups.",
+            duration: "4 years",
+            entry_requirements: "ATAR 65-85",
+            career_prospects: "Primary Teacher, Secondary Teacher, Education Administrator, Curriculum Developer",
+            average_salary: "$60,000 - $95,000",
+            universities: ["Deakin University", "University of Melbourne", "University of Sydney"],
+            courses_count: 35
+          },
+          {
+            id: 6,
+            title: "Arts & Creative Industries",
+            category: "Arts",
+            description: "Creative pathways including visual arts, performing arts, design, media, and creative writing with industry connections.",
+            duration: "3-4 years",
+            entry_requirements: "ATAR 60-90",
+            career_prospects: "Graphic Designer, Artist, Writer, Film Producer, Art Director",
+            average_salary: "$50,000 - $85,000",
+            universities: ["RMIT University", "University of Technology Sydney", "Griffith University"],
+            courses_count: 42
+          },
+          {
+            id: 7,
+            title: "Science & Research",
+            category: "Science",
+            description: "Scientific research pathways covering biology, chemistry, physics, environmental science, and emerging fields.",
+            duration: "3-8 years",
+            entry_requirements: "ATAR 75-95",
+            career_prospects: "Research Scientist, Laboratory Technician, Environmental Consultant, Data Analyst",
+            average_salary: "$65,000 - $110,000",
+            universities: ["Australian National University", "University of Melbourne", "University of Queensland"],
+            courses_count: 48
+          },
+          {
+            id: 8,
+            title: "Information Technology",
+            category: "Technology",
+            description: "IT pathways covering software development, cybersecurity, data science, and emerging technologies.",
+            duration: "3-4 years",
+            entry_requirements: "ATAR 70-95",
+            career_prospects: "Software Developer, Cybersecurity Analyst, Data Scientist, IT Manager",
+            average_salary: "$70,000 - $140,000",
+            universities: ["University of Technology Sydney", "UNSW Sydney", "Monash University"],
+            courses_count: 36
+          }
+        ]
+        
+        setPathways(sampleData)
+        setFilteredPathways(sampleData)
       } catch (error) {
         console.error('Error fetching pathways:', error)
       } finally {
@@ -40,7 +150,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(pathway =>
-        pathway.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pathway.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (pathway.description && pathway.description.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
@@ -48,12 +158,12 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
     // Filter by category
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(pathway => {
-        const name = pathway.name.toLowerCase()
-        if (categoryFilter === 'business') return name.includes('business') || name.includes('accounting') || name.includes('finance')
-        if (categoryFilter === 'engineering') return name.includes('engineering') || name.includes('technology')
-        if (categoryFilter === 'health') return name.includes('health') || name.includes('medical') || name.includes('nursing')
-        if (categoryFilter === 'education') return name.includes('education') || name.includes('teaching')
-        if (categoryFilter === 'arts') return name.includes('arts') || name.includes('creative') || name.includes('design')
+        const title = pathway.title.toLowerCase()
+        if (categoryFilter === 'business') return title.includes('business') || title.includes('commerce')
+        if (categoryFilter === 'engineering') return title.includes('engineering') || title.includes('technology')
+        if (categoryFilter === 'health') return title.includes('health') || title.includes('medicine')
+        if (categoryFilter === 'education') return title.includes('education') || title.includes('teaching')
+        if (categoryFilter === 'arts') return title.includes('arts') || title.includes('creative')
         return true
       })
     }
@@ -61,22 +171,41 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
     setFilteredPathways(filtered)
   }, [searchTerm, categoryFilter, pathways])
 
-  const getCategoryColor = (pathwayName) => {
-    const name = pathwayName.toLowerCase()
-    if (name.includes('business') || name.includes('accounting') || name.includes('finance')) {
+  const handleCategoryFilterChange = (newCategory) => {
+    setCategoryFilter(newCategory)
+    
+    // Update URL parameters
+    const newSearchParams = new URLSearchParams(searchParams)
+    if (newCategory === 'all') {
+      newSearchParams.delete('category')
+    } else {
+      newSearchParams.set('category', newCategory)
+    }
+    setSearchParams(newSearchParams)
+  }
+
+  const getCategoryColor = (pathwayTitle) => {
+    const title = pathwayTitle.toLowerCase()
+    if (title.includes('business') || title.includes('commerce')) {
       return 'bg-blue-100 text-blue-700'
     }
-    if (name.includes('engineering') || name.includes('technology')) {
+    if (title.includes('engineering') || title.includes('technology')) {
       return 'bg-purple-100 text-purple-700'
     }
-    if (name.includes('health') || name.includes('medical') || name.includes('nursing')) {
+    if (title.includes('health') || title.includes('medicine')) {
       return 'bg-green-100 text-green-700'
     }
-    if (name.includes('education') || name.includes('teaching')) {
+    if (title.includes('education') || title.includes('teaching')) {
       return 'bg-orange-100 text-orange-700'
     }
-    if (name.includes('arts') || name.includes('creative') || name.includes('design')) {
+    if (title.includes('arts') || title.includes('creative')) {
       return 'bg-pink-100 text-pink-700'
+    }
+    if (title.includes('science') || title.includes('research')) {
+      return 'bg-cyan-100 text-cyan-700'
+    }
+    if (title.includes('law') || title.includes('legal')) {
+      return 'bg-indigo-100 text-indigo-700'
     }
     return 'bg-gray-100 text-gray-700'
   }
@@ -137,7 +266,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-600" />
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <Select value={categoryFilter} onValueChange={handleCategoryFilterChange}>
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Filter by category" />
                     </SelectTrigger>
@@ -173,18 +302,14 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {filteredPathways.map((pathway) => (
-                    <Card key={pathway.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-                      <CardHeader className="pb-4">
+                    <Card key={pathway.id} className="group hover:shadow-lg transition-all duration-200 border-l-4 border-l-purple-500">
+                      <CardHeader className="pb-3">
                         <div className="flex items-center justify-between mb-2">
                           <Badge 
                             variant="secondary" 
-                            className={getCategoryColor(pathway.name)}
+                            className={getCategoryColor(pathway.title)}
                           >
-                            {pathway.name.includes('business') || pathway.name.includes('accounting') ? 'Business' :
-                             pathway.name.includes('engineering') || pathway.name.includes('technology') ? 'Engineering' :
-                             pathway.name.includes('health') || pathway.name.includes('medical') ? 'Health' :
-                             pathway.name.includes('education') || pathway.name.includes('teaching') ? 'Education' :
-                             pathway.name.includes('arts') || pathway.name.includes('creative') ? 'Arts' : 'General'}
+                            {pathway.category}
                           </Badge>
                           <div className="flex items-center text-purple-600">
                             <BookOpen className="h-4 w-4 mr-1" />
@@ -192,7 +317,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
                           </div>
                         </div>
                         <CardTitle className="text-xl group-hover:text-purple-600 transition-colors">
-                          {pathway.name}
+                          {pathway.title}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -201,23 +326,15 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
                             {pathway.description || 'Structured pathway designed to help you achieve your career goals through specialized courses and programs.'}
                           </p>
                           
-                          {pathway.typical_progression && pathway.typical_progression.length > 0 && (
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-semibold text-gray-700">Typical Progression:</h4>
-                              <div className="flex flex-wrap gap-1">
-                                {pathway.typical_progression.slice(0, 3).map((step, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
-                                    {step}
-                                  </Badge>
-                                ))}
-                                {pathway.typical_progression.length > 3 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{pathway.typical_progression.length - 3} more
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          )}
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-semibold text-gray-700">Career Prospects:</h4>
+                            <p className="text-xs text-gray-600">{pathway.career_prospects}</p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-semibold text-gray-700">Average Salary:</h4>
+                            <p className="text-xs text-green-600 font-semibold">{pathway.average_salary}</p>
+                          </div>
                           
                           <Button 
                             variant="outline" 

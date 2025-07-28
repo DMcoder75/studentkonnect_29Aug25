@@ -20,7 +20,6 @@ import {
   ArrowDown,
   ExternalLink
 } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
 import Sidebar from './Sidebar'
 
 export default function CareerInsightsPage({ isMobileMenuOpen, onMobileMenuClose }) {
@@ -34,11 +33,90 @@ export default function CareerInsightsPage({ isMobileMenuOpen, onMobileMenuClose
       try {
         setLoading(true)
         
-        // Fetch professions and pathways data
-        const [professionsData, pathwaysData] = await Promise.all([
-          dbHelpers.getProfessions(),
-          dbHelpers.getPathways()
-        ])
+        // Sample career data with numeric salary values
+        const professionsData = [
+          {
+            id: 1,
+            title: 'Software Engineer',
+            category: 'Technology',
+            averageSalary: '$95,000',
+            average_salary: 95000,
+            growth: '+22%',
+            demand: 'High',
+            education: 'Bachelor\'s in Computer Science',
+            skills: ['Programming', 'Problem Solving', 'Teamwork'],
+            description: 'Design and develop software applications and systems.'
+          },
+          {
+            id: 2,
+            title: 'Data Scientist',
+            category: 'Technology',
+            averageSalary: '$110,000',
+            average_salary: 110000,
+            growth: '+31%',
+            demand: 'Very High',
+            education: 'Master\'s in Data Science or Statistics',
+            skills: ['Python', 'Machine Learning', 'Statistics'],
+            description: 'Analyze complex data to help organizations make decisions.'
+          },
+          {
+            id: 3,
+            title: 'Registered Nurse',
+            category: 'Healthcare',
+            averageSalary: '$75,000',
+            average_salary: 75000,
+            growth: '+7%',
+            demand: 'High',
+            education: 'Bachelor\'s in Nursing',
+            skills: ['Patient Care', 'Communication', 'Critical Thinking'],
+            description: 'Provide patient care and support in healthcare settings.'
+          },
+          {
+            id: 4,
+            title: 'Financial Analyst',
+            category: 'Finance',
+            averageSalary: '$85,000',
+            average_salary: 85000,
+            growth: '+6%',
+            demand: 'Medium',
+            education: 'Bachelor\'s in Finance or Economics',
+            skills: ['Financial Modeling', 'Excel', 'Analysis'],
+            description: 'Analyze financial data to guide business decisions.'
+          },
+          {
+            id: 5,
+            title: 'Marketing Manager',
+            category: 'Business',
+            averageSalary: '$90,000',
+            average_salary: 90000,
+            growth: '+10%',
+            demand: 'High',
+            education: 'Bachelor\'s in Marketing or Business',
+            skills: ['Strategy', 'Communication', 'Analytics'],
+            description: 'Develop and execute marketing strategies for products and services.'
+          }
+        ]
+
+        const pathwaysData = [
+          {
+            id: 1,
+            field: 'Computer Science',
+            universities: ['MIT', 'Stanford', 'Carnegie Mellon'],
+            duration: '4 years',
+            averageCost: '$200,000',
+            careerOutcomes: ['Software Engineer', 'Data Scientist', 'Product Manager'],
+            employmentRate: '95%'
+          },
+          {
+            id: 2,
+            field: 'Business Administration',
+            universities: ['Harvard', 'Wharton', 'Stanford'],
+            duration: '4 years',
+            averageCost: '$250,000',
+            careerOutcomes: ['Business Analyst', 'Consultant', 'Manager'],
+            employmentRate: '92%'
+          }
+        ]
         
         setProfessions(professionsData)
         setPathways(pathwaysData)

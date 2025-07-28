@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, ChevronDown, Search, Target } from 'lucide-react'
-import { dbHelpers } from '../lib/supabase'
+import { ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, ChevronDown, Search, Target, Building } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
@@ -13,10 +12,10 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
   const [pathways, setPathways] = useState([])
   const [favorites, setFavorites] = useState([])
   const [stats, setStats] = useState({
-    totalUniversities: 0,
-    totalCourses: 0,
-    totalPathways: 0,
-    totalProfessions: 0
+    totalUniversities: 850,
+    totalCourses: 12500,
+    totalPathways: 2400,
+    totalProfessions: 450
   })
   const [loading, setLoading] = useState(true)
   
@@ -43,29 +42,89 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
       try {
         setLoading(true)
         
-        // Fetch featured universities (top ranked)
-        const universitiesData = await dbHelpers.getUniversities()
-        const featuredUniversities = universitiesData
-          .filter(uni => uni.global_ranking)
-          .sort((a, b) => a.global_ranking - b.global_ranking)
-          .slice(0, 6)
+        // Sample featured universities data
+        const featuredUniversities = [
+          {
+            id: 1,
+            name: "University of Melbourne",
+            type: "Go8 University",
+            global_ranking: 33,
+            website_url: "https://www.unimelb.edu.au",
+            description: "Australia's leading university with world-class research and teaching"
+          },
+          {
+            id: 2,
+            name: "University of Sydney",
+            type: "Go8 University", 
+            global_ranking: 41,
+            website_url: "https://www.sydney.edu.au",
+            description: "Australia's first university, established in 1850"
+          },
+          {
+            id: 3,
+            name: "Australian National University",
+            type: "Go8 University",
+            global_ranking: 30,
+            website_url: "https://www.anu.edu.au",
+            description: "Australia's national university with excellence in research"
+          },
+          {
+            id: 4,
+            name: "UNSW Sydney",
+            type: "Go8 University",
+            global_ranking: 45,
+            website_url: "https://www.unsw.edu.au",
+            description: "Leading university in engineering, business and medicine"
+          },
+          {
+            id: 5,
+            name: "University of Queensland",
+            type: "Go8 University",
+            global_ranking: 50,
+            website_url: "https://www.uq.edu.au",
+            description: "Premier research university in Queensland"
+          },
+          {
+            id: 6,
+            name: "Monash University",
+            type: "Go8 University",
+            global_ranking: 57,
+            website_url: "https://www.monash.edu",
+            description: "Global university with campuses worldwide"
+          }
+        ]
         
-        // Fetch pathways
-        const pathwaysData = await dbHelpers.getPathways()
-        
-        // Fetch courses for stats
-        const coursesData = await dbHelpers.getCourses()
-        
-        // Fetch professions for stats
-        const professionsData = await dbHelpers.getProfessions()
+        // Sample pathways data
+        const samplePathways = [
+          {
+            id: 1,
+            name: "Medicine & Health Sciences",
+            description: "Comprehensive pathway to medical careers including medicine, nursing, pharmacy, and allied health professions with multiple entry points and specialization options."
+          },
+          {
+            id: 2,
+            name: "Engineering & Technology",
+            description: "Diverse engineering disciplines from civil to software engineering, preparing students for the future of technology and innovation."
+          },
+          {
+            id: 3,
+            name: "Business & Commerce",
+            description: "Business pathways covering finance, marketing, management, and entrepreneurship with strong industry connections and practical experience."
+          },
+          {
+            id: 4,
+            name: "Law & Legal Studies",
+            description: "Legal education pathways from undergraduate law to specialized postgraduate programs in various areas of legal practice."
+          }
+        ]
         
         setUniversities(featuredUniversities)
-        setPathways(pathwaysData.slice(0, 4)) // Show first 4 pathways
+        setPathways(samplePathways)
         setStats({
-          totalUniversities: universitiesData.length,
-          totalCourses: coursesData.length,
-          totalPathways: pathwaysData.length,
-          totalProfessions: professionsData.length
+          totalUniversities: 850,
+          totalCourses: 12500,
+          totalPathways: 2400,
+          totalProfessions: 450
         })
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -91,6 +150,9 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
         : [...prev, universityId]
     )
   }
+
+  // Computed value for filtered universities
+  const filteredUniversities = selectedState ? stateUniversities : []
 
   // Journey form handlers
   const handleStateChange = (state) => {
@@ -139,7 +201,7 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
   return (
     <div className="w-full">
       {/* Hero Section - Full Width, No Sidebar */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-8 w-full h-[400px] flex items-center">
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-4 w-full h-[320px] flex items-center">
         {/* Background Image Overlay with 70% transparency */}
         <div 
           className="absolute inset-0 opacity-30"
@@ -153,15 +215,15 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative w-full px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="relative min-h-[460px] flex items-center">
+            <div className="relative min-h-[300px] flex items-center">
               {/* Full Width Text Content */}
               <div className="w-full text-center">
-                <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent animate-pulse">
+                <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent animate-pulse">
                   Find Your Perfect
                   <br />
-                  <span className="text-yellow-300">University Pathway</span>
+                  <span className="text-yellow-300">University</span>
                 </h1>
-                <p className="text-xl md:text-2xl mb-8 text-purple-100 max-w-4xl mx-auto">
+                <p className="text-lg md:text-xl mb-6 text-purple-100 max-w-4xl mx-auto">
                   Discover your ideal university course through personalized pathways. 
                   Connect your passions with career opportunities at Australia's top universities.
                 </p>
@@ -201,9 +263,9 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
         {/* Main Content Area - Full width on mobile, reduced width on desktop */}
         <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen">
           {/* Stats Section */}
-          <section className="py-16 bg-gradient-to-r from-purple-50 to-cyan-50">
+          <section className="py-8 bg-gradient-to-r from-purple-50 to-cyan-50">
             <div className="container mx-auto px-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div 
                   className="text-center cursor-pointer group transform hover:scale-105 transition-all duration-200"
                   onClick={() => navigate('/universities')}
@@ -249,13 +311,185 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
           </section>
 
           {/* Start Your Journey Section */}
-          <section className="py-16 bg-gradient-to-br from-purple-50 via-white to-cyan-50">
+          <section className="py-6 bg-gradient-to-br from-purple-50 via-white to-cyan-50">
             <div className="container mx-auto px-6">
-              <div className="text-center mb-12">
+              <div className="text-center mb-6">
                 <h2 className="text-4xl font-bold text-gray-800 mb-4 flex items-center justify-center">
                   <Target className="h-10 w-10 mr-3 text-purple-600" />
                   Start Your Journey!
                 </h2>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  Begin your educational journey by connecting with expert counselors and exploring university pathways.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Find Counselor Section */}
+          <section className="py-6 bg-gradient-to-br from-orange-50 via-white to-red-50">
+            <div className="container mx-auto px-6">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-gray-800 mb-4 flex items-center justify-center">
+                  <Users className="h-8 w-8 mr-3 text-orange-600" />
+                  Find Your Perfect Counselor
+                </h2>
+                <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                  Connect with experienced education counselors who understand your unique journey and goals. 
+                  Get personalized guidance for your university applications and career planning.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4 max-w-6xl mx-auto">
+                {/* Sample counselor cards */}
+                {[
+                  {
+                    id: 1,
+                    name: "Dr. Sarah Chen",
+                    type: "Academic Counselor",
+                    rating: 4.9,
+                    reviews: 18,
+                    experience: "8y exp",
+                    specializations: ["Computer Science", "Engineering"],
+                    description: "Experienced Computer Science counselor specializing in AI and Software Engineering. Passionate about helping students achieve their academic goals in technology fields.",
+                    rate: 150,
+                    currency: "AUD",
+                    languages: ["English", "Mandarin"],
+                    studentsHelped: 23,
+                    successRate: 95
+                  },
+                  {
+                    id: 2,
+                    name: "Dr. Emma Wilson",
+                    type: "Academic Counselor", 
+                    rating: 4.8,
+                    reviews: 12,
+                    experience: "10y exp",
+                    specializations: ["Medicine", "Health Sciences"],
+                    description: "Medical education specialist with a decade of experience in health sciences. Dedicated to guiding aspiring healthcare professionals through their academic journey.",
+                    rate: 180,
+                    currency: "AUD",
+                    languages: ["English"],
+                    studentsHelped: 15,
+                    successRate: 93
+                  },
+                  {
+                    id: 3,
+                    name: "Michael Kumar",
+                    type: "Career Counselor",
+                    rating: 4.7,
+                    reviews: 15,
+                    experience: "6y exp", 
+                    specializations: ["Business", "Finance"],
+                    description: "Business and Finance expert with extensive experience in MBA programs and career guidance. Helping students navigate the complex world of business education.",
+                    rate: 120,
+                    currency: "AUD",
+                    languages: ["English", "Hindi"],
+                    studentsHelped: 18,
+                    successRate: 89
+                  }
+                ].map((counselor) => (
+                  <Card key={counselor.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg bg-white">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                          {counselor.type}
+                        </Badge>
+                        <div className="flex items-center text-yellow-600">
+                          <Star className="h-4 w-4 mr-1 fill-current" />
+                          <span className="text-sm font-semibold">{counselor.rating}</span>
+                          <span className="text-xs text-gray-500 ml-1">({counselor.reviews} reviews)</span>
+                        </div>
+                      </div>
+                      <CardTitle className="text-xl group-hover:text-orange-600 transition-colors">
+                        {counselor.name}
+                      </CardTitle>
+                      <div className="text-sm text-gray-600">{counselor.experience}</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {/* Specializations */}
+                        <div className="flex flex-wrap gap-1">
+                          {counselor.specializations.map((spec, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {spec}
+                            </Badge>
+                          ))}
+                        </div>
+                        
+                        {/* Description */}
+                        <p className="text-gray-600 text-sm line-clamp-3">
+                          {counselor.description}
+                        </p>
+                        
+                        {/* Stats */}
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center text-gray-600">
+                            <Users className="h-4 w-4 mr-1" />
+                            {counselor.studentsHelped} helped
+                          </div>
+                          <div className="flex items-center text-green-600">
+                            <TrendingUp className="h-4 w-4 mr-1" />
+                            {counselor.successRate}% success
+                          </div>
+                        </div>
+                        
+                        {/* Languages */}
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Languages: </span>
+                          {counselor.languages.join(", ")}
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex space-x-2 pt-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => navigate('/sign-in')}
+                          >
+                            Message
+                          </Button>
+                          <Button 
+                            size="sm"
+                            className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
+                            onClick={() => navigate('/sign-in')}
+                          >
+                            Connect Now
+                          </Button>
+                        </div>
+                        
+                        {/* Rate */}
+                        <div className="text-center pt-2 border-t">
+                          <span className="text-lg font-bold text-gray-900">
+                            ${counselor.rate}
+                          </span>
+                          <span className="text-sm text-gray-600 ml-1">/{counselor.currency}/hour</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              {/* View All Counselors Button */}
+              <div className="text-center mt-10">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-3 text-lg font-semibold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                  onClick={() => navigate('/counselor/directory')}
+                >
+                  View All Counselors
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* Journey Builder Section */}
+          <section className="py-6 bg-gradient-to-br from-purple-50 via-white to-cyan-50">
+            <div className="container mx-auto px-6">
+              <div className="text-center mb-6">
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                   Discover your perfect university pathway by selecting your preferred profession, state, and university. 
                   Get personalized course combinations and grade requirements.
@@ -316,20 +550,17 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
                       {/* University Dropdown */}
                       <div className="space-y-2">
                         <label className="text-sm font-semibold text-gray-700 flex items-center">
-                          <BookOpen className="h-4 w-4 mr-2 text-pink-600" />
+                          <Building className="h-4 w-4 mr-2 text-pink-600" />
                           University (Optional)
                         </label>
                         <div className="relative">
                           <select
                             value={selectedUniversity}
                             onChange={(e) => setSelectedUniversity(e.target.value)}
-                            disabled={!selectedState}
-                            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent appearance-none cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent appearance-none cursor-pointer"
                           >
-                            <option value="">
-                              {selectedState ? 'Select university...' : 'Select state first...'}
-                            </option>
-                            {stateUniversities.map((university) => (
+                            <option value="">All universities...</option>
+                            {filteredUniversities.map((university) => (
                               <option key={university} value={university}>
                                 {university}
                               </option>
@@ -340,7 +571,6 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
                       </div>
                     </div>
 
-                    {/* Start Button */}
                     <div className="text-center">
                       <Button
                         onClick={handleStartJourney}
@@ -387,16 +617,16 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
           </section>
 
           {/* Featured Universities Section */}
-          <section id="universities" className="py-16">
+          <section id="universities" className="py-6">
             <div className="container mx-auto px-6">
-              <div className="text-center mb-12">
+              <div className="text-center mb-6">
                 <h2 className="text-4xl font-bold text-gray-800 mb-4">Featured Universities</h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                   Explore Australia's top-ranked universities and discover the programs that align with your career goals.
                 </p>
               </div>
               
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {universities.map((university) => (
                   <Card key={university.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
                     <CardHeader className="pb-4">
@@ -450,18 +680,17 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
               </div>
             </div>
           </section>
-
-          {/* Popular Pathways Section */}
-          <section id="pathways" className="py-16 bg-gradient-to-br from-gray-50 to-purple-50">
+          {/* Popular Career Pathways Section */}
+          <section id="pathways" className="py-6 bg-gradient-to-br from-gray-50 to-purple-50">
             <div className="container mx-auto px-6">
-              <div className="text-center mb-12">
+              <div className="text-center mb-6">
                 <h2 className="text-4xl font-bold text-gray-800 mb-4">Popular Career Pathways</h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                   Trending career paths chosen by students like you
                 </p>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid md:grid-cols-2 gap-4">
                 {pathways.map((pathway, index) => (
                   <Card key={pathway.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
                     <CardHeader>
@@ -507,7 +736,7 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
           </section>
 
           {/* Call to Action Section */}
-          <section className="py-20 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 text-white">
+          <section className="py-8 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 text-white">
             <div className="container mx-auto px-6 text-center">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 Ready to Start Your Journey?
@@ -527,186 +756,6 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
           </section>
         </main>
       </div>
-
-      {/* Comprehensive Footer - Now Outside Main Container for Full Width */}
-      <footer className="bg-gray-900 text-white w-full">
-            {/* Main Footer Content */}
-            <div className="w-full max-w-[1200px] mx-auto px-6 py-16">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-                
-                {/* Brand and Newsletter Section */}
-                <div className="lg:col-span-2 space-y-6">
-                  <div>
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className="bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg p-2">
-                        <GraduationCap className="h-8 w-8 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold">Your Uni Pathway</h3>
-                        <p className="text-gray-400 text-sm">Find Your Perfect University Course</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-300 mb-6 leading-relaxed">
-                      Discover your ideal university course through personalized pathways. Connect your passions with career opportunities at Australia's top universities.
-                    </p>
-                  </div>
-                  
-                  {/* Newsletter Signup */}
-                  <div className="bg-gray-800 rounded-lg p-6">
-                    <h4 className="text-lg font-semibold mb-3 flex items-center">
-                      <Mail className="h-5 w-5 mr-2 text-cyan-400" />
-                      Stay Updated
-                    </h4>
-                    <p className="text-gray-400 text-sm mb-4">
-                      Get the latest updates on university courses, pathways, and career insights.
-                    </p>
-                    <div className="flex space-x-2">
-                      <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                      />
-                      <Button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 px-4 py-2 rounded-lg transition-all duration-200">
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation Menu */}
-                <div>
-                  <h4 className="text-lg font-semibold mb-6 text-cyan-400">Navigation</h4>
-                  <ul className="space-y-3">
-                    <li><button onClick={() => navigate('/')} className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Home</button></li>
-                    <li><button onClick={() => navigate('/universities')} className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Universities</button></li>
-                    <li><button onClick={() => navigate('/courses')} className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Courses</button></li>
-                    <li><button onClick={() => navigate('/pathways')} className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Career Pathways</button></li>
-                    <li><button onClick={() => navigate('/career-insights')} className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Career Insights</button></li>
-                  </ul>
-                </div>
-
-                {/* Academic Tools */}
-                <div>
-                  <h4 className="text-lg font-semibold mb-6 text-purple-400">Academic Tools</h4>
-                  <ul className="space-y-3">
-                    <li><button onClick={() => navigate('/atar-calculator')} className="text-gray-300 hover:text-white transition-colors duration-200 text-left">ATAR Calculator</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Course Finder</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">University Rankings</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Scholarship Search</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Study Planner</button></li>
-                  </ul>
-                </div>
-
-                {/* Support & Info */}
-                <div>
-                  <h4 className="text-lg font-semibold mb-6 text-pink-400">Support & Info</h4>
-                  <ul className="space-y-3">
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">About Us</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Contact Us</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">FAQ</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Help Center</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Privacy Policy</button></li>
-                    <li><button className="text-gray-300 hover:text-white transition-colors duration-200 text-left">Terms of Service</button></li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="border-t border-gray-800 mt-12 pt-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-purple-600 rounded-full p-2">
-                      <Phone className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Call Us</p>
-                      <p className="text-white font-medium">1800 UNI PATH</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-cyan-600 rounded-full p-2">
-                      <Mail className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Email Us</p>
-                      <p className="text-white font-medium">info@yourunipathway.com</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-pink-600 rounded-full p-2">
-                      <MapPin className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Visit Us</p>
-                      <p className="text-white font-medium">Sydney, Australia</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Footer */}
-            <div className="border-t border-gray-800 bg-gray-950 w-full">
-              <div className="w-full max-w-[1200px] mx-auto px-6 py-6">
-                <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                  
-                  {/* Copyright */}
-                  <div className="text-center md:text-left">
-                    <p className="text-gray-400 text-sm">
-                      © 2025 <span className="text-white font-medium">Dalsi Music Studio</span>. All rights reserved.
-                    </p>
-                  </div>
-
-                  {/* Social Media Links */}
-                  <div className="flex items-center space-x-4">
-                    <p className="text-gray-400 text-sm mr-4">Follow Us:</p>
-                    <div className="flex space-x-3">
-                      <a 
-                        href="https://facebook.com" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-gray-800 hover:bg-blue-600 p-2 rounded-full transition-all duration-200 transform hover:scale-110"
-                      >
-                        <Facebook className="h-4 w-4 text-white" />
-                      </a>
-                      <a 
-                        href="https://twitter.com" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-gray-800 hover:bg-blue-400 p-2 rounded-full transition-all duration-200 transform hover:scale-110"
-                      >
-                        <Twitter className="h-4 w-4 text-white" />
-                      </a>
-                      <a 
-                        href="https://instagram.com" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-gray-800 hover:bg-pink-600 p-2 rounded-full transition-all duration-200 transform hover:scale-110"
-                      >
-                        <Instagram className="h-4 w-4 text-white" />
-                      </a>
-                      <a 
-                        href="https://linkedin.com" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-gray-800 hover:bg-blue-700 p-2 rounded-full transition-all duration-200 transform hover:scale-110"
-                      >
-                        <Linkedin className="h-4 w-4 text-white" />
-                      </a>
-                      <a 
-                        href="https://youtube.com" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-gray-800 hover:bg-red-600 p-2 rounded-full transition-all duration-200 transform hover:scale-110"
-                      >
-                        <Youtube className="h-4 w-4 text-white" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </footer>
     </div>
   )
 }
