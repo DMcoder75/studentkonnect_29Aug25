@@ -9,6 +9,8 @@ import HomePage from './components/HomePage'
 import UniversitiesPage from './components/UniversitiesPage'
 import PathwaysPage from './components/PathwaysPage'
 import CoursesPage from './components/CoursesPage'
+import GlobalUniversitiesPage from './components/GlobalUniversitiesPage'
+import GlobalCoursesPage from './components/GlobalCoursesPage'
 import ProfilePage from './components/ProfilePage'
 import PathwayDetailPage from './components/PathwayDetailPage'
 import CareerInsightsPage from './components/CareerInsightsPage'
@@ -58,6 +60,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import HelperMenu from './components/HelperMenu'
 import Footer from './components/Footer'
 import './App.css'
 
@@ -113,6 +116,9 @@ function AppContent() {
         onComplete={handleOnboardingComplete}
       />
       
+      {/* Helper Menu - Show for non-admin routes */}
+      {!isAdminRoute && <HelperMenu />}
+      
       {/* Show header only for non-admin routes */}
       {!isAdminRoute && <Header onLogout={handleLogout} />}
       
@@ -123,6 +129,10 @@ function AppContent() {
         <Route path="/pathways" element={<PathwaysPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
         <Route path="/pathways/:id" element={<PathwayDetailPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
         <Route path="/courses" element={<CoursesPage favorites={favorites} setFavorites={setFavorites} isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
+        <Route path="/global/universities/:country" element={<GlobalUniversitiesPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
+        <Route path="/global/courses/:country" element={<GlobalCoursesPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
+        <Route path="/global/universities" element={<GlobalUniversitiesPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
+        <Route path="/global/courses" element={<GlobalCoursesPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
         <Route path="/career-insights" element={<CareerInsightsPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
         <Route path="/atar-calculator" element={<ATARCalculatorPage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
         <Route path="/terms-of-service" element={<TermsOfServicePage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />

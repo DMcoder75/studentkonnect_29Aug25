@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { globalEducationService } from '../services/globalEducationService'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -21,17 +22,44 @@ import {
   BarChart3,
   MessageCircle,
   Plane,
-  Users
+  Users,
+  MapPin,
+  Building2
 } from 'lucide-react'
 
 export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen, onMobileMenuClose }) {
   const [expandedItems, setExpandedItems] = useState({})
+  const [countries, setCountries] = useState([])
+  const [loadingCountries, setLoadingCountries] = useState(true)
   const location = useLocation()
   const navigate = useNavigate()
   const { isAuthenticated, user } = useAuth()
 
   // Check if user is a counselor
   const isCounselor = user?.user_type === 'counselor' || user?.role === 'counselor'
+
+  // Load countries on component mount
+  useEffect(() => {
+    fetchCountries()
+  }, [])
+
+  const fetchCountries = async () => {
+    try {
+      setLoadingCountries(true)
+      const { data, error } = await globalEducationService.getAllCountries()
+      
+      if (error) {
+        console.error('Error fetching countries:', error)
+        return
+      }
+
+      setCountries(data || [])
+    } catch (err) {
+      console.error('Error:', err)
+    } finally {
+      setLoadingCountries(false)
+    }
+  }
 
   const toggleExpanded = (itemId) => {
     setExpandedItems(prev => ({
@@ -41,7 +69,15 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
   }
 
   const menuItems = [
-    // Student-related items first (when authenticated)
+    // Home should always be first
+    {
+      id: 'home',
+      name: 'Home',
+      path: '/',
+      icon: Home,
+      badge: null
+    },
+    // Student-related items (when authenticated)
     ...(isAuthenticated() ? [
       {
         id: 'student-dashboard',
@@ -105,18 +141,55 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         badge: null
       }
     ] : []),
-    // General navigation items
+    // Global Education - Parent menu for Universities, Pathways, and Courses by Country
     {
-      id: 'home',
-      name: 'Home',
-      path: '/',
-      icon: Home,
-      badge: null
+      id: 'global-education',
+      name: 'Global Education',
+      icon: Globe,
+      badge: null,
+      submenu: [
+        {
+          name: 'All Universities',
+          path: '/global/universities',
+          badge: loadingCountries ? '...' : `${countries.length * 50}+`,
+          submenu: [
+            { name: 'All Countries', path: '/global/universities' },
+            ...(countries.map(country => ({
+              name: country.country_name,
+              path: `/global/universities?country=${country.country_id}`,
+              icon: MapPin
+            })))
+          ]
+        },
+        {
+          name: 'All Courses',
+          path: '/global/courses',
+          badge: loadingCountries ? '...' : `${countries.length * 200}+`,
+          submenu: [
+            { name: 'All Countries', path: '/global/courses' },
+            ...(countries.map(country => ({
+              name: country.country_name,
+              path: `/global/courses?country=${country.country_id}`,
+              icon: MapPin
+            })))
+          ]
+        },
+        {
+          name: 'Study Destinations',
+          path: '/global/destinations',
+          badge: loadingCountries ? '...' : `${countries.length}`,
+          submenu: countries.map(country => ({
+            name: country.country_name,
+            path: `/global/destination/${country.country_id}`,
+            icon: Building2
+          }))
+        }
+      ]
     },
-    // AUS Functions - Parent menu for Universities, Pathways, and Courses
+    // Australia Process - Keep for backward compatibility
     {
       id: 'aus-functions',
-      name: 'AUS Functions',
+      name: 'Australia Process',
       icon: GraduationCap,
       badge: null,
       submenu: [
@@ -153,6 +226,11 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
             { name: 'Postgraduate', path: '/courses?level=postgraduate' },
             { name: 'Research', path: '/courses?level=research' }
           ]
+        },
+        {
+          name: 'ATAR Calculator',
+          path: '/atar-calculator',
+          badge: null
         }
       ]
     },
@@ -162,13 +240,6 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
       name: 'Find Counselors',
       path: '/counselor/directory',
       icon: User,
-      badge: null
-    },
-    {
-      id: 'atar-calculator',
-      name: 'ATAR Calculator',
-      path: '/atar-calculator',
-      icon: Calculator,
       badge: null
     },
     {

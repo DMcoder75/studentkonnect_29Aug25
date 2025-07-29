@@ -3,17 +3,51 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, ChevronDown, Search, Target, Building } from 'lucide-react'
+import { ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, ChevronDown, Search, Target, Building, Globe } from 'lucide-react'
 import Sidebar from './Sidebar'
+import { globalEducationService } from '../services/globalEducationService'
+
+// Custom CSS for animations
+const customStyles = `
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+  }
+  
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(-180deg); }
+  }
+  
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-float-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+`
 
 export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
   const [universities, setUniversities] = useState([])
   const [pathways, setPathways] = useState([])
   const [favorites, setFavorites] = useState([])
+  const [countries, setCountries] = useState([])
   const [stats, setStats] = useState({
-    totalUniversities: 850,
-    totalCourses: 12500,
+    totalCountries: 0,
+    totalUniversities: 0,
+    totalCourses: 0,
     totalPathways: 2400,
     totalProfessions: 450
   })
@@ -21,9 +55,9 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
   
   // Journey form states
   const [selectedProfession, setSelectedProfession] = useState('')
-  const [selectedState, setSelectedState] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedUniversity, setSelectedUniversity] = useState('')
-  const [stateUniversities, setStateUniversities] = useState([])
+  const [countryUniversities, setCountryUniversities] = useState([])
 
   // Sample data for dropdowns
   const professions = [
@@ -31,101 +65,115 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
     'Computer Science', 'Nursing', 'Architecture', 'Accounting', 'Marketing', 
     'Journalism', 'Design', 'Social Work', 'Environmental Science'
   ]
-  
-  const states = [
-    'New South Wales', 'Victoria', 'Queensland', 'Western Australia', 
-    'South Australia', 'Tasmania', 'Australian Capital Territory', 'Northern Territory'
-  ]
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
         
-        // Sample featured universities data
+        // Fetch global statistics and countries
+        const [statsResult, countriesResult] = await Promise.all([
+          globalEducationService.getGlobalStatistics(),
+          globalEducationService.getAllCountries()
+        ])
+
+        if (statsResult.data) {
+          setStats(prev => ({
+            ...prev,
+            totalCountries: statsResult.data.countries,
+            totalUniversities: statsResult.data.universities,
+            totalCourses: statsResult.data.courses
+          }))
+        }
+
+        if (countriesResult.data) {
+          setCountries(countriesResult.data)
+        }
+        
+        // Sample featured universities data - now global
         const featuredUniversities = [
           {
             id: 1,
-            name: "University of Melbourne",
-            type: "Go8 University",
-            global_ranking: 33,
-            website_url: "https://www.unimelb.edu.au",
-            description: "Australia's leading university with world-class research and teaching"
+            name: "Harvard University",
+            type: "Ivy League",
+            country: "United States",
+            global_ranking: 1,
+            website_url: "https://www.harvard.edu",
+            description: "World's leading university with excellence in research and education"
           },
           {
             id: 2,
-            name: "University of Sydney",
-            type: "Go8 University", 
-            global_ranking: 41,
-            website_url: "https://www.sydney.edu.au",
-            description: "Australia's first university, established in 1850"
+            name: "University of Oxford",
+            type: "Russell Group", 
+            country: "United Kingdom",
+            global_ranking: 2,
+            website_url: "https://www.ox.ac.uk",
+            description: "Oldest university in the English-speaking world, established in 1096"
           },
           {
             id: 3,
-            name: "Australian National University",
-            type: "Go8 University",
-            global_ranking: 30,
-            website_url: "https://www.anu.edu.au",
-            description: "Australia's national university with excellence in research"
+            name: "University of Toronto",
+            type: "Research University",
+            country: "Canada",
+            global_ranking: 18,
+            website_url: "https://www.utoronto.ca",
+            description: "Canada's leading university with global research excellence"
           },
           {
             id: 4,
-            name: "UNSW Sydney",
+            name: "University of Melbourne",
             type: "Go8 University",
-            global_ranking: 45,
-            website_url: "https://www.unsw.edu.au",
-            description: "Leading university in engineering, business and medicine"
+            country: "Australia",
+            global_ranking: 33,
+            website_url: "https://www.unimelb.edu.au",
+            description: "Australia's leading university with world-class research"
           },
           {
             id: 5,
-            name: "University of Queensland",
-            type: "Go8 University",
-            global_ranking: 50,
-            website_url: "https://www.uq.edu.au",
-            description: "Premier research university in Queensland"
+            name: "ETH Zurich",
+            type: "Technical University",
+            country: "Switzerland",
+            global_ranking: 7,
+            website_url: "https://ethz.ch",
+            description: "Premier technical university in Europe for science and technology"
           },
           {
             id: 6,
-            name: "Monash University",
-            type: "Go8 University",
-            global_ranking: 57,
-            website_url: "https://www.monash.edu",
-            description: "Global university with campuses worldwide"
+            name: "National University of Singapore",
+            type: "Research University",
+            country: "Singapore",
+            global_ranking: 11,
+            website_url: "https://www.nus.edu.sg",
+            description: "Asia's leading global university with diverse programs"
           }
         ]
         
-        // Sample pathways data
+        // Sample pathways data - now global
         const samplePathways = [
           {
             id: 1,
             name: "Medicine & Health Sciences",
-            description: "Comprehensive pathway to medical careers including medicine, nursing, pharmacy, and allied health professions with multiple entry points and specialization options."
+            description: "Global pathway to medical careers including medicine, nursing, pharmacy, and allied health professions with international recognition and mobility."
           },
           {
             id: 2,
             name: "Engineering & Technology",
-            description: "Diverse engineering disciplines from civil to software engineering, preparing students for the future of technology and innovation."
+            description: "International engineering disciplines from civil to software engineering, preparing students for global technology careers and innovation."
           },
           {
             id: 3,
             name: "Business & Commerce",
-            description: "Business pathways covering finance, marketing, management, and entrepreneurship with strong industry connections and practical experience."
+            description: "Global business pathways covering international finance, marketing, management, and entrepreneurship with worldwide industry connections."
           },
           {
             id: 4,
             name: "Law & Legal Studies",
-            description: "Legal education pathways from undergraduate law to specialized postgraduate programs in various areas of legal practice."
+            description: "International legal education pathways from comparative law to specialized programs in various global legal systems and practices."
           }
         ]
         
         setUniversities(featuredUniversities)
         setPathways(samplePathways)
-        setStats({
-          totalUniversities: 850,
-          totalCourses: 12500,
-          totalPathways: 2400,
-          totalProfessions: 450
-        })
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -152,26 +200,26 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
   }
 
   // Computed value for filtered universities
-  const filteredUniversities = selectedState ? stateUniversities : []
+  const filteredUniversities = selectedCountry ? countryUniversities : []
 
   // Journey form handlers
-  const handleStateChange = (state) => {
-    setSelectedState(state)
-    setSelectedUniversity('') // Reset university when state changes
+  const handleCountryChange = (country) => {
+    setSelectedCountry(country)
+    setSelectedUniversity('') // Reset university when country changes
     
-    // Filter universities by state (simplified mapping)
-    const stateUniversityMap = {
-      'New South Wales': ['University of Sydney', 'UNSW Sydney', 'University of Technology Sydney', 'Macquarie University'],
-      'Victoria': ['University of Melbourne', 'Monash University', 'RMIT University', 'Deakin University'],
-      'Queensland': ['University of Queensland', 'Queensland University of Technology', 'Griffith University', 'James Cook University'],
-      'Western Australia': ['University of Western Australia', 'Curtin University', 'Murdoch University', 'Edith Cowan University'],
-      'South Australia': ['University of Adelaide', 'University of South Australia', 'Flinders University'],
-      'Tasmania': ['University of Tasmania'],
-      'Australian Capital Territory': ['Australian National University', 'University of Canberra'],
-      'Northern Territory': ['Charles Darwin University']
+    // Filter universities by country (simplified mapping)
+    const countryUniversityMap = {
+      'United States': ['Harvard University', 'Stanford University', 'MIT', 'Yale University'],
+      'United Kingdom': ['University of Oxford', 'University of Cambridge', 'Imperial College London', 'UCL'],
+      'Canada': ['University of Toronto', 'McGill University', 'University of British Columbia', 'University of Waterloo'],
+      'Australia': ['University of Melbourne', 'University of Sydney', 'Australian National University', 'UNSW Sydney'],
+      'Germany': ['Technical University of Munich', 'Heidelberg University', 'Humboldt University', 'RWTH Aachen'],
+      'Switzerland': ['ETH Zurich', 'University of Zurich', 'EPFL', 'University of Geneva'],
+      'Singapore': ['National University of Singapore', 'Nanyang Technological University'],
+      'Netherlands': ['University of Amsterdam', 'Delft University of Technology', 'Leiden University']
     }
     
-    setStateUniversities(stateUniversityMap[state] || [])
+    setCountryUniversities(countryUniversityMap[country] || [])
   }
 
   const handleStartJourney = () => {
@@ -183,7 +231,7 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
     // Navigate to results page with selected parameters
     const params = new URLSearchParams({
       profession: selectedProfession,
-      state: selectedState || '',
+      country: selectedCountry || '',
       university: selectedUniversity || ''
     })
     
@@ -200,6 +248,8 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
 
   return (
     <div className="w-full">
+      {/* Inject Custom CSS */}
+      <style dangerouslySetInnerHTML={{ __html: customStyles }} />
       {/* Hero Section - Full Width, No Sidebar */}
       <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-4 w-full h-[320px] flex items-center">
         {/* Background Image Overlay with 70% transparency */}
@@ -221,11 +271,11 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
                 <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent animate-pulse">
                   Find Your Perfect
                   <br />
-                  <span className="text-yellow-300">University</span>
+                  <span className="text-yellow-300">Global University</span>
                 </h1>
                 <p className="text-lg md:text-xl mb-6 text-purple-100 max-w-4xl mx-auto">
-                  Discover your ideal university course through personalized pathways. 
-                  Connect your passions with career opportunities at Australia's top universities.
+                  Discover your ideal university course through personalized pathways worldwide. 
+                  Connect your passions with career opportunities at top universities globally.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button 
@@ -262,64 +312,111 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
 
         {/* Main Content Area - Full width on mobile, reduced width on desktop */}
         <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen">
-          {/* Stats Section */}
-          <section className="py-8 bg-gradient-to-r from-purple-50 to-cyan-50">
-            <div className="container mx-auto px-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Stats Section - Enhanced with Jazzy Styling */}
+          <section className="py-12 bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-100 relative overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-10 left-10 w-32 h-32 bg-purple-500 rounded-full animate-pulse"></div>
+              <div className="absolute top-20 right-20 w-24 h-24 bg-cyan-500 rounded-full animate-bounce"></div>
+              <div className="absolute bottom-10 left-1/4 w-20 h-20 bg-pink-500 rounded-full animate-ping"></div>
+              <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-yellow-500 rounded-full animate-pulse"></div>
+            </div>
+            
+            <div className="container mx-auto px-6 relative z-10">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 bg-clip-text text-transparent mb-4">
+                  🌟 Global Education at Your Fingertips 🌟
+                </h2>
+                <p className="text-lg text-gray-700 font-medium">Discover endless possibilities across the world</p>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 <div 
-                  className="text-center cursor-pointer group transform hover:scale-105 transition-all duration-200"
+                  className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:rotate-2"
+                  onClick={() => navigate('/countries')}
+                >
+                  <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-green-300 transition-all duration-300 animate-pulse">
+                    <Globe className="h-10 w-10" />
+                  </div>
+                  <div className="text-4xl font-black bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalCountries || 8}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-lg group-hover:text-green-700 transition-colors duration-200">Countries</div>
+                </div>
+                
+                <div 
+                  className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:-rotate-2"
                   onClick={() => navigate('/universities')}
                 >
-                  <div className="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-700 transition-colors duration-200">
-                    <GraduationCap className="h-8 w-8" />
+                  <div className="bg-gradient-to-br from-purple-500 to-violet-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-purple-300 transition-all duration-300 animate-bounce">
+                    <GraduationCap className="h-10 w-10" />
                   </div>
-                  <div className="text-3xl font-bold text-purple-600 mb-2 group-hover:text-purple-700 transition-colors duration-200">{stats.totalUniversities}+</div>
-                  <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">Universities</div>
+                  <div className="text-4xl font-black bg-gradient-to-r from-purple-600 to-violet-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalUniversities || 866}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-lg group-hover:text-purple-700 transition-colors duration-200">Universities</div>
                 </div>
+                
                 <div 
-                  className="text-center cursor-pointer group transform hover:scale-105 transition-all duration-200"
+                  className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:rotate-2"
                   onClick={() => navigate('/courses')}
                 >
-                  <div className="bg-pink-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-pink-700 transition-colors duration-200">
-                    <BookOpen className="h-8 w-8" />
+                  <div className="bg-gradient-to-br from-pink-500 to-rose-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-pink-300 transition-all duration-300 animate-pulse">
+                    <BookOpen className="h-10 w-10" />
                   </div>
-                  <div className="text-3xl font-bold text-pink-600 mb-2 group-hover:text-pink-700 transition-colors duration-200">{stats.totalCourses}+</div>
-                  <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">Courses</div>
+                  <div className="text-4xl font-black bg-gradient-to-r from-pink-600 to-rose-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalCourses || 1000}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-lg group-hover:text-pink-700 transition-colors duration-200">Courses</div>
                 </div>
+                
                 <div 
-                  className="text-center cursor-pointer group transform hover:scale-105 transition-all duration-200"
+                  className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:-rotate-2"
                   onClick={() => navigate('/pathways')}
                 >
-                  <div className="bg-cyan-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-cyan-700 transition-colors duration-200">
-                    <TrendingUp className="h-8 w-8" />
+                  <div className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-cyan-300 transition-all duration-300 animate-bounce">
+                    <TrendingUp className="h-10 w-10" />
                   </div>
-                  <div className="text-3xl font-bold text-cyan-600 mb-2 group-hover:text-cyan-700 transition-colors duration-200">{stats.totalPathways}+</div>
-                  <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">Pathways</div>
+                  <div className="text-4xl font-black bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalPathways}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-lg group-hover:text-cyan-700 transition-colors duration-200">Pathways</div>
                 </div>
+                
                 <div 
-                  className="text-center cursor-pointer group transform hover:scale-105 transition-all duration-200"
+                  className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:rotate-2"
                   onClick={() => navigate('/career-insights')}
                 >
-                  <div className="bg-yellow-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-yellow-700 transition-colors duration-200">
-                    <Users className="h-8 w-8" />
+                  <div className="bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-yellow-300 transition-all duration-300 animate-pulse">
+                    <Users className="h-10 w-10" />
                   </div>
-                  <div className="text-3xl font-bold text-yellow-600 mb-2 group-hover:text-yellow-700 transition-colors duration-200">{stats.totalProfessions}+</div>
-                  <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">Career Paths</div>
+                  <div className="text-4xl font-black bg-gradient-to-r from-yellow-600 to-orange-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalProfessions}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-lg group-hover:text-yellow-700 transition-colors duration-200">Career Paths</div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Start Your Journey Section */}
-          <section className="py-6 bg-gradient-to-br from-purple-50 via-white to-cyan-50">
-            <div className="container mx-auto px-6">
-              <div className="text-center mb-6">
-                <h2 className="text-4xl font-bold text-gray-800 mb-4 flex items-center justify-center">
-                  <Target className="h-10 w-10 mr-3 text-purple-600" />
-                  Start Your Journey!
+          {/* Start Your Journey Section - Enhanced with Jazzy Styling */}
+          <section className="py-12 bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 relative overflow-hidden">
+            {/* Floating Elements */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-5 left-5 w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-float"></div>
+              <div className="absolute top-10 right-10 w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-float-delayed"></div>
+              <div className="absolute bottom-5 left-1/3 w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-float"></div>
+            </div>
+            
+            <div className="container mx-auto px-6 relative z-10">
+              <div className="text-center mb-8">
+                <h2 className="text-5xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 flex items-center justify-center animate-pulse">
+                  <Target className="h-12 w-12 mr-4 text-purple-600 animate-spin-slow" />
+                  🚀 Start Your Journey! 🎯
                 </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Begin your educational journey by connecting with expert counselors and exploring university pathways.
+                <p className="text-xl text-gray-700 max-w-4xl mx-auto font-medium leading-relaxed">
+                  Begin your educational adventure by connecting with expert counselors and exploring university pathways. 
+                  <span className="text-purple-600 font-bold"> Your future starts here! ✨</span>
                 </p>
               </div>
             </div>
@@ -486,20 +583,31 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
             </div>
           </section>
 
-          {/* Journey Builder Section */}
-          <section className="py-6 bg-gradient-to-br from-purple-50 via-white to-cyan-50">
-            <div className="container mx-auto px-6">
-              <div className="text-center mb-6">
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Discover your perfect university pathway by selecting your preferred profession, state, and university. 
-                  Get personalized course combinations and grade requirements.
+          {/* Journey Builder Section - Enhanced with Jazzy Styling */}
+          <section className="py-12 bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 relative overflow-hidden">
+            {/* Animated Background Shapes */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse"></div>
+              <div className="absolute top-1/2 right-0 w-32 h-32 bg-gradient-to-r from-pink-400 to-red-400 rounded-full animate-bounce"></div>
+              <div className="absolute bottom-0 left-1/2 w-36 h-36 bg-gradient-to-r from-green-400 to-cyan-400 rounded-full animate-pulse"></div>
+            </div>
+            
+            <div className="container mx-auto px-6 relative z-10">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                  🎯 Build Your Perfect Pathway 🌟
+                </h2>
+                <p className="text-xl text-gray-700 max-w-4xl mx-auto font-medium leading-relaxed">
+                  Discover your perfect university pathway by selecting your preferred profession, country, and university. 
+                  <span className="text-indigo-600 font-bold"> Get personalized course combinations and admission requirements globally! 🚀</span>
                 </p>
               </div>
 
               <div className="max-w-4xl mx-auto">
-                <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                  <CardContent className="p-8">
-                    <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-lg rounded-3xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-2"></div>
+                  <CardContent className="p-10">
+                    <div className="grid md:grid-cols-3 gap-8 mb-10">
                       
                       {/* Profession Dropdown */}
                       <div className="space-y-2">
@@ -524,22 +632,31 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
                         </div>
                       </div>
 
-                      {/* State Dropdown */}
+                      {/* Country Dropdown */}
                       <div className="space-y-2">
                         <label className="text-sm font-semibold text-gray-700 flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-cyan-600" />
-                          State (Optional)
+                          <Globe className="h-4 w-4 mr-2 text-cyan-600" />
+                          Country (Optional)
                         </label>
                         <div className="relative">
                           <select
-                            value={selectedState}
-                            onChange={(e) => handleStateChange(e.target.value)}
+                            value={selectedCountry}
+                            onChange={(e) => handleCountryChange(e.target.value)}
                             className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-cyan-500 focus:border-transparent appearance-none cursor-pointer"
                           >
-                            <option value="">All states...</option>
-                            {states.map((state) => (
-                              <option key={state} value={state}>
-                                {state}
+                            <option value="">All countries...</option>
+                            {Object.keys({
+                              'United States': ['Harvard University', 'Stanford University', 'MIT', 'Yale University'],
+                              'United Kingdom': ['University of Oxford', 'University of Cambridge', 'Imperial College London', 'UCL'],
+                              'Canada': ['University of Toronto', 'McGill University', 'University of British Columbia', 'University of Waterloo'],
+                              'Australia': ['University of Melbourne', 'University of Sydney', 'Australian National University', 'UNSW Sydney'],
+                              'Germany': ['Technical University of Munich', 'Heidelberg University', 'Humboldt University', 'RWTH Aachen'],
+                              'Switzerland': ['ETH Zurich', 'University of Zurich', 'EPFL', 'University of Geneva'],
+                              'Singapore': ['National University of Singapore', 'Nanyang Technological University'],
+                              'Netherlands': ['University of Amsterdam', 'Delft University of Technology', 'Leiden University']
+                            }).map((country) => (
+                              <option key={country} value={country}>
+                                {country}
                               </option>
                             ))}
                           </select>
@@ -576,10 +693,10 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
                         onClick={handleStartJourney}
                         disabled={!selectedProfession}
                         size="lg"
-                        className="bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 hover:from-purple-700 hover:via-pink-700 hover:to-cyan-600 text-white px-12 py-4 text-lg font-semibold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        className="bg-gray-900 hover:bg-black text-white px-12 py-4 text-lg font-bold rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-gray-800 hover:border-gray-900"
                       >
                         <Search className="h-5 w-5 mr-2" />
-                        Start My Journey
+                        Get Started Now
                         <ArrowRight className="h-5 w-5 ml-2" />
                       </Button>
                       {!selectedProfession && (
