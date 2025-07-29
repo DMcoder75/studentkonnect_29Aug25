@@ -1,661 +1,691 @@
-import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-import { useAdminAuth } from '../contexts/AdminAuthContext'
-import { counselorService } from '../lib/supabase'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Button } from './ui/button'
-import { Badge } from './ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import React, { useState, useEffect } from 'react';
 import { 
-  Users,
-  UserCheck,
-  UserX,
-  Edit,
-  Trash2,
-  Plus,
+  Users, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  AlertCircle,
   Search,
   Filter,
-  Download,
+  MoreVertical,
+  Eye,
+  Edit,
+  UserCheck,
+  UserX,
+  RefreshCw,
+  Calendar,
   Mail,
   Phone,
   MapPin,
   Star,
   TrendingUp,
-  Clock,
-  DollarSign,
-  Award,
-  AlertTriangle,
-  CheckCircle2,
-  RefreshCw,
-  Save,
-  X
-} from 'lucide-react'
-import AdminSidebar from './AdminSidebar'
+  FileText,
+  MessageSquare
+} from 'lucide-react';
 
-export default function AdminCounselorManagement() {
-  const { adminUser, hasPermission } = useAdminAuth()
-  const location = useLocation()
-  const [selectedTab, setSelectedTab] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
-  const [isLoading, setIsLoading] = useState(false)
-  const [editingCounselor, setEditingCounselor] = useState(null)
-  const [editForm, setEditForm] = useState({})
-  const [counselors, setCounselors] = useState([])
-  const [error, setError] = useState(null)
+const AdminCounselorManagement = () => {
+  const [activeTab, setActiveTab] = useState('requests');
+  const [requests, setRequests] = useState([]);
+  const [assignments, setAssignments] = useState([]);
+  const [counselors, setCounselors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showReassignModal, setShowReassignModal] = useState(false);
 
-  // Fetch counselors from database
+  // Mock data - replace with actual API calls
   useEffect(() => {
-    fetchCounselors()
-  }, [])
-
-  const fetchCounselors = async () => {
-    setIsLoading(true)
-    setError(null)
-    
-    try {
-      const { data, error } = await counselorService.getAllCounselors()
-      
-      if (error) {
-        setError('Failed to fetch counselors: ' + error.message)
-        console.error('Error fetching counselors:', error)
-      } else {
-        setCounselors(data || [])
-      }
-    } catch (err) {
-      setError('Failed to fetch counselors: ' + err.message)
-      console.error('Error fetching counselors:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Detect current route and set appropriate tab
-  useEffect(() => {
-    const path = location.pathname
-    if (path.includes('/pending')) {
-      setSelectedTab('pending')
-    } else if (path.includes('/performance')) {
-      setSelectedTab('active') // Performance shows active counselors
-    } else if (path.includes('/suspended')) {
-      setSelectedTab('suspended')
-    } else {
-      setSelectedTab('all')
-    }
-  }, [location.pathname])
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-      case 'suspended':
-        return <Badge className="bg-red-100 text-red-800">Suspended</Badge>
-      default:
-        return <Badge className="bg-gray-100 text-gray-800">Unknown</Badge>
-    }
-  }
-
-  const getVerificationBadge = (status) => {
-    switch (status) {
-      case 'verified':
-        return <Badge className="bg-blue-100 text-blue-800">Verified</Badge>
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-      case 'rejected':
-        return <Badge className="bg-red-100 text-red-800">Rejected</Badge>
-      default:
-        return <Badge className="bg-gray-100 text-gray-800">Unknown</Badge>
-    }
-  }
-  // Filter counselors based on search and filters
-  const filteredCounselors = counselors.filter(counselor => {
-    const displayName = counselor.display_name || `${counselor.first_name} ${counselor.last_name}`;
-    const searchFields = [
-      displayName,
-      counselor.email,
-      ...(Array.isArray(counselor.specializations) ? counselor.specializations : [])
-    ].join(' ').toLowerCase();
-    
-    const matchesSearch = searchTerm === '' || searchFields.includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || counselor.status === filterStatus;
-    
-    let matchesTab = true;
-    if (selectedTab === 'pending') {
-      matchesTab = counselor.status === 'pending' || !counselor.email_verified_at;
-    } else if (selectedTab === 'active') {
-      matchesTab = counselor.status === 'active';
-    } else if (selectedTab === 'suspended') {
-      matchesTab = counselor.status === 'suspended';
-    }
-
-    return matchesSearch && matchesFilter && matchesTab
-  })
-
-  const refreshData = async () => {
-    await fetchCounselors()
-    alert('Counselor data refreshed successfully!')
-  }
-
-  const handleEditCounselor = (counselorId) => {
-    const counselor = counselors.find(c => c.id === counselorId);
-    if (counselor) {
-      setEditingCounselor(counselorId);
-      setEditForm({
-        first_name: counselor.first_name || '',
-        last_name: counselor.last_name || '',
-        display_name: counselor.display_name || '',
-        email: counselor.email || '',
-        phone: counselor.phone || '',
-        country_code: counselor.country_code || '+61',
-        bio: counselor.bio || '',
-        years_experience: counselor.years_experience || 0,
-        counselor_type: counselor.counselor_type || 'academic',
-        status: counselor.status || 'pending',
-        specializations: Array.isArray(counselor.specializations) ? counselor.specializations.join(', ') : '',
-        languages_spoken: Array.isArray(counselor.languages_spoken) ? counselor.languages_spoken.join(', ') : '',
-        hourly_rate: counselor.hourly_rate || 0,
-        is_available: counselor.is_available || false,
-        is_featured: counselor.is_featured || false
-      });
-    }
-  };
-
-  const handleSaveCounselor = async (counselorId) => {
-    setIsLoading(true);
-    
-    try {
-      const updates = {
-        first_name: editForm.first_name,
-        last_name: editForm.last_name,
-        display_name: editForm.display_name,
-        email: editForm.email,
-        phone: editForm.phone,
-        country_code: editForm.country_code,
-        bio: editForm.bio,
-        years_experience: parseInt(editForm.years_experience) || 0,
-        counselor_type: editForm.counselor_type,
-        status: editForm.status,
-        specializations: editForm.specializations.split(',').map(s => s.trim()).filter(s => s),
-        languages_spoken: editForm.languages_spoken.split(',').map(l => l.trim()).filter(l => l),
-        hourly_rate: parseFloat(editForm.hourly_rate) || 0,
-        is_available: editForm.is_available,
-        is_featured: editForm.is_featured
-      };
-
-      const { data, error } = await counselorService.updateCounselor(counselorId, updates);
-      
-      if (error) {
-        alert('Error updating counselor: ' + error.message);
-      } else {
-        // Update local state
-        setCounselors(prev => prev.map(counselor => 
-          counselor.id === counselorId ? { ...counselor, ...data } : counselor
-        ));
-        
-        setEditingCounselor(null);
-        setEditForm({});
-        alert('Counselor details updated successfully!');
-      }
-    } catch (err) {
-      alert('Error updating counselor: ' + err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCounselor(null);
-    setEditForm({});
-  };
-
-  const handleFormChange = (field, value) => {
-    setEditForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleDeleteCounselor = async (counselorId) => {
-    const counselor = counselors.find(c => c.id === counselorId);
-    if (counselor) {
-      const displayName = counselor.display_name || `${counselor.first_name} ${counselor.last_name}`;
-      const confirmed = confirm(`Are you sure you want to delete counselor:\n\n${displayName} (${counselor.email})?\n\nThis action cannot be undone and will affect ${counselor.current_active_students || 0} active students.`);
-      
-      if (confirmed) {
-        setIsLoading(true);
-        
-        try {
-          const { error } = await counselorService.deleteCounselor(counselorId);
-          
-          if (error) {
-            alert('Error deleting counselor: ' + error.message);
-          } else {
-            setCounselors(prev => prev.filter(c => c.id !== counselorId));
-            alert(`Counselor ${displayName} has been deleted successfully!`);
+    setTimeout(() => {
+      // Mock counselor requests
+      setRequests([
+        {
+          id: 1,
+          studentId: 'student-001',
+          studentName: 'Arjun Patel',
+          studentEmail: 'arjun.patel@email.com',
+          requestedCounselorId: 1,
+          requestedCounselorName: 'Sarah Johnson',
+          requestDate: '2024-07-28 10:30',
+          status: 'pending',
+          priority: 'high',
+          reason: 'I am interested in studying law in Canada and Sarah has excellent reviews for Canadian university admissions. Her expertise in visa guidance would be very helpful for my application process.',
+          preferredMeetingTime: 'Morning (9 AM - 12 PM)',
+          studentProfile: {
+            country: 'India',
+            targetCountry: 'Canada',
+            fieldOfStudy: 'Law',
+            currentEducation: 'Bachelor of Arts (Final Year)',
+            gpa: 8.5
           }
-        } catch (err) {
-          alert('Error deleting counselor: ' + err.message);
-        } finally {
-          setIsLoading(false);
+        },
+        {
+          id: 2,
+          studentId: 'student-002',
+          studentName: 'Meera Singh',
+          studentEmail: 'meera.singh@email.com',
+          requestedCounselorId: 4,
+          requestedCounselorName: 'Michael Chen',
+          requestDate: '2024-07-27 15:45',
+          status: 'pending',
+          priority: 'medium',
+          reason: 'Looking for guidance on engineering programs in Singapore and Australia. Michael\'s global expertise and high success rate make him ideal for my needs.',
+          preferredMeetingTime: 'Afternoon (12 PM - 5 PM)',
+          studentProfile: {
+            country: 'India',
+            targetCountry: 'Singapore',
+            fieldOfStudy: 'Computer Engineering',
+            currentEducation: 'Bachelor of Technology (3rd Year)',
+            gpa: 9.2
+          }
+        },
+        {
+          id: 3,
+          studentId: 'student-003',
+          studentName: 'Rohit Kumar',
+          studentEmail: 'rohit.kumar@email.com',
+          requestedCounselorId: 2,
+          requestedCounselorName: 'James Wilson',
+          requestDate: '2024-07-26 09:15',
+          status: 'approved',
+          priority: 'low',
+          reason: 'Interested in UK universities for business studies. James specializes in UK education system and has good experience with business programs.',
+          preferredMeetingTime: 'Evening (5 PM - 8 PM)',
+          studentProfile: {
+            country: 'India',
+            targetCountry: 'United Kingdom',
+            fieldOfStudy: 'Business Administration',
+            currentEducation: 'Bachelor of Commerce (Final Year)',
+            gpa: 7.8
+          },
+          approvedBy: 'Admin User',
+          approvedDate: '2024-07-26 14:30'
         }
-      }
-    }
+      ]);
+
+      // Mock active assignments
+      setAssignments([
+        {
+          id: 1,
+          studentId: 'student-004',
+          studentName: 'Priya Dubey',
+          studentEmail: 'priya.dubey@email.com',
+          counselorId: 1,
+          counselorName: 'Sarah Johnson',
+          assignedDate: '2024-07-15',
+          status: 'active',
+          progress: 35,
+          currentStage: 'University Selection',
+          nextMeeting: '2024-07-30 14:00',
+          totalMeetings: 3,
+          lastActivity: '2024-07-28 10:30',
+          studentProfile: {
+            country: 'India',
+            targetCountry: 'Canada',
+            fieldOfStudy: 'Law',
+            currentEducation: 'Bachelor of Arts (Completed)',
+            gpa: 8.7
+          }
+        },
+        {
+          id: 2,
+          studentId: 'student-005',
+          studentName: 'Rahul Patel',
+          studentEmail: 'rahul.patel@email.com',
+          counselorId: 1,
+          counselorName: 'Sarah Johnson',
+          assignedDate: '2024-07-10',
+          status: 'active',
+          progress: 65,
+          currentStage: 'Document Preparation',
+          nextMeeting: '2024-07-29 16:00',
+          totalMeetings: 5,
+          lastActivity: '2024-07-27 15:45',
+          studentProfile: {
+            country: 'India',
+            targetCountry: 'Australia',
+            fieldOfStudy: 'Engineering',
+            currentEducation: 'Bachelor of Technology (Completed)',
+            gpa: 9.1
+          }
+        }
+      ]);
+
+      // Mock counselors
+      setCounselors([
+        {
+          id: 1,
+          name: 'Sarah Johnson',
+          email: 'sarah.johnson@studentkonnect.com',
+          specializations: ['University Admissions', 'Visa Guidance', 'Scholarship Assistance'],
+          countries: ['Australia', 'Canada'],
+          currentStudents: 18,
+          maxStudents: 25,
+          rating: 4.8,
+          availability: 'Available'
+        },
+        {
+          id: 2,
+          name: 'James Wilson',
+          email: 'james.wilson@studentkonnect.com',
+          specializations: ['University Admissions', 'Scholarship Assistance', 'Career Guidance'],
+          countries: ['United Kingdom', 'Germany'],
+          currentStudents: 12,
+          maxStudents: 20,
+          rating: 4.6,
+          availability: 'Available'
+        },
+        {
+          id: 3,
+          name: 'Priya Sharma',
+          email: 'priya.sharma@studentkonnect.com',
+          specializations: ['University Admissions', 'Test Preparation', 'Scholarship Assistance'],
+          countries: ['United States', 'Canada'],
+          currentStudents: 8,
+          maxStudents: 15,
+          rating: 4.4,
+          availability: 'Busy'
+        },
+        {
+          id: 4,
+          name: 'Michael Chen',
+          email: 'michael.chen@studentkonnect.com',
+          specializations: ['University Admissions', 'Career Guidance', 'Visa Guidance'],
+          countries: ['Singapore', 'Australia', 'United States'],
+          currentStudents: 22,
+          maxStudents: 30,
+          rating: 4.9,
+          availability: 'Available'
+        }
+      ]);
+
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      approved: 'bg-green-100 text-green-800',
+      rejected: 'bg-red-100 text-red-800',
+      active: 'bg-blue-100 text-blue-800',
+      completed: 'bg-gray-100 text-gray-800',
+      paused: 'bg-orange-100 text-orange-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      high: 'text-red-600',
+      medium: 'text-yellow-600',
+      low: 'text-green-600'
+    };
+    return colors[priority] || 'text-gray-600';
+  };
+
+  const handleApproveRequest = (requestId) => {
+    setRequests(requests.map(req => 
+      req.id === requestId 
+        ? { ...req, status: 'approved', approvedBy: 'Current Admin', approvedDate: new Date().toISOString() }
+        : req
+    ));
+  };
+
+  const handleRejectRequest = (requestId) => {
+    setRequests(requests.map(req => 
+      req.id === requestId 
+        ? { ...req, status: 'rejected', rejectedBy: 'Current Admin', rejectedDate: new Date().toISOString() }
+        : req
+    ));
+  };
+
+  const handleReassignRequest = (requestId, newCounselorId) => {
+    const newCounselor = counselors.find(c => c.id === newCounselorId);
+    setRequests(requests.map(req => 
+      req.id === requestId 
+        ? { 
+            ...req, 
+            requestedCounselorId: newCounselorId,
+            requestedCounselorName: newCounselor.name,
+            status: 'reassigned',
+            reassignedBy: 'Current Admin',
+            reassignedDate: new Date().toISOString()
+          }
+        : req
+    ));
+    setShowReassignModal(false);
+  };
+
+  const filteredRequests = requests.filter(request => {
+    const matchesSearch = request.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         request.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         request.requestedCounselorName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || request.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  const filteredAssignments = assignments.filter(assignment => {
+    const matchesSearch = assignment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         assignment.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         assignment.counselorName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || assignment.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Admin Sidebar */}
-      <AdminSidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Counselor Management</h1>
-              <p className="text-gray-600">Manage counselors, verifications, and performance</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={refreshData}
-                disabled={isLoading}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Counselor
-              </Button>
+              <p className="text-gray-600">Manage counselor requests and assignments</p>
             </div>
           </div>
-        </header>
+        </div>
+      </div>
 
-        {/* Content */}
-        <main className="flex-1 p-6 space-y-6">
+      {/* Stats Cards */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Pending Requests</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {requests.filter(r => r.status === 'pending').length}
+                </p>
+              </div>
+            </div>
+          </div>
           
-          {/* Search and Filters */}
-          <Card className="shadow-sm border-0">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search counselors by name, email, or specialization..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Active Assignments</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {assignments.filter(a => a.status === 'active').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Approved Today</p>
+                <p className="text-2xl font-bold text-gray-900">3</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Success Rate</p>
+                <p className="text-2xl font-bold text-gray-900">94%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8 px-6">
+              {[
+                { id: 'requests', name: 'Counselor Requests', icon: Clock },
+                { id: 'assignments', name: 'Active Assignments', icon: Users },
+                { id: 'counselors', name: 'Counselor Overview', icon: UserCheck }
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`${
+                      activeTab === tab.id
+                        ? 'border-indigo-500 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
                   >
-                    <option value="all">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="pending">Pending</option>
-                    <option value="suspended">Suspended</option>
-                  </select>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.name}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search students, counselors..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="sm:w-48">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="all">All Status</option>
+                  {activeTab === 'requests' && (
+                    <>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </>
+                  )}
+                  {activeTab === 'assignments' && (
+                    <>
+                      <option value="active">Active</option>
+                      <option value="completed">Completed</option>
+                      <option value="paused">Paused</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            </div>
 
-          {/* Counselor Tabs */}
-          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all">All Counselors ({counselors.length})</TabsTrigger>
-              <TabsTrigger value="pending">Pending Verification ({counselors.filter(c => c.status === 'pending' || !c.email_verified_at).length})</TabsTrigger>
-              <TabsTrigger value="active">Active ({counselors.filter(c => c.status === 'active').length})</TabsTrigger>
-              <TabsTrigger value="suspended">Suspended ({counselors.filter(c => c.status === 'suspended').length})</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value={selectedTab} className="space-y-6">
-              {/* Counselors List */}
-              <div className="grid gap-6">
-                {filteredCounselors.map((counselor) => (
-                  <Card key={counselor.id} className="shadow-sm border-0">
-                    <CardContent className="p-6">
-                      {editingCounselor === counselor.id ? (
-                        /* Edit Form */
-                        <div className="space-y-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Edit Counselor Details</h3>
-                            <div className="flex space-x-2">
-                              <Button 
-                                size="sm"
-                                onClick={() => handleSaveCounselor(counselor.id)}
-                                className="bg-green-600 hover:bg-green-700"
-                              >
-                                <Save className="h-4 w-4 mr-2" />
-                                Save Changes
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={handleCancelEdit}
-                              >
-                                <X className="h-4 w-4 mr-2" />
-                                Cancel
-                              </Button>
-                            </div>
+            {/* Counselor Requests Tab */}
+            {activeTab === 'requests' && (
+              <div className="space-y-4">
+                {filteredRequests.map((request) => (
+                  <div key={request.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{request.studentName}</h3>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+                            {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                          </span>
+                          <AlertCircle className={`w-4 h-4 ${getPriorityColor(request.priority)}`} />
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Student Email</p>
+                            <p className="font-medium">{request.studentEmail}</p>
                           </div>
-
-                          <div className="grid md:grid-cols-2 gap-6">
-                            {/* Personal Information */}
-                            <div className="space-y-4">
-                              <h4 className="font-medium text-gray-900">Personal Information</h4>
-                              
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                <input
-                                  type="text"
-                                  value={editForm.first_name || ''}
-                                  onChange={(e) => handleFormChange('first_name', e.target.value)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                <input
-                                  type="text"
-                                  value={editForm.last_name || ''}
-                                  onChange={(e) => handleFormChange('last_name', e.target.value)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
-                                <input
-                                  type="text"
-                                  value={editForm.display_name || ''}
-                                  onChange={(e) => handleFormChange('display_name', e.target.value)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                <input
-                                  type="email"
-                                  value={editForm.email || ''}
-                                  onChange={(e) => handleFormChange('email', e.target.value)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">Country Code</label>
-                                  <input
-                                    type="text"
-                                    value={editForm.country_code || ''}
-                                    onChange={(e) => handleFormChange('country_code', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                                  <input
-                                    type="tel"
-                                    value={editForm.phone || ''}
-                                    onChange={(e) => handleFormChange('phone', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  />
-                                </div>
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                                <textarea
-                                  value={editForm.bio || ''}
-                                  onChange={(e) => handleFormChange('bio', e.target.value)}
-                                  rows={3}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                  <select
-                                    value={editForm.status || ''}
-                                    onChange={(e) => handleFormChange('status', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  >
-                                    <option value="active">Active</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="suspended">Suspended</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">Counselor Type</label>
-                                  <select
-                                    value={editForm.counselor_type || ''}
-                                    onChange={(e) => handleFormChange('counselor_type', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  >
-                                    <option value="academic">Academic</option>
-                                    <option value="career">Career</option>
-                                    <option value="admissions">Admissions</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Professional Information */}
-                            <div className="space-y-4">
-                              <h4 className="font-medium text-gray-900">Professional Information</h4>
-                              
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Specializations (comma-separated)</label>
-                                <input
-                                  type="text"
-                                  value={editForm.specializations || ''}
-                                  onChange={(e) => handleFormChange('specializations', e.target.value)}
-                                  placeholder="computer_science, engineering"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Years Experience</label>
-                                <input
-                                  type="number"
-                                  value={editForm.years_experience || ''}
-                                  onChange={(e) => handleFormChange('years_experience', e.target.value)}
-                                  min="0"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Languages Spoken (comma-separated)</label>
-                                <input
-                                  type="text"
-                                  value={editForm.languages_spoken || ''}
-                                  onChange={(e) => handleFormChange('languages_spoken', e.target.value)}
-                                  placeholder="English, Spanish, French"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (AUD)</label>
-                                <input
-                                  type="number"
-                                  value={editForm.hourly_rate || ''}
-                                  onChange={(e) => handleFormChange('hourly_rate', e.target.value)}
-                                  min="0"
-                                  step="0.01"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="flex items-center space-x-2">
-                                  <input
-                                    type="checkbox"
-                                    id="is_available"
-                                    checked={editForm.is_available || false}
-                                    onChange={(e) => handleFormChange('is_available', e.target.checked)}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                  />
-                                  <label htmlFor="is_available" className="text-sm font-medium text-gray-700">Available</label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <input
-                                    type="checkbox"
-                                    id="is_featured"
-                                    checked={editForm.is_featured || false}
-                                    onChange={(e) => handleFormChange('is_featured', e.target.checked)}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                  />
-                                  <label htmlFor="is_featured" className="text-sm font-medium text-gray-700">Featured</label>
-                                </div>
-                              </div>
-                            </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Requested Counselor</p>
+                            <p className="font-medium">{request.requestedCounselorName}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Request Date</p>
+                            <p className="font-medium">{request.requestDate}</p>
                           </div>
                         </div>
-                      ) : (
-                        /* Display Mode */
-                        <>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-4">
-                              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                <Users className="h-6 w-6 text-blue-600" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-3 mb-2">
-                                  <h3 className="text-lg font-semibold text-gray-900">
-                                    {counselor.display_name || `${counselor.first_name} ${counselor.last_name}`}
-                                  </h3>
-                                  {getStatusBadge(counselor.status)}
-                                  {counselor.email_verified_at && (
-                                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                                      Verified
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                                  <div className="space-y-1">
-                                    <div className="flex items-center">
-                                      <Mail className="h-4 w-4 mr-2" />
-                                      {counselor.email}
-                                    </div>
-                                    <div className="flex items-center">
-                                      <Phone className="h-4 w-4 mr-2" />
-                                      {counselor.country_code} {counselor.phone}
-                                    </div>
-                                    <div className="flex items-center">
-                                      <Award className="h-4 w-4 mr-2" />
-                                      {counselor.counselor_type}
-                                    </div>
-                                  </div>
-                                  <div className="space-y-1">
-                                    <div><strong>Specializations:</strong> {Array.isArray(counselor.specializations) ? counselor.specializations.join(', ') : 'None'}</div>
-                                    <div><strong>Experience:</strong> {counselor.years_experience} years</div>
-                                    <div><strong>Languages:</strong> {Array.isArray(counselor.languages_spoken) ? counselor.languages_spoken.join(', ') : 'None'}</div>
-                                  </div>
-                                </div>
-                                {counselor.bio && (
-                                  <div className="mt-2 text-sm text-gray-600">
-                                    <strong>Bio:</strong> {counselor.bio}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleEditCounselor(counselor.id)}
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </Button>
-                              {hasPermission('manage_counselors') && (
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  className="text-red-600 hover:text-red-700"
-                                  onClick={() => handleDeleteCounselor(counselor.id)}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </Button>
-                              )}
-                            </div>
-                          </div>
 
-                          {/* Performance Metrics */}
-                          {counselor.status === 'active' && (
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                                <div className="text-center">
-                                  <div className="flex items-center justify-center mb-1">
-                                    <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                                    <span className="font-semibold">{counselor.average_rating || '0.0'}</span>
-                                  </div>
-                                  <div className="text-gray-600">Rating</div>
-                                </div>
-                                <div className="text-center">
-                                  <div className="font-semibold text-blue-600">{counselor.total_students_helped || 0}</div>
-                                  <div className="text-gray-600">Students</div>
-                                </div>
-                                <div className="text-center">
-                                  <div className="font-semibold text-green-600">{counselor.success_rate || 0}%</div>
-                                  <div className="text-gray-600">Success Rate</div>
-                                </div>
-                                <div className="text-center">
-                                  <div className="font-semibold text-purple-600">${counselor.hourly_rate || 0}</div>
-                                  <div className="text-gray-600">Hourly Rate</div>
-                                </div>
-                                <div className="text-center">
-                                  <div className="font-semibold text-yellow-600">{counselor.current_active_students || 0}</div>
-                                  <div className="text-gray-600">Active Students</div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Target Country</p>
+                            <p className="font-medium">{request.studentProfile.targetCountry}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Field of Study</p>
+                            <p className="font-medium">{request.studentProfile.fieldOfStudy}</p>
+                          </div>
+                        </div>
+
+                        <div className="mb-4">
+                          <p className="text-sm text-gray-600 mb-1">Reason for Request</p>
+                          <p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{request.reason}</p>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span>Preferred meeting: {request.preferredMeetingTime}</span>
+                          <span>Priority: <span className={getPriorityColor(request.priority)}>{request.priority}</span></span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      {request.status === 'pending' && (
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button
+                            onClick={() => handleApproveRequest(request.id)}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-1"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Approve</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setShowReassignModal(true);
+                            }}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-1"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                            <span>Reassign</span>
+                          </button>
+                          <button
+                            onClick={() => handleRejectRequest(request.id)}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center space-x-1"
+                          >
+                            <XCircle className="w-4 h-4" />
+                            <span>Reject</span>
+                          </button>
+                        </div>
                       )}
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
+            )}
 
-              {filteredCounselors.length === 0 && (
-                <Card className="shadow-sm border-0">
-                  <CardContent className="p-12 text-center">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No counselors found</h3>
-                    <p className="text-gray-600">Try adjusting your search criteria or filters.</p>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-          </Tabs>
-        </main>
+            {/* Active Assignments Tab */}
+            {activeTab === 'assignments' && (
+              <div className="space-y-4">
+                {filteredAssignments.map((assignment) => (
+                  <div key={assignment.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{assignment.studentName}</h3>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(assignment.status)}`}>
+                            {assignment.currentStage}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Counselor</p>
+                            <p className="font-medium">{assignment.counselorName}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Assigned Date</p>
+                            <p className="font-medium">{assignment.assignedDate}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Total Meetings</p>
+                            <p className="font-medium">{assignment.totalMeetings}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Next Meeting</p>
+                            <p className="font-medium">{assignment.nextMeeting}</p>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="mb-4">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm font-medium text-gray-700">Progress</span>
+                            <span className="text-sm text-gray-500">{assignment.progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${assignment.progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span>Target: {assignment.studentProfile.targetCountry}</span>
+                          <span>Field: {assignment.studentProfile.fieldOfStudy}</span>
+                          <span>Last activity: {assignment.lastActivity}</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center space-x-2 ml-4">
+                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <MessageSquare className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Counselors Overview Tab */}
+            {activeTab === 'counselors' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {counselors.map((counselor) => (
+                  <div key={counselor.id} className="border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{counselor.name}</h3>
+                        <p className="text-gray-600">{counselor.email}</p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                          <span className="font-medium">{counselor.rating}</span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            counselor.availability === 'Available' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {counselor.availability}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Specializations</p>
+                      <div className="flex flex-wrap gap-1">
+                        {counselor.specializations.map((spec, index) => (
+                          <span key={index} className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Countries</p>
+                      <p className="text-sm text-gray-600">{counselor.countries.join(', ')}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-lg font-bold text-gray-900">{counselor.currentStudents}</div>
+                        <div className="text-xs text-gray-500">Current Students</div>
+                      </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-lg font-bold text-gray-900">{counselor.maxStudents}</div>
+                        <div className="text-xs text-gray-500">Max Capacity</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Reassign Modal */}
+      {showReassignModal && selectedRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Reassign Counselor for {selectedRequest.studentName}
+            </h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select New Counselor
+              </label>
+              <select 
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleReassignRequest(selectedRequest.id, parseInt(e.target.value));
+                  }
+                }}
+              >
+                <option value="">Choose a counselor...</option>
+                {counselors
+                  .filter(c => c.id !== selectedRequest.requestedCounselorId && c.availability === 'Available')
+                  .map(counselor => (
+                    <option key={counselor.id} value={counselor.id}>
+                      {counselor.name} ({counselor.currentStudents}/{counselor.maxStudents} students)
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowReassignModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default AdminCounselorManagement;
 

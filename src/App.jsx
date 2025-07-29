@@ -30,6 +30,11 @@ import ApplicationAssistance from './components/ApplicationAssistance'
 import EligibilityChecker from './components/EligibilityChecker'
 import CounselorRegistration from './components/CounselorRegistration'
 import CounselorDashboard from './components/CounselorDashboard'
+import CounselorStudents from './components/CounselorStudents'
+import CounselorProfile from './components/CounselorProfile'
+import CounselorMeetings from './components/CounselorMeetings'
+import CounselorApplications from './components/CounselorApplications'
+import CounselorNetwork from './components/CounselorNetwork'
 import CounselorDirectory from './components/CounselorDirectory'
 import CounselorDirectoryNew from './components/CounselorDirectoryNew'
 import CounselorProfilePage from './components/CounselorProfilePage'
@@ -50,7 +55,7 @@ import AdminCommunicationsManagement from './components/AdminCommunicationsManag
 import AdminFinancialManagement from './components/AdminFinancialManagement'
 import AdminSystemManagement from './components/AdminSystemManagement'
 import AdminProtectedRoute from './components/AdminProtectedRoute'
-import CounselorProfile from './components/CounselorProfile'
+import CounselorSelectionPage from './components/CounselorSelectionPage'
 import TravelHelp from './components/TravelHelp'
 import AccommodationHelp from './components/AccommodationHelp'
 import StudentForums from './components/StudentForums'
@@ -120,7 +125,7 @@ function AppContent() {
       {!isAdminRoute && <HelperMenu />}
       
       {/* Show header only for non-admin routes */}
-      {!isAdminRoute && <Header onLogout={handleLogout} />}
+      {!isAdminRoute && <Header onMobileMenuToggle={toggleMobileMenu} onLogout={handleLogout} />}
       
       <Routes>
         <Route path="/" element={<HomePage isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={closeMobileMenu} />} />
@@ -184,6 +189,36 @@ function AppContent() {
             onMobileMenuClose={closeMobileMenu} 
           />
         } />
+        <Route path="/counselor/students" element={
+          <CounselorStudents 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
+        <Route path="/counselor/profile" element={
+          <CounselorProfile 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
+        <Route path="/counselor/meetings" element={
+          <CounselorMeetings 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
+        <Route path="/counselor/applications" element={
+          <CounselorApplications 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
+        <Route path="/counselor/network" element={
+          <CounselorNetwork 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
         <Route path="/counselor/directory" element={
           <CounselorDirectoryNew 
             isMobileMenuOpen={isMobileMenuOpen} 
@@ -192,6 +227,12 @@ function AppContent() {
         } />
         <Route path="/find-counselors" element={
           <CounselorDirectoryNew 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
+        <Route path="/counselor/select" element={
+          <CounselorSelectionPage 
             isMobileMenuOpen={isMobileMenuOpen} 
             onMobileMenuClose={closeMobileMenu} 
           />

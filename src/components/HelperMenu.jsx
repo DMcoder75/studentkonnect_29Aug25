@@ -170,27 +170,28 @@ export default function HelperMenu() {
   }
 
   return (
-    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-2 shadow-lg">
-      <div className="container mx-auto px-6">
+    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-2 shadow-lg relative z-40">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between">
           {/* Left side - Countries Menu */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2 sm:space-x-6">
             <div className="relative" ref={countriesRef}>
               <button
                 onClick={() => setShowCountriesMenu(!showCountriesMenu)}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 backdrop-blur-sm"
+                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1 sm:py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 backdrop-blur-sm text-xs sm:text-sm"
               >
-                <Globe className="h-4 w-4" />
-                <span className="font-medium">Study Destinations</span>
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showCountriesMenu ? 'rotate-180' : ''}`} />
+                <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="font-medium hidden sm:inline">Study Destinations</span>
+                <span className="font-medium sm:hidden">Destinations</span>
+                <ChevronDown className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-200 ${showCountriesMenu ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Countries Dropdown */}
               {showCountriesMenu && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white text-gray-800 rounded-xl shadow-2xl z-50 border border-gray-200">
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                      <Globe className="h-5 w-5 mr-2 text-indigo-600" />
+                <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-white text-gray-800 rounded-xl shadow-2xl z-[100] border border-gray-200 max-h-96 overflow-y-auto">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                      <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-indigo-600" />
                       Global Study Destinations
                     </h3>
                     <div className="grid grid-cols-1 gap-2">
@@ -198,12 +199,12 @@ export default function HelperMenu() {
                         <div
                           key={country.id}
                           onClick={() => handleCountryClick(country)}
-                          className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 group"
+                          className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 group"
                         >
-                          <div className="flex items-center space-x-3">
-                            <span className="text-2xl">{country.flag}</span>
+                          <div className="flex items-center space-x-2 sm:space-x-3">
+                            <span className="text-lg sm:text-2xl">{country.flag}</span>
                             <div>
-                              <div className="font-semibold text-gray-800 group-hover:text-indigo-600">
+                              <div className="font-semibold text-gray-800 group-hover:text-indigo-600 text-sm sm:text-base">
                                 {country.name}
                               </div>
                               <div className="text-xs text-gray-500">
@@ -214,9 +215,9 @@ export default function HelperMenu() {
                           <div className="flex items-center space-x-1 text-xs text-gray-400">
                             <GraduationCap className="h-3 w-3" />
                             <span>{country.universities}</span>
-                            <BookOpen className="h-3 w-3 ml-2" />
+                            <BookOpen className="h-3 w-3 ml-1 sm:ml-2" />
                             <span>{country.courses}</span>
-                            <TrendingUp className="h-3 w-3 ml-2" />
+                            <TrendingUp className="h-3 w-3 ml-1 sm:ml-2" />
                             <span>{country.pathways}</span>
                           </div>
                         </div>
@@ -227,8 +228,8 @@ export default function HelperMenu() {
               )}
             </div>
 
-            {/* Quick Stats */}
-            <div className="hidden md:flex items-center space-x-4 text-sm">
+            {/* Quick Stats - Hidden on mobile */}
+            <div className="hidden lg:flex items-center space-x-4 text-sm">
               <div className="flex items-center space-x-1">
                 <Globe className="h-4 w-4" />
                 <span>8+ Countries</span>
@@ -248,26 +249,26 @@ export default function HelperMenu() {
           <div className="relative" ref={featuredRef}>
             <button
               onClick={() => setShowFeaturedMenu(!showFeaturedMenu)}
-              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 backdrop-blur-sm"
+              className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1 sm:py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 backdrop-blur-sm text-xs sm:text-sm"
             >
-              <Star className="h-4 w-4" />
+              <Star className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="font-medium">Featured</span>
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showFeaturedMenu ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-200 ${showFeaturedMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Featured Dropdown */}
             {showFeaturedMenu && (
-              <div className="absolute top-full right-0 mt-2 w-96 bg-white text-gray-800 rounded-xl shadow-2xl z-50 border border-gray-200">
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <Crown className="h-5 w-5 mr-2 text-yellow-500" />
+              <div className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-white text-gray-800 rounded-xl shadow-2xl z-[100] border border-gray-200 max-h-96 overflow-y-auto">
+                <div className="p-3 sm:p-4">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                    <Crown className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-yellow-500" />
                     Featured Content
                   </h3>
 
                   {/* Featured Universities */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-indigo-600 mb-3 flex items-center">
-                      <GraduationCap className="h-4 w-4 mr-2" />
+                  <div className="mb-4 sm:mb-6">
+                    <h4 className="text-sm font-semibold text-indigo-600 mb-2 sm:mb-3 flex items-center">
+                      <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Top Universities
                     </h4>
                     <div className="space-y-2">
@@ -278,7 +279,7 @@ export default function HelperMenu() {
                           className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200"
                         >
                           <div>
-                            <div className="font-medium text-sm">{uni.name}</div>
+                            <div className="font-medium text-xs sm:text-sm">{uni.name}</div>
                             <div className="text-xs text-gray-500">{uni.country} • {uni.type}</div>
                           </div>
                           <div className="flex items-center space-x-1">
@@ -289,8 +290,6 @@ export default function HelperMenu() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Featured Courses */}
                   <div className="mb-6">
                     <h4 className="text-sm font-semibold text-pink-600 mb-3 flex items-center">
                       <BookOpen className="h-4 w-4 mr-2" />

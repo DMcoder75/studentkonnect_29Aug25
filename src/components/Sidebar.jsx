@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { globalEducationService } from '../services/globalEducationService'
@@ -77,8 +77,60 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
       icon: Home,
       badge: null
     },
-    // Student-related items (when authenticated)
-    ...(isAuthenticated() ? [
+    // Counselor-specific items (when counselor is authenticated)
+    ...(isAuthenticated() && isCounselor ? [
+      {
+        id: 'counselor-dashboard',
+        name: 'My Dashboard',
+        path: '/counselor/dashboard',
+        icon: BarChart3,
+        badge: null
+      },
+      {
+        id: 'my-students',
+        name: 'My Students',
+        path: '/counselor/students',
+        icon: Users,
+        badge: '18'
+      },
+      {
+        id: 'counselor-profile',
+        name: 'My Profile',
+        path: '/counselor/profile',
+        icon: User,
+        badge: null
+      },
+      {
+        id: 'meetings-schedule',
+        name: 'Meetings & Schedule',
+        path: '/counselor/meetings',
+        icon: MessageCircle,
+        badge: '3'
+      },
+      {
+        id: 'student-applications',
+        name: 'Student Applications',
+        path: '/counselor/applications',
+        icon: FileText,
+        badge: '12'
+      },
+      {
+        id: 'counselor-network',
+        name: 'Counselor Network',
+        path: '/counselor/network',
+        icon: Users,
+        badge: null
+      },
+      {
+        id: 'resources-tools',
+        name: 'Resources & Tools',
+        path: '/counselor/resources',
+        icon: BookOpen,
+        badge: null
+      }
+    ] : []),
+    // Student-related items (when student is authenticated)
+    ...(isAuthenticated() && !isCounselor ? [
       {
         id: 'student-dashboard',
         name: 'My Dashboard',
@@ -100,18 +152,6 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         icon: MessageCircle,
         badge: '2'
       },
-      // Show full Counselor Connect menu only for counselors
-      ...(isCounselor ? [{
-        id: 'counselor-connect',
-        name: 'Counselor Connect',
-        icon: User,
-        badge: null,
-        submenu: [
-          { name: 'Find Counselors', path: '/counselor/directory' },
-          { name: 'Become a Counselor', path: '/counselor/register' },
-          { name: 'Counselor Dashboard', path: '/counselor/dashboard' }
-        ]
-      }] : []),
       {
         id: 'student-forums',
         name: 'Student Forums',
@@ -141,6 +181,18 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         badge: null
       }
     ] : []),
+    // Show Counselor Connect menu for students only
+    ...(isAuthenticated() && !isCounselor ? [{
+      id: 'counselor-connect',
+      name: 'Counselor Connect',
+      icon: User,
+      badge: null,
+      submenu: [
+        { name: 'Find Counselors', path: '/counselor/directory' },
+        { name: 'Select Counselor', path: '/counselor/select' },
+        { name: 'Become a Counselor', path: '/counselor/register' }
+      ]
+    }] : []),
     // Global Education - Parent menu for Universities, Pathways, and Courses by Country
     {
       id: 'global-education',
@@ -238,9 +290,16 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
     {
       id: 'find-counselors',
       name: 'Find Counselors',
-      path: '/counselor/directory',
       icon: User,
-      badge: null
+      badge: null,
+      submenu: [
+        { name: 'Browse Counselors', path: '/counselor/directory' },
+        { name: 'Select Counselor', path: '/counselor/select' },
+        ...(isCounselor ? [
+          { name: 'Counselor Dashboard', path: '/counselor/dashboard' },
+          { name: 'My Students', path: '/counselor/students' }
+        ] : [])
+      ]
     },
     {
       id: 'career-insights',

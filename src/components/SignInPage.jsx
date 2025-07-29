@@ -114,10 +114,15 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
         if (result.user) {
           // Use the login function from auth context
           login(result.user)
-          setSuccess(`Welcome back, ${result.user.firstName}! Redirecting to your dashboard...`)
+          setSuccess(`Welcome back, ${result.user.first_name || result.user.firstName}! Redirecting to your dashboard...`)
           
           setTimeout(() => {
-            navigate('/student/profile')
+            // Redirect based on user role
+            if (result.user.role === 'counselor') {
+              navigate('/counselor/dashboard')
+            } else {
+              navigate('/student/profile')
+            }
           }, 1500)
         } else {
           setError('Invalid credentials')

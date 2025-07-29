@@ -24,11 +24,46 @@ const DEMO_STUDENTS = [
   { email: 'nikhil.rao@email.com', password: 'student123', name: 'Nikhil Rao' }
 ]
 
+// Demo counselor credentials for testing
+const DEMO_COUNSELORS = [
+  { email: 'sarah.johnson@studentkonnect.com', password: 'counselor123', name: 'Dr. Sarah Johnson', role: 'counselor' },
+  { email: 'james.wilson@studentkonnect.com', password: 'counselor123', name: 'Dr. James Wilson', role: 'counselor' },
+  { email: 'priya.sharma@studentkonnect.com', password: 'counselor123', name: 'Dr. Priya Sharma', role: 'counselor' },
+  { email: 'michael.chen@studentkonnect.com', password: 'counselor123', name: 'Dr. Michael Chen', role: 'counselor' },
+  { email: 'emma.davis@studentkonnect.com', password: 'counselor123', name: 'Dr. Emma Davis', role: 'counselor' }
+]
+
 export const authService = {
   // Authenticate user with database
   async authenticateUser(email, password) {
     try {
-      // First, check if it's a demo student account
+      // First, check if it's a demo counselor account
+      const demoCounselor = DEMO_COUNSELORS.find(counselor => 
+        counselor.email === email && counselor.password === password
+      )
+
+      if (demoCounselor) {
+        // Return counselor authentication data
+        return {
+          success: true,
+          user: {
+            id: `counselor_${demoCounselor.email.split('@')[0]}`,
+            email: demoCounselor.email,
+            first_name: demoCounselor.name.split(' ')[1] || demoCounselor.name,
+            last_name: demoCounselor.name.split(' ')[2] || '',
+            full_name: demoCounselor.name,
+            role: 'counselor',
+            user_roles: [{
+              role_name: 'counselor',
+              role_description: 'Education Counselor',
+              permissions: ['view_students', 'manage_applications', 'schedule_meetings']
+            }]
+          },
+          message: 'Counselor authentication successful'
+        }
+      }
+
+      // Then, check if it's a demo student account
       const demoStudent = DEMO_STUDENTS.find(student => 
         student.email === email && student.password === password
       )
