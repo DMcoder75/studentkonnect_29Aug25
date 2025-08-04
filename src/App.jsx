@@ -35,6 +35,7 @@ import CounselorProfile from './components/CounselorProfile'
 import CounselorMeetings from './components/CounselorMeetings'
 import CounselorApplications from './components/CounselorApplications'
 import CounselorNetwork from './components/CounselorNetwork'
+import CounselorResources from './components/CounselorResources'
 import CounselorDirectory from './components/CounselorDirectory'
 import CounselorDirectoryNew from './components/CounselorDirectoryNew'
 import CounselorProfilePage from './components/CounselorProfilePage'
@@ -215,6 +216,12 @@ function AppContent() {
         } />
         <Route path="/counselor/network" element={
           <CounselorNetwork 
+            isMobileMenuOpen={isMobileMenuOpen} 
+            onMobileMenuClose={closeMobileMenu} 
+          />
+        } />
+        <Route path="/counselor/resources" element={
+          <CounselorResources 
             isMobileMenuOpen={isMobileMenuOpen} 
             onMobileMenuClose={closeMobileMenu} 
           />
