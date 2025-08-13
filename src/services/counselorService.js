@@ -121,18 +121,26 @@ export class CounselorService {
       // Get all counselors first
       const counselors = await this.getAllCounselors();
       
-      // Import and use the matching algorithm
-      const { CounselorMatcher } = await import('/home/ubuntu/counselor_matching_algorithm.js');
-      const matcher = new CounselorMatcher();
-      
-      // Find matches
-      const matches = await matcher.findMatchingCounselors(
-        studentProfile, 
-        counselors, 
-        options
-      );
+      // Import and use the matching algorithm      // Simple matching algorithm - can be enhanced later
+      const matchedCounselors = counselors.filter(counselor => {
+        // Basic matching logic
+        const hasRequiredSpecialization = !criteria.specialization || 
+          counselor.specializations?.includes(criteria.specialization);
+        
+        const hasRequiredLocation = !criteria.location || 
+          counselor.coverage?.some(coverage => 
+            coverage.country?.toLowerCase().includes(criteria.location.toLowerCase()) ||
+            coverage.state_province?.toLowerCase().includes(criteria.location.toLowerCase()) ||
+            coverage.city?.toLowerCase().includes(criteria.location.toLowerCase())
+          );
+        
+        const meetsRatingRequirement = !criteria.minRating || 
+          counselor.average_rating >= criteria.minRating;
+        
+        return hasRequiredSpecialization && hasRequiredLocation && meetsRatingRequirement;
+      });
 
-      return matches;
+      return matchedCounselors;
     } catch (error) {
       console.error('Error finding matching counselors:', error);
       throw error;

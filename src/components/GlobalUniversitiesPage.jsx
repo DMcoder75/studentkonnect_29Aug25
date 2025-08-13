@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Search, Filter, MapPin, Globe, Building2, Users, Calendar, ExternalLink, Star } from 'lucide-react'
-import { globalEducationService } from '../services/globalEducationService'
+import { realDatabaseService } from '../services/realDatabaseService'
 import CountrySelector from './CountrySelector'
 import Sidebar from './Sidebar'
 
@@ -41,8 +41,8 @@ const GlobalUniversitiesPage = ({ isMobileMenuOpen, onMobileMenuClose }) => {
       
       // Fetch countries and universities in parallel
       const [countriesResult, universitiesResult] = await Promise.all([
-        globalEducationService.getAllCountries(),
-        globalEducationService.getAllUniversities()
+        realDatabaseService.getAllCountries(),
+        realDatabaseService.getAllUniversities()
       ])
 
       if (countriesResult.data) {

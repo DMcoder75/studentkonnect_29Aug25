@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { globalEducationService } from '../services/globalEducationService'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+// Mock auth context for now
+const useAuth = () => ({
+  isAuthenticated: () => false,
+  user: null
+})
+import { realDatabaseService } from '../services/realDatabaseService'
 import { 
   Home, 
   GraduationCap, 
@@ -46,7 +48,7 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
   const fetchCountries = async () => {
     try {
       setLoadingCountries(true)
-      const { data, error } = await globalEducationService.getAllCountries()
+      const { data, error } = await realDatabaseService.getAllCountries()
       
       if (error) {
         console.error('Error fetching countries:', error)

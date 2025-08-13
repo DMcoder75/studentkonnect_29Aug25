@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, ArrowRight, ArrowLeft, User, Users, Search, Globe, Calendar, GraduationCap, BookOpen, MapPin } from 'lucide-react';
 
 const OnboardingModal = ({ isOpen, onClose, onComplete }) => {

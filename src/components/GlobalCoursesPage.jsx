@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -6,9 +7,10 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { BookOpen, Search, Filter, Globe, GraduationCap, Clock, Languages, MapPin } from 'lucide-react'
 import Sidebar from './Sidebar'
-import { globalEducationService } from '../services/globalEducationService'
+import { realDatabaseService } from '../services/realDatabaseService'
 
 export default function GlobalCoursesPage({ isMobileMenuOpen, onMobileMenuClose }) {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [courses, setCourses] = useState([])
   const [countries, setCountries] = useState([])
   const [universities, setUniversities] = useState([])
@@ -26,9 +28,9 @@ export default function GlobalCoursesPage({ isMobileMenuOpen, onMobileMenuClose 
         
         // Fetch countries, universities, and courses from global database
         const [countriesResult, universitiesResult, coursesResult] = await Promise.all([
-          globalEducationService.getAllCountries(),
-          globalEducationService.getAllUniversities(),
-          globalEducationService.getAllCourses()
+          realDatabaseService.getAllCountries(),
+          realDatabaseService.getAllUniversities(),
+          realDatabaseService.getAllCourses()
         ])
 
         if (countriesResult.data) {
@@ -144,6 +146,17 @@ export default function GlobalCoursesPage({ isMobileMenuOpen, onMobileMenuClose 
 
     fetchData()
   }, [])
+
+  useEffect(() => {
+    // Handle URL parameters for country filtering
+    const countryParam = searchParams.get('country')
+    if (countryParam && countries.length > 0) {
+      const country = countries.find(c => c.country_id.toString() === countryParam)
+      if (country) {
+        setSelectedCountry(country.country_name)
+      }
+    }
+  }, [searchParams, countries])
 
   // Filter courses based on search and filters
   const filteredCourses = courses.filter(course => {
