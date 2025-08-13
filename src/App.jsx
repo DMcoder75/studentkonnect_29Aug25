@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/Header'
-import HomePageExact from './components/HomePageExact'
+import HomePageEnhanced from './components/HomePageEnhanced'
 import OnboardingModal from './components/OnboardingModal'
 import useEngagementTimer from './hooks/useEngagementTimer'
 
@@ -67,7 +67,7 @@ function App() {
           <Header />
           
           <Routes>
-            <Route path="/" element={<HomePageExact />} />
+            <Route path="/" element={<HomePageEnhanced />} />
           
           {/* Global Education Routes */}
           <Route path="/global/universities" element={<GlobalUniversitiesPage />} />

@@ -130,7 +130,7 @@ export default function Footer() {
             {/* Copyright */}
             <div className="text-center md:text-left">
               <p className="text-gray-400 text-sm">
-                © 2025 <span className="text-white font-medium">Dalsi Music Studio</span>. All rights reserved.
+                © 2025 <span className="text-white font-medium">StudentKonnect</span>. All rights reserved.
               </p>
             </div>
 
