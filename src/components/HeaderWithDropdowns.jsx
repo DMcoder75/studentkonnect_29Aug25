@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { Search, User, Settings, Globe, GraduationCap, BookOpen, Star, ChevronDown } from 'lucide-react'
+import { Search, User, Settings, Globe, GraduationCap, BookOpen, Star, ChevronDown, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { realDatabaseService } from '../services/realDatabaseService'
 
 const HeaderWithDropdowns = () => {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [dropdownStates, setDropdownStates] = useState({
     destinations: false,
     universities: false,
     courses: false,
-    featured: false
+    featured: false,
+    userMenu: false
   })
   
   // Data states
@@ -77,7 +80,8 @@ const HeaderWithDropdowns = () => {
       destinations: false,
       universities: false,
       courses: false,
-      featured: false
+      featured: false,
+      userMenu: false
     })
   }
 
@@ -93,6 +97,12 @@ const HeaderWithDropdowns = () => {
 
   const handleCourseClick = (course) => {
     navigate(`/global/courses?course=${encodeURIComponent(course.name)}`)
+    closeAllDropdowns()
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
     closeAllDropdowns()
   }
 
@@ -339,13 +349,72 @@ const HeaderWithDropdowns = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => navigate('/signin')}
-              className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
-            >
-              <User className="w-5 h-5" />
-              <span>Sign In</span>
-            </button>
+            {user ? (
+              // Logged in user menu
+              <div className="relative">
+                <button 
+                  onClick={() => toggleDropdown('userMenu')}
+                  className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                    {user.firstName ? user.firstName.charAt(0) : 'U'}
+                  </div>
+                  <span>Hi, {user.firstName || user.name}</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${dropdownStates.userMenu ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {dropdownStates.userMenu && (
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                          {user.firstName ? user.firstName.charAt(0) : 'U'}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">{user.name}</div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => { navigate('/student/profile'); closeAllDropdowns(); }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 text-sm transition-colors flex items-center space-x-2"
+                    >
+                      <User className="h-4 w-4" />
+                      <span>My Profile</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => { navigate('/student/dashboard'); closeAllDropdowns(); }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 text-sm transition-colors flex items-center space-x-2"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span>My Dashboard</span>
+                    </button>
+                    
+                    <div className="border-t border-gray-100 mt-2 pt-2">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 text-sm transition-colors flex items-center space-x-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Not logged in - show sign in button
+              <button 
+                onClick={() => navigate('/signin')}
+                className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
+              >
+                <User className="w-5 h-5" />
+                <span>Sign In</span>
+              </button>
+            )}
             
             <button 
               onClick={() => navigate('/admin')}
@@ -359,7 +428,7 @@ const HeaderWithDropdowns = () => {
       </header>
 
       {/* Overlay to close dropdowns when clicking outside */}
-      {(dropdownStates.destinations || dropdownStates.universities || dropdownStates.courses || dropdownStates.featured) && (
+      {(dropdownStates.destinations || dropdownStates.universities || dropdownStates.courses || dropdownStates.featured || dropdownStates.userMenu) && (
         <div 
           className="fixed inset-0 z-40" 
           onClick={closeAllDropdowns}

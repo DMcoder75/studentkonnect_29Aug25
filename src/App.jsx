@@ -37,6 +37,10 @@ import TermsOfServicePage from './components/TermsOfServicePage'
 import TravelHelp from './components/TravelHelp'
 import AccommodationHelp from './components/AccommodationHelp'
 
+// Import new student components
+import StudentProfile from './components/StudentProfile'
+import SignInForm from './components/SignInForm'
+
 function App() {
   const [user, setUser] = useState(null) // Track user state
   
@@ -87,8 +91,12 @@ function App() {
           
           {/* Student Routes */}
           <Route path="/student/dashboard" element={<StudentDashboard />} />
-          <Route path="/student/profile" element={<StudentProfileDashboard />} />
+          <Route path="/student/profile" element={<StudentProfile />} />
           <Route path="/student/forums" element={<StudentForums />} />
+          
+          {/* Authentication Routes */}
+          <Route path="/signin" element={<SignInForm />} />
+          <Route path="/login" element={<SignInForm />} />
           
           {/* Tools & Utilities */}
           <Route path="/career-insights" element={<CareerInsightsPage />} />

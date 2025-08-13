@@ -28,9 +28,48 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
   }, [])
 
-  const login = (userData) => {
-    setUser(userData)
-    localStorage.setItem('user', JSON.stringify(userData))
+  const login = (email, password) => {
+    // Predefined student data for demo
+    const studentData = {
+      'priya.dubey@email.com': {
+        id: 1,
+        email: 'priya.dubey@email.com',
+        name: 'Priya Dubey',
+        firstName: 'Priya',
+        role: 'student',
+        profileCompletion: 33,
+        personalInfo: {
+          fullName: 'Priya Dubey',
+          nationality: 'Not specified',
+          currentLocation: 'Not specified',
+          phone: '+91-9876543210'
+        },
+        academicBackground: {
+          currentInstitution: 'Not specified',
+          currentEducationLevel: 'Not Specified',
+          expectedGraduationYear: 'Not specified',
+          currentGPA: 'Not specified',
+          previousEducation: 'Not specified'
+        },
+        preferences: {
+          targetCountries: [],
+          targetUniversities: [],
+          interestedPrograms: [],
+          budgetRange: 'Not specified'
+        },
+        connections: 2,
+        joinedDate: '2024-01-15'
+      }
+    }
+
+    if (studentData[email] && password === 'password123') {
+      const userData = studentData[email]
+      setUser(userData)
+      localStorage.setItem('user', JSON.stringify(userData))
+      return { success: true, user: userData }
+    }
+    
+    return { success: false, error: 'Invalid credentials' }
   }
 
   const logout = () => {

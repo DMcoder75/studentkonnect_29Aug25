@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { 
   ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, 
   Globe, Target, Building, Search, ChevronDown, Mail, Phone, MapPin 
 } from 'lucide-react'
 import Sidebar from './Sidebar'
+import StudentSidebar from './StudentSidebar'
 import Footer from './Footer'
 import { globalEducationService } from '../services/globalEducationService'
 
@@ -53,6 +55,7 @@ const customStyles = `
 
 export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [universities, setUniversities] = useState([])
   const [stats, setStats] = useState({
     totalCountries: 8,
@@ -323,7 +326,11 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
 
       {/* Main Content with Sidebar */}
       <div className="flex">
-        <Sidebar isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={onMobileMenuClose} />
+        {user ? (
+          <StudentSidebar isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={onMobileMenuClose} />
+        ) : (
+          <Sidebar isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={onMobileMenuClose} />
+        )}
         
         <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen">
           
