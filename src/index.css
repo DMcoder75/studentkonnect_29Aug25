@@ -622,13 +622,13 @@ html {
   font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
-/* Hero section font size - made more prominent */
+/* Hero section font size - made much more prominent for true hero impact */
 .hero-title {
-  font-size: 3rem !important; /* Increased from 2.5rem for better impact */
+  font-size: 3.267rem !important; /* Increased by 4 points from 3rem */
 }
 
 .hero-subtitle {
-  font-size: 1.133rem !important; /* Increased from 1rem */
+  font-size: 1.4rem !important; /* Increased by 4 points from 1.133rem */
 }
 
 /* General text size overrides - all increased by 1 point */
@@ -671,11 +671,11 @@ input, textarea, select {
   }
   
   .hero-title {
-    font-size: 2.25rem !important; /* Increased from 2rem */
+    font-size: 2.517rem !important; /* Increased by 4 points from 2.25rem */
   }
   
   .hero-subtitle {
-    font-size: 1rem !important; /* Increased from 0.9rem */
+    font-size: 1.267rem !important; /* Increased by 4 points from 1rem */
   }
 }
 
@@ -685,11 +685,11 @@ input, textarea, select {
   }
   
   .hero-title {
-    font-size: 2rem !important; /* Increased from 1.75rem */
+    font-size: 2.267rem !important; /* Increased by 4 points from 2rem */
   }
   
   .hero-subtitle {
-    font-size: 0.9rem !important; /* Increased from 0.8rem */
+    font-size: 1.167rem !important; /* Increased by 4 points from 0.9rem */
   }
 }
 
