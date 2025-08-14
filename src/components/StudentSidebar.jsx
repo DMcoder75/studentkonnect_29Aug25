@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { 
   Home, 
@@ -21,6 +21,7 @@ import {
 
 const StudentSidebar = ({ isOpen, onClose, isMobileMenuOpen, onMobileMenuClose }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
   const [expandedItems, setExpandedItems] = useState({})
 
@@ -206,25 +207,36 @@ const StudentSidebar = ({ isOpen, onClose, isMobileMenuOpen, onMobileMenuClose }
 
           {/* Student Menu Items */}
           <div className="space-y-2 mb-6">
-            {studentMenuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavigation(item.path)}
-                className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 rounded-lg transition-colors group"
-              >
-                <div className="flex items-center space-x-3">
-                  <item.icon className={`h-5 w-5 ${item.color}`} />
-                  <span className="font-medium text-gray-700 group-hover:text-gray-900">
-                    {item.label}
-                  </span>
-                </div>
-                {item.badge && (
-                  <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            ))}
+            {studentMenuItems.map((item) => {
+              const isActive = location.pathname === item.path
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavigation(item.path)}
+                  className={`w-full flex items-center justify-between p-3 text-left rounded-lg transition-colors group ${
+                    isActive 
+                      ? 'bg-purple-50 border-l-4 border-purple-500' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className={`h-5 w-5 ${isActive ? 'text-purple-600' : item.color}`} />
+                    <span className={`font-medium ${
+                      isActive 
+                        ? 'text-purple-700' 
+                        : 'text-gray-700 group-hover:text-gray-900'
+                    }`}>
+                      {item.label}
+                    </span>
+                  </div>
+                  {item.badge && (
+                    <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </div>
 
           {/* Smart Apply Section */}

@@ -1,12 +1,29 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import StudentSidebar from './StudentSidebar'
+import { Edit, User, GraduationCap, Settings, FileText } from 'lucide-react'
 
 const StudentProfile = () => {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('personal')
 
   if (!user) {
-    return <div>Please log in to view your profile.</div>
+    return (
+      <div className="flex min-h-screen">
+        <StudentSidebar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Please log in to view your profile</h2>
+            <button 
+              onClick={() => window.location.href = '/signin'}
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+            >
+              Sign In
+            </button>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   const profileSections = [
@@ -118,8 +135,13 @@ const StudentProfile = () => {
   )
 
   return (
-    <main className="flex-1 w-full md:w-auto transition-all duration-300">
-      <div className="container mx-auto px-6 py-8">
+    <div className="flex min-h-screen">
+      {/* Left StudentSidebar */}
+      <StudentSidebar />
+      
+      {/* Right Detail Section with Profile Content */}
+      <main className="flex-1 w-full md:w-auto transition-all duration-300">
+        <div className="container mx-auto px-6 py-8">
         {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -219,8 +241,9 @@ const StudentProfile = () => {
             </div>
           </div>
         </div>
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   )
 }
 
