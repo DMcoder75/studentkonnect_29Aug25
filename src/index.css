@@ -573,123 +573,123 @@ textarea:focus {
 }
 
 
-/* Global font size reduction for more compact design */
+/* Global font size adjustment - increased by 1 point for better readability */
 html {
-  font-size: 14px; /* Reduced from default 16px */
+  font-size: 15px; /* Increased from 14px to 15px */
 }
 
-/* Header and navigation font size reduction */
+/* Header and navigation font size adjustment */
 .header-text {
-  font-size: 0.875rem !important; /* 14px */
+  font-size: 0.933rem !important; /* Increased from 0.875rem */
 }
 
 .nav-text {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
 .button-text {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
-/* Sidebar font size reduction */
+/* Sidebar font size adjustment */
 .sidebar-text {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
 .sidebar-title {
-  font-size: 0.9rem !important; /* 14.4px */
+  font-size: 0.967rem !important; /* Increased from 0.9rem */
 }
 
-/* Card and content font size reduction */
+/* Card and content font size adjustment */
 .card-title {
-  font-size: 1rem !important; /* 16px */
+  font-size: 1.067rem !important; /* Increased from 1rem */
 }
 
 .card-text {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
 .content-text {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
-/* Form elements font size reduction */
+/* Form elements font size adjustment */
 .form-label {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
 .form-input {
-  font-size: 0.8rem !important; /* 12.8px */
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
-/* Hero section font size reduction */
+/* Hero section font size - made more prominent */
 .hero-title {
-  font-size: 2.5rem !important; /* Reduced from larger */
+  font-size: 3rem !important; /* Increased from 2.5rem for better impact */
 }
 
 .hero-subtitle {
-  font-size: 1rem !important; /* Reduced */
+  font-size: 1.133rem !important; /* Increased from 1rem */
 }
 
-/* General text size overrides */
-.text-xs { font-size: 0.65rem !important; }
-.text-sm { font-size: 0.75rem !important; }
-.text-base { font-size: 0.8rem !important; }
-.text-lg { font-size: 0.9rem !important; }
-.text-xl { font-size: 1rem !important; }
-.text-2xl { font-size: 1.25rem !important; }
-.text-3xl { font-size: 1.5rem !important; }
-.text-4xl { font-size: 2rem !important; }
-.text-5xl { font-size: 2.5rem !important; }
+/* General text size overrides - all increased by 1 point */
+.text-xs { font-size: 0.717rem !important; } /* Increased from 0.65rem */
+.text-sm { font-size: 0.817rem !important; } /* Increased from 0.75rem */
+.text-base { font-size: 0.867rem !important; } /* Increased from 0.8rem */
+.text-lg { font-size: 0.967rem !important; } /* Increased from 0.9rem */
+.text-xl { font-size: 1.067rem !important; } /* Increased from 1rem */
+.text-2xl { font-size: 1.317rem !important; } /* Increased from 1.25rem */
+.text-3xl { font-size: 1.567rem !important; } /* Increased from 1.5rem */
+.text-4xl { font-size: 2.067rem !important; } /* Increased from 2rem */
+.text-5xl { font-size: 2.567rem !important; } /* Increased from 2.5rem */
 
-/* Button size reduction */
+/* Button size adjustment */
 button {
-  font-size: 0.8rem !important;
-  padding: 0.5rem 1rem !important;
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
+  padding: 0.533rem 1.067rem !important; /* Slightly increased padding */
 }
 
-/* Input size reduction */
+/* Input size adjustment */
 input, textarea, select {
-  font-size: 0.8rem !important;
+  font-size: 0.867rem !important; /* Increased from 0.8rem */
 }
 
-/* Badge and label size reduction */
+/* Badge and label size adjustment */
 .badge, .label {
-  font-size: 0.7rem !important;
+  font-size: 0.75rem !important; /* Increased from 0.7rem */
 }
 
 /* Compact spacing for better proportions */
 .compact-spacing {
-  padding: 0.5rem !important;
-  margin: 0.25rem !important;
+  padding: 0.533rem !important; /* Slightly increased */
+  margin: 0.267rem !important; /* Slightly increased */
 }
 
 /* Responsive font scaling */
 @media (max-width: 768px) {
   html {
-    font-size: 13px;
+    font-size: 14px; /* Increased from 13px */
   }
   
   .hero-title {
-    font-size: 2rem !important;
+    font-size: 2.25rem !important; /* Increased from 2rem */
   }
   
   .hero-subtitle {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important; /* Increased from 0.9rem */
   }
 }
 
 @media (max-width: 480px) {
   html {
-    font-size: 12px;
+    font-size: 13px; /* Increased from 12px */
   }
   
   .hero-title {
-    font-size: 1.75rem !important;
+    font-size: 2rem !important; /* Increased from 1.75rem */
   }
   
   .hero-subtitle {
-    font-size: 0.8rem !important;
+    font-size: 0.9rem !important; /* Increased from 0.8rem */
   }
 }
 
