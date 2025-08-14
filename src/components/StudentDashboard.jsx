@@ -22,7 +22,7 @@ import {
   Plus,
   Eye
 } from 'lucide-react'
-import Sidebar from './Sidebar'
+import GlobalSidebarManager from './GlobalSidebarManager'
 
 export default function StudentDashboard({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
@@ -299,10 +299,7 @@ export default function StudentDashboard({ isMobileMenuOpen, onMobileMenuClose }
 
         {/* Two-Column Layout */}
         <div className="flex">
-          <Sidebar 
-            isOpen={true}
-            onClose={() => {}}
-            isHomepage={false}
+          <GlobalSidebarManager 
             isMobileMenuOpen={isMobileMenuOpen}
             onMobileMenuClose={onMobileMenuClose}
           />
@@ -387,10 +384,7 @@ export default function StudentDashboard({ isMobileMenuOpen, onMobileMenuClose }
 
       {/* Two-Column Layout */}
       <div className="flex">
-        <Sidebar 
-          isOpen={true}
-          onClose={() => {}}
-          isHomepage={false}
+        <GlobalSidebarManager 
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuClose={onMobileMenuClose}
         />

@@ -5,8 +5,7 @@ import {
   ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, 
   Globe, Target, Building, Search, ChevronDown, Mail, Phone, MapPin 
 } from 'lucide-react'
-import Sidebar from './Sidebar'
-import StudentSidebar from './StudentSidebar'
+import GlobalSidebarManager from './GlobalSidebarManager'
 import Footer from './Footer'
 import { globalEducationService } from '../services/globalEducationService'
 
@@ -326,11 +325,11 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
 
       {/* Main Content with Sidebar */}
       <div className="flex">
-        {user ? (
-          <StudentSidebar isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={onMobileMenuClose} />
-        ) : (
-          <Sidebar isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={onMobileMenuClose} />
-        )}
+        <GlobalSidebarManager 
+          isMobileMenuOpen={isMobileMenuOpen} 
+          onMobileMenuClose={onMobileMenuClose}
+          isHomepage={true}
+        />
         
         <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen">
           

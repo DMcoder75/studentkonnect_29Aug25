@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = (email, password) => {
-    // Predefined student data for demo
-    const studentData = {
+    // Predefined user data for demo - multiple user types
+    const userData = {
       'priya.dubey@email.com': {
         id: 1,
         email: 'priya.dubey@email.com',
@@ -59,14 +59,38 @@ export const AuthProvider = ({ children }) => {
         },
         connections: 2,
         joinedDate: '2024-01-15'
+      },
+      'counselor@email.com': {
+        id: 2,
+        email: 'counselor@email.com',
+        name: 'Dr. Sarah Chen',
+        firstName: 'Sarah',
+        lastName: 'Chen',
+        role: 'counselor',
+        specializations: ['Computer Science', 'Engineering'],
+        experience: '8 years',
+        rating: 4.9,
+        studentsHelped: 23,
+        successRate: 95,
+        joinedDate: '2023-06-10'
+      },
+      'admin@email.com': {
+        id: 3,
+        email: 'admin@email.com',
+        name: 'System Administrator',
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'admin',
+        permissions: ['all'],
+        joinedDate: '2023-01-01'
       }
     }
 
-    if (studentData[email] && password === 'password123') {
-      const userData = studentData[email]
-      setUser(userData)
-      localStorage.setItem('user', JSON.stringify(userData))
-      return { success: true, user: userData }
+    if (userData[email] && password === 'password123') {
+      const user = userData[email]
+      setUser(user)
+      localStorage.setItem('user', JSON.stringify(user))
+      return { success: true, user: user }
     }
     
     return { success: false, error: 'Invalid credentials' }
@@ -81,8 +105,15 @@ export const AuthProvider = ({ children }) => {
     return user !== null
   }
 
+  // Get user role for sidebar management
+  const getUserRole = () => {
+    if (!user) return 'guest'
+    return user.role || 'student' // Default to student if no role specified
+  }
+
   const value = {
     user,
+    userRole: getUserRole(),
     login,
     logout,
     isAuthenticated,

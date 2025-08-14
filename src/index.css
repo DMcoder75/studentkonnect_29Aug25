@@ -572,3 +572,124 @@ textarea:focus {
   height: 300px;
 }
 
+
+/* Global font size reduction for more compact design */
+html {
+  font-size: 14px; /* Reduced from default 16px */
+}
+
+/* Header and navigation font size reduction */
+.header-text {
+  font-size: 0.875rem !important; /* 14px */
+}
+
+.nav-text {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+.button-text {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+/* Sidebar font size reduction */
+.sidebar-text {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+.sidebar-title {
+  font-size: 0.9rem !important; /* 14.4px */
+}
+
+/* Card and content font size reduction */
+.card-title {
+  font-size: 1rem !important; /* 16px */
+}
+
+.card-text {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+.content-text {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+/* Form elements font size reduction */
+.form-label {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+.form-input {
+  font-size: 0.8rem !important; /* 12.8px */
+}
+
+/* Hero section font size reduction */
+.hero-title {
+  font-size: 2.5rem !important; /* Reduced from larger */
+}
+
+.hero-subtitle {
+  font-size: 1rem !important; /* Reduced */
+}
+
+/* General text size overrides */
+.text-xs { font-size: 0.65rem !important; }
+.text-sm { font-size: 0.75rem !important; }
+.text-base { font-size: 0.8rem !important; }
+.text-lg { font-size: 0.9rem !important; }
+.text-xl { font-size: 1rem !important; }
+.text-2xl { font-size: 1.25rem !important; }
+.text-3xl { font-size: 1.5rem !important; }
+.text-4xl { font-size: 2rem !important; }
+.text-5xl { font-size: 2.5rem !important; }
+
+/* Button size reduction */
+button {
+  font-size: 0.8rem !important;
+  padding: 0.5rem 1rem !important;
+}
+
+/* Input size reduction */
+input, textarea, select {
+  font-size: 0.8rem !important;
+}
+
+/* Badge and label size reduction */
+.badge, .label {
+  font-size: 0.7rem !important;
+}
+
+/* Compact spacing for better proportions */
+.compact-spacing {
+  padding: 0.5rem !important;
+  margin: 0.25rem !important;
+}
+
+/* Responsive font scaling */
+@media (max-width: 768px) {
+  html {
+    font-size: 13px;
+  }
+  
+  .hero-title {
+    font-size: 2rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.9rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
+  
+  .hero-title {
+    font-size: 1.75rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.8rem !important;
+  }
+}
+
