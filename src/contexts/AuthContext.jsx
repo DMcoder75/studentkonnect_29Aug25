@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { authService } from '../services/authService'
 
 const AuthContext = createContext()
 
@@ -28,72 +29,27 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
   }, [])
 
-  const login = (email, password) => {
-    // Predefined user data for demo - multiple user types
-    const userData = {
-      'priya.dubey@email.com': {
-        id: 1,
-        email: 'priya.dubey@email.com',
-        name: 'Priya Dubey',
-        firstName: 'Priya',
-        role: 'student',
-        profileCompletion: 33,
-        personalInfo: {
-          fullName: 'Priya Dubey',
-          nationality: 'Not specified',
-          currentLocation: 'Not specified',
-          phone: '+91-9876543210'
-        },
-        academicBackground: {
-          currentInstitution: 'Not specified',
-          currentEducationLevel: 'Not Specified',
-          expectedGraduationYear: 'Not specified',
-          currentGPA: 'Not specified',
-          previousEducation: 'Not specified'
-        },
-        preferences: {
-          targetCountries: [],
-          targetUniversities: [],
-          interestedPrograms: [],
-          budgetRange: 'Not specified'
-        },
-        connections: 2,
-        joinedDate: '2024-01-15'
-      },
-      'counselor@email.com': {
-        id: 2,
-        email: 'counselor@email.com',
-        name: 'Dr. Sarah Chen',
-        firstName: 'Sarah',
-        lastName: 'Chen',
-        role: 'counselor',
-        specializations: ['Computer Science', 'Engineering'],
-        experience: '8 years',
-        rating: 4.9,
-        studentsHelped: 23,
-        successRate: 95,
-        joinedDate: '2023-06-10'
-      },
-      'admin@email.com': {
-        id: 3,
-        email: 'admin@email.com',
-        name: 'System Administrator',
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'admin',
-        permissions: ['all'],
-        joinedDate: '2023-01-01'
+  const login = async (email, password) => {
+    try {
+      setLoading(true)
+      
+      // Use professional database authentication
+      const result = await authService.authenticateUser(email, password)
+      
+      if (result.success && result.user) {
+        setUser(result.user)
+        localStorage.setItem('user', JSON.stringify(result.user))
+        setLoading(false)
+        return { success: true, user: result.user }
+      } else {
+        setLoading(false)
+        return { success: false, error: result.error || 'Authentication failed' }
       }
+    } catch (error) {
+      console.error('Login error:', error)
+      setLoading(false)
+      return { success: false, error: 'Login service error' }
     }
-
-    if (userData[email] && password === 'password123') {
-      const user = userData[email]
-      setUser(user)
-      localStorage.setItem('user', JSON.stringify(user))
-      return { success: true, user: user }
-    }
-    
-    return { success: false, error: 'Invalid credentials' }
   }
 
   const logout = () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
-import Header from './components/Header'
+import HeaderWithDropdowns from './components/HeaderWithDropdowns'
 import HomePageEnhanced from './components/HomePageEnhanced'
 import OnboardingModal from './components/OnboardingModal'
 import useEngagementTimer from './hooks/useEngagementTimer'
@@ -68,7 +68,7 @@ function App() {
       <Router>
         <div className="min-h-screen">
           {/* Header appears on every page */}
-          <Header />
+          <HeaderWithDropdowns />
           
           <Routes>
             <Route path="/" element={<HomePageEnhanced />} />

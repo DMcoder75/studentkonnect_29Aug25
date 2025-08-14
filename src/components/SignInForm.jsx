@@ -29,11 +29,18 @@ const SignInForm = () => {
     setError('')
 
     try {
-      const result = login(formData.email, formData.password)
+      const result = await login(formData.email, formData.password)
       
       if (result.success) {
-        // Redirect to student profile after successful login
-        navigate('/student/profile')
+        // Redirect based on user role
+        const userRole = result.user.role || 'student'
+        if (userRole === 'counselor') {
+          navigate('/counselor/dashboard')
+        } else if (userRole === 'admin') {
+          navigate('/admin/dashboard')
+        } else {
+          navigate('/student/profile')
+        }
       } else {
         setError(result.error || 'Invalid credentials')
       }
@@ -121,10 +128,11 @@ const SignInForm = () => {
               {/* Demo Credentials */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials:</h4>
-                <p className="text-sm text-blue-700">
-                  <strong>Email:</strong> priya.dubey@email.com<br />
-                  <strong>Password:</strong> password123
-                </p>
+                <div className="text-sm text-blue-700 space-y-1">
+                  <p><strong>Student:</strong> priya.dubey@email.com / password123</p>
+                  <p><strong>Counselor:</strong> michael.kumar@email.com / counselor123</p>
+                  <p><strong>Admin:</strong> admin@email.com / admin123</p>
+                </div>
               </div>
 
               {/* Submit Button */}

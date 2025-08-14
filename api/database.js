@@ -262,6 +262,237 @@ app.get('/api/statistics', async (req, res) => {
   }
 });
 
+// Authentication endpoints
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email and password are required' 
+      });
+    }
+
+    console.log('Attempting login for:', email);
+
+    // Check in counselors table first
+    const counselorResult = await pool.query(`
+      SELECT 
+        id,
+        full_name as name,
+        email,
+        phone,
+        specialization,
+        experience_years,
+        rating,
+        total_reviews,
+        success_rate,
+        languages,
+        hourly_rate,
+        'counselor' as role
+      FROM counselors 
+      WHERE LOWER(email) = LOWER($1)
+    `, [email]);
+
+    if (counselorResult.rows.length > 0) {
+      const counselor = counselorResult.rows[0];
+      console.log('Found counselor:', counselor.name);
+      
+      // For demo purposes, accept any password for existing counselors
+      // In production, implement proper password hashing
+      return res.json({
+        success: true,
+        user: {
+          id: counselor.id,
+          email: counselor.email,
+          full_name: counselor.name,
+          firstName: counselor.name.split(' ')[0],
+          role: 'counselor',
+          profile: {
+            phone: counselor.phone,
+            specialization: counselor.specialization,
+            experience_years: counselor.experience_years,
+            rating: counselor.rating,
+            total_reviews: counselor.total_reviews,
+            success_rate: counselor.success_rate,
+            languages: counselor.languages,
+            hourly_rate: counselor.hourly_rate
+          }
+        }
+      });
+    }
+
+    // Check in students table
+    const studentResult = await pool.query(`
+      SELECT 
+        id,
+        full_name as name,
+        email,
+        phone,
+        nationality,
+        current_education_level,
+        target_country,
+        target_university,
+        'student' as role
+      FROM students 
+      WHERE LOWER(email) = LOWER($1)
+    `, [email]);
+
+    if (studentResult.rows.length > 0) {
+      const student = studentResult.rows[0];
+      console.log('Found student:', student.name);
+      
+      return res.json({
+        success: true,
+        user: {
+          id: student.id,
+          email: student.email,
+          full_name: student.name,
+          firstName: student.name.split(' ')[0],
+          role: 'student',
+          profile: {
+            phone: student.phone,
+            nationality: student.nationality,
+            current_education_level: student.current_education_level,
+            target_country: student.target_country,
+            target_university: student.target_university
+          }
+        }
+      });
+    }
+
+    // Check for admin users (you can add an admins table or check a specific email)
+    if (email.toLowerCase() === 'admin@email.com' && password === 'admin123') {
+      return res.json({
+        success: true,
+        user: {
+          id: 'admin-1',
+          email: 'admin@email.com',
+          full_name: 'System Administrator',
+          firstName: 'Admin',
+          role: 'admin'
+        }
+      });
+    }
+
+    // If no user found in database, return error
+    console.log('No user found for email:', email);
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid email or password'
+    });
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Authentication failed. Please try again.'
+    });
+  }
+});
+
+// Get user profile endpoint
+app.get('/api/auth/profile/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.query;
+
+    let result;
+    if (role === 'counselor') {
+      result = await pool.query(`
+        SELECT 
+          id,
+          full_name as name,
+          email,
+          phone,
+          specialization,
+          experience_years,
+          rating,
+          total_reviews,
+          success_rate,
+          languages,
+          hourly_rate,
+          bio,
+          profile_image
+        FROM counselors 
+        WHERE id = $1
+      `, [userId]);
+    } else if (role === 'student') {
+      result = await pool.query(`
+        SELECT 
+          id,
+          full_name as name,
+          email,
+          phone,
+          nationality,
+          current_education_level,
+          target_country,
+          target_university,
+          profile_completion_percentage,
+          created_at
+        FROM students 
+        WHERE id = $1
+      `, [userId]);
+    }
+
+    if (result && result.rows.length > 0) {
+      res.json({ data: result.rows[0], error: null });
+    } else {
+      res.status(404).json({ data: null, error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ data: null, error: error.message });
+  }
+});
+
+// Check database tables endpoint
+app.get('/api/debug/tables', async (req, res) => {
+  try {
+    // Check what tables exist
+    const tablesResult = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name
+    `);
+
+    // Check counselors table structure
+    const counselorsStructure = await pool.query(`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'counselors' 
+      ORDER BY ordinal_position
+    `);
+
+    // Check students table structure  
+    const studentsStructure = await pool.query(`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'students' 
+      ORDER BY ordinal_position
+    `);
+
+    // Sample data from counselors
+    const counselorsSample = await pool.query('SELECT * FROM counselors LIMIT 3');
+    
+    // Sample data from students
+    const studentsSample = await pool.query('SELECT * FROM students LIMIT 3');
+
+    res.json({
+      tables: tablesResult.rows,
+      counselors_structure: counselorsStructure.rows,
+      students_structure: studentsStructure.rows,
+      counselors_sample: counselorsSample.rows,
+      students_sample: studentsSample.rows
+    });
+  } catch (error) {
+    console.error('Error checking database:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Database API server running on port ${PORT}`);

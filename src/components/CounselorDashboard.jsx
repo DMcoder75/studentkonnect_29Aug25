@@ -22,7 +22,7 @@ import {
   Video,
   Mail
 } from 'lucide-react';
-import Sidebar from './Sidebar';
+import GlobalSidebarManager from './GlobalSidebarManager';
 
 const CounselorDashboard = ({ isMobileMenuOpen, onMobileMenuClose }) => {
   const { user } = useAuth();
@@ -46,6 +46,17 @@ const CounselorDashboard = ({ isMobileMenuOpen, onMobileMenuClose }) => {
         activeStudents: 18,
         successRate: 95.5,
         totalReviews: 156
+      },
+      'michael.kumar@email.com': {
+        id: 5,
+        name: 'Michael Kumar',
+        email: 'michael.kumar@email.com',
+        specializations: ['Business', 'Finance', 'MBA Programs'],
+        rating: 4.7,
+        totalStudents: 180,
+        activeStudents: 18,
+        successRate: 89.0,
+        totalReviews: 15
       },
       'michael.chen@studentkonnect.com': {
         id: 2,
@@ -214,10 +225,53 @@ const CounselorDashboard = ({ isMobileMenuOpen, onMobileMenuClose }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Two-Column Layout */}
+      {/* Full-Width Hero Section */}
+      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div className="flex-1">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-2xl font-bold">{counselorData?.name?.charAt(0)}</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold">Welcome back, {counselorData?.name}</h1>
+                  <p className="text-white/80 text-lg">Counselor Dashboard</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {counselorData?.specializations?.map((spec, index) => (
+                  <span key={index} className="px-3 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">
+                    {spec}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center space-x-6 mt-6 md:mt-0">
+              <div className="text-center">
+                <div className="flex items-center space-x-1 mb-1">
+                  <Star className="w-5 h-5 text-yellow-300" />
+                  <span className="text-2xl font-bold">{counselorData?.rating}</span>
+                </div>
+                <p className="text-white/80 text-sm">({counselorData?.totalReviews} reviews)</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{counselorData?.successRate}%</div>
+                <p className="text-white/80 text-sm">Success Rate</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{counselorData?.totalStudents}</div>
+                <p className="text-white/80 text-sm">Students Helped</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Two-Column Layout: Sidebar + Content */}
       <div className="flex">
         {/* Sidebar */}
-        <Sidebar 
+        <GlobalSidebarManager 
           isOpen={true}
           onClose={() => {}}
           isMobileMenuOpen={isMobileMenuOpen}
@@ -226,25 +280,6 @@ const CounselorDashboard = ({ isMobileMenuOpen, onMobileMenuClose }) => {
 
         {/* Main Content Area */}
         <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen">
-          {/* Header */}
-          <div className="bg-white shadow-sm border-b">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center py-6">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Counselor Dashboard</h1>
-                  <p className="text-gray-600">Welcome back, {counselorData?.name}</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 text-yellow-500" />
-                    <span className="font-semibold">{counselorData?.rating}</span>
-                    <span className="text-gray-500">({counselorData?.totalReviews} reviews)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Stats Cards */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

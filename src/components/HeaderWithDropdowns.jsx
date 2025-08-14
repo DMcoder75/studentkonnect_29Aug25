@@ -357,9 +357,9 @@ const HeaderWithDropdowns = () => {
                   className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                    {user.firstName ? user.firstName.charAt(0) : 'U'}
+                    {user.full_name ? user.full_name.charAt(0) : (user.firstName ? user.firstName.charAt(0) : 'U')}
                   </div>
-                  <span>Hi, {user.firstName || user.name}</span>
+                  <span>Hi, {user.full_name || user.firstName || user.name}</span>
                   <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${dropdownStates.userMenu ? 'rotate-180' : ''}`} />
                 </button>
                 
@@ -368,10 +368,10 @@ const HeaderWithDropdowns = () => {
                     <div className="px-4 py-3 border-b border-gray-100">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {user.firstName ? user.firstName.charAt(0) : 'U'}
+                          {user.full_name ? user.full_name.charAt(0) : (user.firstName ? user.firstName.charAt(0) : 'U')}
                         </div>
                         <div>
-                          <div className="font-semibold text-gray-900">{user.name}</div>
+                          <div className="font-semibold text-gray-900">{user.full_name || user.name}</div>
                           <div className="text-sm text-gray-500">{user.email}</div>
                         </div>
                       </div>
