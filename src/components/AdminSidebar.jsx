@@ -43,7 +43,11 @@ import {
   BarChart,
   LineChart,
   BookOpen,
-  CreditCard
+  CreditCard,
+  HelpCircle,
+  LifeBuoy,
+  Phone,
+  Headphones
 } from 'lucide-react'
 
 export default function AdminSidebar() {
@@ -180,6 +184,20 @@ export default function AdminSidebar() {
         { name: 'API Management', path: '/admin/system/api', icon: Database },
         { name: 'System Logs', path: '/admin/system/logs', icon: FileText },
         { name: 'Backup & Recovery', path: '/admin/system/backup', icon: Download }
+      ]
+    },
+    {
+      id: 'support',
+      name: 'For Support',
+      icon: LifeBuoy,
+      permission: 'view_support',
+      submenu: [
+        { name: 'Support Dashboard', path: '/admin/support/dashboard', icon: LifeBuoy },
+        { name: 'Application Support', path: '/admin/support/applications', icon: HelpCircle },
+        { name: 'Technical Issues', path: '/admin/support/technical', icon: Settings, badge: '7' },
+        { name: 'User Assistance', path: '/admin/support/users', icon: Headphones },
+        { name: 'Knowledge Base', path: '/admin/support/knowledge', icon: BookOpen },
+        { name: 'Contact Support', path: '/admin/support/contact', icon: Phone }
       ]
     }
   ]
