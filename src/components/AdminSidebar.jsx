@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAdminAuth } from '../contexts/AdminAuthContext'
 import { Button } from './ui/button'
@@ -47,7 +47,8 @@ import {
   HelpCircle,
   LifeBuoy,
   Phone,
-  Headphones
+  Headphones,
+  Clock
 } from 'lucide-react'
 
 export default function AdminSidebar() {
@@ -57,11 +58,39 @@ export default function AdminSidebar() {
   const { adminUser, logout, hasPermission } = useAdminAuth()
 
   const toggleExpanded = (itemId) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [itemId]: !prev[itemId]
-    }))
+    setExpandedItems(prev => {
+      // If clicking on an already expanded item, collapse it
+      if (prev[itemId]) {
+        return {
+          ...prev,
+          [itemId]: false
+        }
+      }
+      
+      // If clicking on a collapsed item, expand it and keep others as they are
+      return {
+        ...prev,
+        [itemId]: true
+      }
+    })
   }
+
+  // Auto-expand parent menu if current route matches a submenu item
+  React.useEffect(() => {
+    const currentPath = location.pathname
+    
+    menuItems.forEach(item => {
+      if (item.submenu) {
+        const hasActiveSubmenu = item.submenu.some(subItem => subItem.path === currentPath)
+        if (hasActiveSubmenu && !expandedItems[item.id]) {
+          setExpandedItems(prev => ({
+            ...prev,
+            [item.id]: true
+          }))
+        }
+      }
+    })
+  }, [location.pathname])
 
   const handleLogout = () => {
     logout()
@@ -75,6 +104,20 @@ export default function AdminSidebar() {
       path: '/admin/dashboard',
       icon: LayoutDashboard,
       permission: 'view_dashboard'
+    },
+    {
+      id: 'consular-engagement',
+      name: 'Consular-Student Engagement',
+      icon: MessageSquare,
+      permission: 'manage_engagement',
+      submenu: [
+        { name: 'Engagement Requests', path: '/admin/engagement/requests', icon: MessageSquare, badge: '15' },
+        { name: 'Active Engagements', path: '/admin/engagement/active', icon: UserCheck },
+        { name: 'Pending Approval', path: '/admin/engagement/pending', icon: Clock },
+        { name: 'Rejected Mappings', path: '/admin/engagement/rejected', icon: UserX },
+        { name: 'Reassignment Queue', path: '/admin/engagement/reassign', icon: RefreshCw },
+        { name: 'Engagement Analytics', path: '/admin/engagement/analytics', icon: BarChart3 }
+      ]
     },
     {
       id: 'counselors',

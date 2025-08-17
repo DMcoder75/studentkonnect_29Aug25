@@ -48,6 +48,7 @@ import AdminLogin from './components/AdminLogin'
 import AdminDashboard from './components/AdminDashboard'
 import AdminProtectedRoute from './components/AdminProtectedRoute'
 import CounselorManagementFixed from './components/admin/CounselorManagementFixed'
+import EngagementRequests from './components/admin/EngagementRequests'
 import StudentManagementSimple from './components/admin/StudentManagementSimple'
 import ScholarshipManagementWorking from './components/admin/ScholarshipManagementWorking'
 import AnalyticsOverview from './components/admin/AnalyticsOverview'
@@ -171,6 +172,56 @@ function App() {
             element={
               <AdminProtectedRoute>
                 <AdminDashboard />
+              </AdminProtectedRoute>
+            } 
+          />
+          
+          {/* Consular-Student Engagement Routes */}
+          <Route 
+            path="/admin/engagement/requests" 
+            element={
+              <AdminProtectedRoute>
+                <EngagementRequests />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/engagement/active" 
+            element={
+              <AdminProtectedRoute>
+                <EngagementRequests />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/engagement/pending" 
+            element={
+              <AdminProtectedRoute>
+                <EngagementRequests />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/engagement/rejected" 
+            element={
+              <AdminProtectedRoute>
+                <EngagementRequests />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/engagement/reassign" 
+            element={
+              <AdminProtectedRoute>
+                <EngagementRequests />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/engagement/analytics" 
+            element={
+              <AdminProtectedRoute>
+                <EngagementRequests />
               </AdminProtectedRoute>
             } 
           />

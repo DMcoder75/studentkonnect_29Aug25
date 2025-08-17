@@ -3,6 +3,7 @@ import AdminLayout from './AdminLayout'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
+import { counselorService } from '../../lib/supabase'
 import { 
   Users,
   Star,
@@ -23,59 +24,51 @@ import {
 
 export default function CounselorManagementFixed() {
   const [counselors, setCounselors] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
 
-  // Mock data for counselors
+  // Fetch real counselors from database
   useEffect(() => {
-    const mockCounselors = [
-      {
-        id: 1,
-        name: 'Michael Kumar',
-        email: 'michael.kumar@email.com',
-        phone: '+1 555-0123',
-        specialization: ['Business', 'Finance', 'MBA Programs'],
-        experience: '6 years',
-        rating: 4.7,
-        reviews: 18,
-        students: 89,
-        successRate: '89%',
-        status: 'active',
-        joinDate: '2023-01-15',
-        languages: ['English', 'Hindi']
-      },
-      {
-        id: 2,
-        name: 'Dr. Sarah Chen',
-        email: 'sarah.chen@email.com',
-        phone: '+1 555-0124',
-        specialization: ['Computer Science', 'AI', 'Software Engineering'],
-        experience: '8 years',
-        rating: 4.9,
-        reviews: 25,
-        students: 156,
-        successRate: '95%',
-        status: 'active',
-        joinDate: '2022-08-10',
-        languages: ['English', 'Mandarin']
-      },
-      {
-        id: 3,
-        name: 'Dr. Emma Wilson',
-        email: 'emma.wilson@email.com',
-        phone: '+1 555-0125',
-        specialization: ['Medicine', 'Health Sciences'],
-        experience: '10 years',
-        rating: 4.8,
-        reviews: 32,
-        students: 203,
-        successRate: '93%',
-        status: 'pending',
-        joinDate: '2022-03-20',
-        languages: ['English']
+    const fetchCounselors = async () => {
+      try {
+        setLoading(true)
+        console.log('Fetching counselors from Supabase...')
+        const { data, error } = await counselorService.getAllCounselors()
+        
+        if (error) {
+          console.error('Error fetching counselors:', error)
+          return
+        }
+        
+        console.log('Counselors fetched:', data)
+        
+        // Transform the data to match the expected format
+        const transformedCounselors = data?.map(counselor => ({
+          id: counselor.id,
+          name: `${counselor.first_name || ''} ${counselor.last_name || ''}`.trim() || counselor.display_name || 'Unknown',
+          email: counselor.email,
+          phone: counselor.phone || 'N/A',
+          specialization: counselor.specializations || [],
+          experience: `${counselor.years_experience || 0} years`,
+          rating: counselor.average_rating || 0,
+          reviews: counselor.total_reviews || 0,
+          students: counselor.total_students_helped || 0,
+          successRate: `${counselor.success_rate || 0}%`,
+          status: counselor.status || 'pending',
+          joinDate: counselor.created_at ? new Date(counselor.created_at).toLocaleDateString() : 'N/A',
+          languages: counselor.languages_spoken || []
+        })) || []
+        
+        setCounselors(transformedCounselors)
+      } catch (error) {
+        console.error('Error in fetchCounselors:', error)
+      } finally {
+        setLoading(false)
       }
-    ]
-    setCounselors(mockCounselors)
+    }
+
+    fetchCounselors()
   }, [])
 
   const getStatusBadge = (status) => {
