@@ -2,46 +2,64 @@
 
 A comprehensive platform connecting students with educational counselors worldwide, facilitating university applications and career guidance.
 
-## 🌟 Features
+## 🌟 Live Demo
 
-### For Students
-- **Profile Management**: Complete student profiles with academic background, goals, and preferences
-- **Counselor Matching**: AI-powered matching with qualified education counselors
-- **University Search**: Browse 866+ universities across 8+ countries
-- **Course Discovery**: Explore 1000+ courses and programs
-- **Application Tracking**: Monitor application progress and deadlines
-- **Resume Builder**: Professional resume creation with AI assistance
-- **SOP Builder**: Statement of Purpose creation with guided templates
+**Production URL:** https://cjvpmofj.manus.space
 
-### For Counselors
-- **Dashboard**: Comprehensive counselor dashboard with student management
-- **Student Portfolio**: Manage assigned students and track their progress
-- **Session Management**: Schedule and conduct counseling sessions
-- **Progress Tracking**: Monitor student application success rates
-- **Earnings Dashboard**: Track counseling revenue and performance metrics
+- **Main Website:** Complete university finder and pathway builder
+- **Admin Portal:** https://cjvpmofj.manus.space/admin
+- **Admin Credentials:** admin@yourunipathway.com / admin123
 
-### For Administrators
-- **User Management**: Manage students, counselors, and platform users
-- **Analytics**: Platform-wide analytics and reporting
-- **Content Management**: Manage universities, courses, and platform content
+## 🚀 Features
+
+### Main Website
+- **University Finder:** Search through 866+ universities across 8+ countries
+- **Course Discovery:** Browse 1000+ courses and programs
+- **Counselor Matching:** Connect with experienced education counselors
+- **Career Pathways:** Explore Medicine, Engineering, Business, and Law pathways
+- **Scholarship Assistance:** Find financial aid opportunities
+- **Professional Design:** Modern, responsive interface
+
+### Admin Portal
+- **Dashboard:** Complete statistics and system health monitoring
+- **Consular-Student Engagement:** Manage student counselor requests with fixed menu behavior
+- **Counselor Management:** Full CRUD operations with real database integration
+- **Student Management:** Comprehensive student administration
+- **Analytics & Reports:** Performance metrics and insights
+- **Content Management:** University and course database management
+
+## 🎯 Key Improvements
+
+### Fixed Menu Behavior ✨
+- **Parent menus stay expanded** when submenu items are clicked
+- **Multiple parent menus** can be expanded simultaneously
+- **Better navigation flow** - no more collapsing interruptions
+- **Auto-expansion** - parent menus automatically expand when navigating to submenu pages
+
+### Database Integration
+- **Real-time data** from Supabase database
+- **Live counselor profiles** with ratings, experience, and success rates
+- **Dynamic statistics** calculated from actual data
+- **Professional data management** with search and filtering
 
 ## 🚀 Technology Stack
 
 - **Frontend**: React 18 with Vite
 - **Styling**: Tailwind CSS with shadcn/ui components
+- **Database**: Supabase (PostgreSQL)
 - **Icons**: Lucide React
-- **Authentication**: Custom authentication system with role-based access
+- **Authentication**: Custom admin authentication system
 - **State Management**: React Context API
 - **Routing**: React Router DOM
 - **Build Tool**: Vite
-- **Deployment**: Production-ready builds
+- **Deployment**: Manus.space hosting
 
 ## 📦 Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/DMcoder75/studentkonnect_14Aug25.git
-cd studentkonnect_14Aug25
+git clone https://github.com/DMcoder75/studentkonnect_17Aug25.git
+cd studentkonnect_17Aug25
 ```
 
 2. Install dependencies:
@@ -49,29 +67,32 @@ cd studentkonnect_14Aug25
 npm install
 ```
 
-3. Start the development server:
+3. Set up environment variables:
 ```bash
-npm run dev
+cp .env.example .env
 ```
+Update the `.env` file with your Supabase credentials.
 
-4. Build for production:
+4. Build the project:
 ```bash
 npm run build
 ```
 
+5. Start the development server:
+```bash
+python3 spa_server.py
+```
+
 ## 🔐 Demo Credentials
 
-### Student Account
-- **Email**: priya.dubey@email.com
-- **Password**: password123
-
-### Counselor Account
-- **Email**: michael.kumar@email.com
-- **Password**: counselor123
-
 ### Admin Account
-- **Email**: admin@email.com
+- **Email**: admin@yourunipathway.com
 - **Password**: admin123
+
+### Database Integration
+- **Live Supabase Database**: Real counselor and student data
+- **Dynamic Statistics**: Calculated from actual database records
+- **Professional Profiles**: 10 active counselors with ratings and success rates
 
 ## 🏗️ Project Structure
 
