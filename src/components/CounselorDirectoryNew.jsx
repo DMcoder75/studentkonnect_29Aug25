@@ -271,15 +271,10 @@ const CounselorDirectoryNew = ({ isMobileMenuOpen, onMobileMenuClose }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex">
-      <Sidebar 
-        isMobileMenuOpen={isMobileMenuOpen} 
-        onMobileMenuClose={onMobileMenuClose} 
-      />
-      <div className="flex-1 w-full md:w-auto transition-all duration-300">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+      {/* Full-width Hero Section */}
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             {/* Back Button */}
             <div className="mb-6">
               <button
@@ -363,8 +358,16 @@ const CounselorDirectoryNew = ({ isMobileMenuOpen, onMobileMenuClose }) => {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Sidebar and Content Layout */}
+      <div className="flex">
+        <Sidebar 
+          isMobileMenuOpen={isMobileMenuOpen} 
+          onMobileMenuClose={onMobileMenuClose} 
+        />
+        <div className="flex-1 w-full md:w-auto transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Enhanced Filters Sidebar */}
             <div className="lg:w-80 flex-shrink-0">

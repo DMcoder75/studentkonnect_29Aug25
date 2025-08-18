@@ -138,12 +138,12 @@ const GlobalUniversitiesPage = ({ isMobileMenuOpen, onMobileMenuClose }) => {
   return (
     <div className="w-full">
       {/* Hero Section - Full Width */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-700 text-white py-12 w-full">
+      <section className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white py-12 w-full">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative w-full px-6">
           <div className="max-w-6xl mx-auto text-center">
             <Globe className="h-12 w-12 mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-pink-200 bg-clip-text text-transparent">
               Global Universities
             </h1>
             <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">

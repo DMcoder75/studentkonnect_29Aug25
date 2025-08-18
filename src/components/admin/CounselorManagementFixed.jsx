@@ -57,7 +57,9 @@ export default function CounselorManagementFixed() {
           successRate: `${counselor.success_rate || 0}%`,
           status: counselor.status || 'pending',
           joinDate: counselor.created_at ? new Date(counselor.created_at).toLocaleDateString() : 'N/A',
-          languages: counselor.languages_spoken || []
+          languages: counselor.languages_spoken || [],
+          hourlyRate: counselor.hourly_rate || 120,
+          currency: counselor.currency || 'AUD'
         })) || []
         
         setCounselors(transformedCounselors)
@@ -237,6 +239,10 @@ export default function CounselorManagementFixed() {
                           <div className="text-center">
                             <p className="text-sm font-medium text-gray-900">Success Rate</p>
                             <p className="text-lg font-semibold text-green-600">{counselor.successRate}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm font-medium text-gray-900">Rate</p>
+                            <p className="text-lg font-semibold text-blue-600">${counselor.hourlyRate}/{counselor.currency}/hour</p>
                           </div>
                           <div className="text-center">
                             <p className="text-sm font-medium text-gray-900">Status</p>

@@ -11,7 +11,7 @@ import useEngagementTimer from './hooks/useEngagementTimer'
 // Import all the pages
 import GlobalUniversitiesPage from './components/GlobalUniversitiesPage'
 import GlobalCoursesPage from './components/GlobalCoursesPage'
-import CounselorDirectory from './components/CounselorDirectory'
+import CounselorDirectoryFixed from './components/CounselorDirectoryFixed'
 import CounselorSelectionPage from './components/CounselorSelectionPage'
 import CounselorDashboard from './components/CounselorDashboard'
 import CounselorProfile from './components/CounselorProfile'
@@ -42,6 +42,13 @@ import AccommodationHelp from './components/AccommodationHelp'
 // Import new student components
 import StudentProfile from './components/StudentProfile'
 import SignInForm from './components/SignInForm'
+import ChooseCounselor from './components/ChooseCounselor'
+
+// Import new missing components
+import GTEVisaStatementBuilder from './components/GTEVisaStatementBuilder'
+import ScholarshipEligibilityChecker from './components/ScholarshipEligibilityChecker'
+import ReferenceLetterToolkit from './components/ReferenceLetterToolkit'
+import ScholarshipApplicationAssistance from './components/ScholarshipApplicationAssistance'
 
 // Import admin components
 import AdminLogin from './components/AdminLogin'
@@ -120,7 +127,7 @@ function App() {
             <Route path="/university/:id" element={<UniversityDetailPage />} />
             
             {/* Counselor Routes */}
-            <Route path="/counselor/directory" element={<CounselorDirectory />} />
+            <Route path="/counselor/directory" element={<CounselorDirectoryFixed />} />
             <Route path="/counselor/select" element={<CounselorSelectionPage />} />
             <Route path="/counselor/selection" element={<CounselorSelectionPage />} />
             <Route path="/counselor/dashboard" element={<CounselorDashboard />} />
@@ -144,6 +151,14 @@ function App() {
           {/* Smart Apply Routes */}
           <Route path="/smart-apply/sop-builder" element={<SOPBuilderProper />} />
           <Route path="/smart-apply/resume-builder" element={<ResumeBuilder />} />
+          <Route path="/smart-apply/reference-letter-toolkit" element={<ReferenceLetterToolkit />} />
+          
+          {/* Visa & International Routes */}
+          <Route path="/visa-international/gte-visa-statement-builder" element={<GTEVisaStatementBuilder />} />
+          
+          {/* Scholarships Routes */}
+          <Route path="/scholarships-assist/eligibility-checker" element={<ScholarshipEligibilityChecker />} />
+          <Route path="/scholarships-assist/application-assistance" element={<ScholarshipApplicationAssistance />} />
           
           <Route path="/atar-calculator" element={<ATARCalculatorPage />} />
           <Route path="/course-finder" element={<CourseFinderPage />} />
@@ -163,6 +178,12 @@ function App() {
           {/* Authentication */}
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/sign-in" element={<SignInPage />} />
+          
+          {/* Student Routes */}
+          <Route path="/student/profile" element={<StudentProfile />} />
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/student/choose-counselor" element={<ChooseCounselor />} />
+          <Route path="/student-forums" element={<StudentForums />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />

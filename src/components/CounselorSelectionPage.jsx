@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Sidebar from './Sidebar';
 import { 
   Star, 
   MapPin, 
@@ -19,6 +21,10 @@ import {
 } from 'lucide-react';
 
 const CounselorSelectionPage = () => {
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const onMobileMenuClose = () => setIsMobileMenuOpen(false);
+  
   const [counselors, setCounselors] = useState([]);
   const [filteredCounselors, setFilteredCounselors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -238,19 +244,26 @@ const CounselorSelectionPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Full-width Hero Section */}
+      <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">Choose Your Education Counselor</h1>
-            <p className="mt-4 text-lg text-gray-600">
+            <h1 className="text-4xl font-bold mb-4">Choose Your Education Counselor</h1>
+            <p className="text-xl text-purple-100 max-w-3xl mx-auto">
               Connect with expert counselors who will guide you through your study abroad journey
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Sidebar and Content Layout */}
+      <div className="flex">
+        <Sidebar 
+          isMobileMenuOpen={isMobileMenuOpen} 
+          onMobileMenuClose={onMobileMenuClose} 
+        />
+        <div className="flex-1 w-full md:w-auto transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
@@ -554,6 +567,8 @@ const CounselorSelectionPage = () => {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };

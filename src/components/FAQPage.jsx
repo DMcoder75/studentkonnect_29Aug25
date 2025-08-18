@@ -22,18 +22,18 @@ export default function FAQPage({ isMobileMenuOpen, onMobileMenuClose }) {
       questions: [
         {
           id: "q1",
-          question: "What is YourUniPathway.com?",
-          answer: "YourUniPathway.com is an online platform designed to help Australian students explore, compare, and plan their senior secondary subject choices and university pathways. We provide up-to-date curriculum information, pathway advice, and tools to better understand requirements for tertiary admissions across every Australian state and territory."
+          question: "What is StudentKonnect?",
+          answer: "StudentKonnect is a comprehensive online platform that helps students find their dream of studying in global universities across 8 countries. We provide counselor access, university guidance, and support students through every step of their international education journey via our portal."
         },
         {
           id: "q2",
-          question: "Who is YourUniPathway.com for?",
-          answer: "Our platform is built primarily for high school students planning their final years of school, but it's also useful for parents, school counsellors, and anyone interested in Australian secondary education and university entry."
+          question: "Who is StudentKonnect for?",
+          answer: "StudentKonnect is designed for students who dream of studying abroad in global universities. Whether you're a high school student planning your future, a graduate looking for advanced studies, or anyone interested in international education opportunities across our 8 supported countries, our platform provides the guidance and counselor support you need."
         },
         {
           id: "q3",
-          question: "What states and curriculums do you cover?",
-          answer: "We cover all major Australian senior secondary systems, including NSW (HSC), VIC (VCE), QLD (QCE), WA (WACE), SA & NT (SACE/NTCET), TAS (TASC), and the ACT (BSSS/AST)."
+          question: "Which countries does StudentKonnect cover?",
+          answer: "StudentKonnect covers 8 major study destinations including Australia, USA, UK, Canada, Germany, New Zealand, Ireland, and Netherlands. We provide comprehensive information about universities, admission requirements, and study opportunities in each of these countries."
         }
       ]
     },
@@ -44,17 +44,17 @@ export default function FAQPage({ isMobileMenuOpen, onMobileMenuClose }) {
         {
           id: "q4",
           question: "Is registration required?",
-          answer: "You can browse most information without registering. However, creating an account lets you save favourite subjects, personalise plans, and access additional features."
+          answer: "You can browse university information and explore our resources without registering. However, creating an account allows you to connect with counselors, save your favorite universities, create personalized study plans, and access our comprehensive application assistance tools."
         },
         {
           id: "q5",
-          question: "How do I use the subject comparison and pathway planning tools?",
-          answer: "After logging in, you can select your state, explore available subjects, add them to your tentative study plan, and see the impact on potential university eligibility or ATAR calculation. The planner helps you visualise requirements and compare similar subjects across states."
+          question: "How do I use StudentKonnect's counselor and university matching tools?",
+          answer: "After creating an account, you can browse our counselor directory, filter by specialization and experience, and connect with counselors who match your study goals. Our university matching tools help you explore programs across our 8 supported countries, compare requirements, and get personalized recommendations based on your academic profile."
         },
         {
           id: "q6",
-          question: "Is there a cost to use YourUniPathway.com?",
-          answer: "Our core tools and resources are free for individual students and families."
+          question: "Is there a cost to use StudentKonnect?",
+          answer: "Our core platform features including university browsing, counselor directory access, and basic guidance tools are free for students. Premium counseling services and personalized application assistance may have associated fees, which will be clearly communicated before any commitment."
         }
       ]
     },
@@ -188,7 +188,7 @@ export default function FAQPage({ isMobileMenuOpen, onMobileMenuClose }) {
       )}
 
       {/* Hero Section - Full Width */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 text-white py-16 w-full">
+      <section className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white py-16 w-full">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative w-full px-6 text-center">
           <div className="max-w-4xl mx-auto">
@@ -196,10 +196,10 @@ export default function FAQPage({ isMobileMenuOpen, onMobileMenuClose }) {
               <HelpCircle className="h-12 w-12 mr-3" />
               <h1 className="text-4xl md:text-5xl font-bold">Frequently Asked Questions</h1>
             </div>
-            <p className="text-xl text-orange-100 max-w-2xl mx-auto">
-              Find answers to common questions about YourUniPathway.com
+            <p className="text-xl text-purple-100 max-w-2xl mx-auto">
+              Find answers to common questions about StudentKonnect
             </p>
-            <div className="flex items-center justify-center mt-6 space-x-6 text-orange-100">
+            <div className="flex items-center justify-center mt-6 space-x-6 text-purple-100">
               <div className="flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
                 <span>Last updated: 18-Jul-2025</span>
@@ -226,8 +226,8 @@ export default function FAQPage({ isMobileMenuOpen, onMobileMenuClose }) {
                 {/* Introduction */}
                 <div className="mb-8 text-center">
                   <p className="text-gray-700 leading-relaxed text-lg">
-                    Welcome to our FAQ section! Here you'll find answers to the most common questions about YourUniPathway.com. 
-                    If you can't find what you're looking for, feel free to <a href="mailto:contact@yourunipathway.com" className="text-blue-600 hover:text-blue-800 underline inline-flex items-center"><Mail className="h-4 w-4 mr-1" />contact our support team</a>.
+                    Welcome to our FAQ section! Here you'll find answers to the most common questions about StudentKonnect. 
+                    If you can't find what you're looking for, feel free to <a href="mailto:contact@studentkonnect.com" className="text-blue-600 hover:text-blue-800 underline inline-flex items-center"><Mail className="h-4 w-4 mr-1" />contact our support team</a>.
                   </p>
                 </div>
 

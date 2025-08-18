@@ -339,6 +339,200 @@ class RealDatabaseService {
       };
     }
   }
+
+  // Counselor service functions
+  async getAllCounselors() {
+    try {
+      const { data, error } = await supabase
+        .from('counselors')
+        .select('*')
+        .eq('is_available', true)
+        .order('display_name', { ascending: true });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselors:', error);
+      return { data: null, error };
+    }
+  }
+
+  async getCounselorById(counselorId) {
+    try {
+      const { data, error } = await supabase
+        .from('counselors')
+        .select('*')
+        .eq('id', counselorId)
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselor:', error);
+      return { data: null, error };
+    }
+  }
+
+  // Counselor Request service functions
+  async getCounselorRequestByStudent(studentId) {
+    try {
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .select('*')
+        .eq('student_id', studentId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselor request:', error);
+      return { data: null, error };
+    }
+  }
+
+  async getCounselorRequestsByCounselor(counselorId) {
+    try {
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .select('*')
+        .eq('requested_counselor_id', counselorId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselor requests by counselor:', error);
+      return { data: null, error };
+    }
+  }
+
+  async createCounselorRequest(requestData) {
+    try {
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .insert([requestData])
+        .select();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error creating counselor request:', error);
+      return { data: null, error };
+    }
+  }
+
+  async getAllCounselorRequests() {
+    try {
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .select(`
+          *,
+          counselors (
+            id,
+            full_name,
+            email,
+            counselor_type,
+            bio,
+            years_experience,
+            specializations,
+            hourly_rate,
+            currency,
+            average_rating,
+            total_reviews,
+            is_available
+          )
+        `)
+        .order('requested_at', { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselor requests:', error);
+      return { data: null, error };
+    }
+  }
+
+  async getCounselorRequestsByStatus(status) {
+    try {
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .select(`
+          *,
+          counselors (
+            id,
+            full_name,
+            email,
+            counselor_type,
+            bio,
+            years_experience,
+            specializations,
+            hourly_rate,
+            currency,
+            average_rating,
+            total_reviews,
+            is_available
+          )
+        `)
+        .eq('status', status)
+        .order('requested_at', { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselor requests by status:', error);
+      return { data: null, error };
+    }
+  }
+
+  async updateCounselorRequestStatus(requestId, status, adminNotes = null) {
+    try {
+      const updateData = {
+        status,
+        updated_at: new Date().toISOString()
+      };
+
+      if (adminNotes) {
+        updateData.admin_notes = adminNotes;
+      }
+
+      if (status === 'approved') {
+        updateData.approved_at = new Date().toISOString();
+      }
+
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .update(updateData)
+        .eq('id', requestId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error updating counselor request status:', error);
+      return { data: null, error };
+    }
+  }
+
+  async getCounselorStudents(counselorId) {
+    try {
+      const { data, error } = await supabase
+        .from('counselor_requests')
+        .select(`
+          *,
+          student_id
+        `)
+        .eq('counselor_id', counselorId)
+        .eq('status', 'approved')
+        .order('approved_at', { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching counselor students:', error);
+      return { data: null, error };
+    }
+  }
 }
 
 // Export singleton instance

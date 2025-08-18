@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, ChevronDown, Search, Target, Building, Globe } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { globalEducationService } from '../services/globalEducationService'
+import { statisticsService } from '../services/statisticsService'
 
 // Custom CSS for animations
 const customStyles = `
@@ -64,11 +65,11 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
   const [favorites, setFavorites] = useState([])
   const [countries, setCountries] = useState([])
   const [stats, setStats] = useState({
-    totalCountries: 8,
-    totalUniversities: 866,
-    totalCourses: 1000,
-    totalPathways: 2400,
-    totalCareerPaths: 450
+    totalCountries: '8+',
+    totalUniversities: '866+',
+    totalCourses: '15K+',
+    totalPathways: '5+',
+    totalCareerPaths: '24+'
   })
   const [loading, setLoading] = useState(true)
   const [selectedProfession, setSelectedProfession] = useState('')
@@ -81,25 +82,43 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
       try {
         setLoading(true)
         
-        // Fetch all data in parallel
-        const [universitiesData, pathwaysData, countriesData, statsData] = await Promise.all([
+        console.log('🔍 Fetching real statistics from database...')
+        
+        // Fetch real statistics from database
+        const realStats = await statisticsService.getHomePageStatistics()
+        console.log('📊 Raw statistics from database:', realStats)
+        
+        // Format the statistics for display
+        const formattedStats = {
+          totalCountries: statisticsService.formatNumber(realStats.countries),
+          totalUniversities: statisticsService.formatNumber(realStats.universities),
+          totalCourses: statisticsService.formatNumber(realStats.courses),
+          totalPathways: statisticsService.formatNumber(realStats.pathways),
+          totalCareerPaths: statisticsService.formatNumber(realStats.careerPaths)
+        }
+        
+        console.log('🎯 Formatted statistics for display:', formattedStats)
+        
+        // Fetch other data in parallel
+        const [universitiesData, pathwaysData, countriesData] = await Promise.all([
           globalEducationService.getAllUniversities(),
           globalEducationService.getAllPathways(),
-          globalEducationService.getAllCountries(),
-          globalEducationService.getGlobalStatistics()
+          globalEducationService.getAllCountries()
         ])
 
         setUniversities(universitiesData || [])
         setPathways(pathwaysData || [])
         setCountries(countriesData || [])
-        setStats(statsData || stats)
+        setStats(formattedStats)
+        
+        console.log('✅ Statistics updated in state:', formattedStats)
         
         // Load favorites from localStorage
         const savedFavorites = JSON.parse(localStorage.getItem('favoriteUniversities') || '[]')
         setFavorites(savedFavorites)
         
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('❌ Error fetching data:', error)
       } finally {
         setLoading(false)
       }

@@ -886,11 +886,11 @@ export default function CounselorRegistration({ isMobileMenuOpen, onMobileMenuCl
   return (
     <div className="w-full">
       {/* Hero Section - Full Width */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 text-white py-12 w-full">
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 text-white py-12 w-full">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative w-full px-6">
           <div className="max-w-6xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
               Join as a Counselor
             </h1>
             <p className="text-lg md:text-xl text-purple-100 max-w-3xl mx-auto">

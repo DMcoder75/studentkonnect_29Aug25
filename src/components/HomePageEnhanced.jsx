@@ -54,7 +54,7 @@ const customStyles = `
 
 export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const [universities, setUniversities] = useState([])
   const [stats, setStats] = useState({
     totalCountries: 8,
@@ -424,7 +424,7 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
           </section>
 
           {/* Build Your Perfect Pathway Section */}
-          <section className="py-12 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+          <section className="py-12 bg-gradient-to-br from-purple-50 via-purple-100 to-pink-50">
             <div className="container mx-auto px-6">
               <div className="text-center mb-8">
                 <h2 className="text-4xl font-bold text-gray-800 mb-4 flex items-center justify-center">
@@ -490,7 +490,7 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
                 <div className="text-center">
                   <button 
                     onClick={handleStartJourney}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center mx-auto"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center mx-auto"
                   >
                     <Search className="mr-2 h-5 w-5" />
                     Get Started Now →
@@ -504,7 +504,7 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
           </section>
 
           {/* Find Your Perfect Counselor Section */}
-          <section className="py-6 bg-gradient-to-br from-orange-50 via-white to-red-50">
+          <section className="py-6 bg-gradient-to-br from-purple-50 via-white to-pink-50">
             <div className="container mx-auto px-6">
               <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4 flex items-center justify-center">
@@ -571,19 +571,21 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
                           <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 h-9 rounded-md px-3 flex-1">
                             Message
                           </button>
-                          <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white h-9 rounded-md px-3 flex-1">
+                          <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-9 rounded-md px-3 flex-1">
                             Connect Now
                           </button>
                         </div>
                         
-                        <div className="text-center pt-2 border-t">
-                          <span className="text-base font-bold text-gray-900">
-                            ${counselor.price}
-                          </span>
-                          <span className="text-sm text-gray-600 ml-1">
-                            /{counselor.currency}/hour
-                          </span>
-                        </div>
+                        {isAdmin && (
+                          <div className="text-center pt-2 border-t">
+                            <span className="text-base font-bold text-gray-900">
+                              ${counselor.price}
+                            </span>
+                            <span className="text-sm text-gray-600 ml-1">
+                              /{counselor.currency}/hour
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

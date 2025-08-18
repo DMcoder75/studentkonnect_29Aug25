@@ -1,11 +1,44 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import GlobalSidebarManager from './GlobalSidebarManager'
-import { Edit, User, GraduationCap, Settings, FileText, Star, TrendingUp, Award, Calendar, MapPin, Phone, Mail, Globe } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+import { Edit, User, GraduationCap, Settings, FileText, Star, TrendingUp, Award, Calendar, MapPin, Phone, Mail, Globe, MessageCircle, X } from 'lucide-react'
 
 const StudentProfile = () => {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('personal')
+  const [showCounselorModal, setShowCounselorModal] = useState(false)
+  const [counselors, setCounselors] = useState([])
+  const [loadingCounselors, setLoadingCounselors] = useState(false)
+
+  // Fetch counselors from database
+  const fetchCounselors = async () => {
+    setLoadingCounselors(true)
+    try {
+      const { data, error } = await supabase
+        .from('counselors')
+        .select('*')
+        .limit(10)
+      
+      if (error) throw error
+      setCounselors(data || [])
+    } catch (error) {
+      console.error('Error fetching counselors:', error)
+    } finally {
+      setLoadingCounselors(false)
+    }
+  }
+
+  const handleStartMatching = () => {
+    setShowCounselorModal(true)
+    fetchCounselors()
+  }
+
+  const handleConnectToCounselor = (counselor) => {
+    // Handle connection logic here
+    alert(`Connecting to ${counselor.name}...`)
+    setShowCounselorModal(false)
+  }
 
   if (!user) {
     return (
@@ -169,7 +202,7 @@ const StudentProfile = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Full-Width Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white w-full">
+      <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="flex-1">
@@ -399,7 +432,10 @@ const StudentProfile = () => {
                 <Award className="h-8 w-8 text-purple-600 mx-auto mb-3" />
                 <h3 className="font-semibold text-gray-900 mb-2">Find Counselors</h3>
                 <p className="text-sm text-gray-600 mb-4">Get matched with counselors based on your profile</p>
-                <button className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <button 
+                  onClick={handleStartMatching}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
                   Start Matching
                 </button>
               </div>
@@ -425,6 +461,84 @@ const StudentProfile = () => {
           </div>
         </main>
       </div>
+
+      {/* Counselor Matching Modal */}
+      {showCounselorModal && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white p-6 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold">Find Your Perfect Counselor</h2>
+                <p className="text-purple-100 mt-1">Connect with experienced education counselors</p>
+              </div>
+              <button 
+                onClick={() => setShowCounselorModal(false)}
+                className="text-white hover:text-gray-200 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {loadingCounselors ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                  <span className="ml-3 text-gray-600">Loading counselors...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {counselors.map((counselor) => (
+                    <div key={counselor.id} className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                          {counselor.name?.charAt(0) || 'C'}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1">{counselor.name}</h3>
+                          <p className="text-purple-600 font-medium mb-2">{counselor.specialization}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                            <span className="flex items-center">
+                              <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                              {counselor.rating || '4.8'}
+                            </span>
+                            <span>{counselor.experience_years || '5'}+ years exp</span>
+                            <span>{counselor.students_helped || '50'}+ helped</span>
+                          </div>
+                          <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+                            {counselor.bio || 'Experienced counselor dedicated to helping students achieve their academic goals.'}
+                          </p>
+                          <div className="flex space-x-2">
+                            <button 
+                              onClick={() => handleConnectToCounselor(counselor)}
+                              className="flex-1 bg-gradient-to-r from-purple-600 to-cyan-500 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-cyan-600 transition-all duration-300 flex items-center justify-center space-x-2"
+                            >
+                              <MessageCircle className="h-4 w-4" />
+                              <span>Connect Now</span>
+                            </button>
+                            <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                              View Profile
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!loadingCounselors && counselors.length === 0 && (
+                <div className="text-center py-12">
+                  <User className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Counselors Found</h3>
+                  <p className="text-gray-600">Please try again later or contact support.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-// Mock auth context for now
-const useAuth = () => ({
-  isAuthenticated: () => false,
-  user: null
-})
+import { useAuth } from '../contexts/AuthContext'
 import { realDatabaseService } from '../services/realDatabaseService'
+import { Badge } from '../components/ui/badge'
 import { 
   Home, 
   GraduationCap, 
@@ -26,7 +23,11 @@ import {
   Plane,
   Users,
   MapPin,
-  Building2
+  Building2,
+  Calendar,
+  Clock,
+  Star,
+  UserCheck
 } from 'lucide-react'
 
 export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen, onMobileMenuClose }) {
@@ -35,10 +36,14 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
   const [loadingCountries, setLoadingCountries] = useState(true)
   const location = useLocation()
   const navigate = useNavigate()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, userRole } = useAuth()
 
   // Check if user is a counselor
-  const isCounselor = user?.user_type === 'counselor' || user?.role === 'counselor'
+  const isCounselor = user?.role === 'counselor'
+  const isStudent = user?.role === 'student'
+  const isLoggedIn = !!user
+
+  // Authentication state for menu rendering
 
   // Load countries on component mount
   useEffect(() => {
@@ -79,8 +84,91 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
       icon: Home,
       badge: null
     },
-    // Counselor-specific items (when counselor is authenticated)
-    ...(isAuthenticated() && isCounselor ? [
+    // Find Counselors - Show for everyone with different submenu based on role
+    {
+      id: 'find-counselors',
+      name: 'Find Counselors',
+      path: '/counselor/directory',
+      icon: Users,
+      badge: null,
+      submenu: isLoggedIn && isStudent ? [
+        { name: 'Browse Counselors', path: '/counselor/directory', icon: Users },
+        { name: 'Select Counselors', path: '/counselor/select', icon: Star },
+        { name: 'My Sessions', path: '/student/sessions', icon: Calendar },
+        { name: 'Book Consultation', path: '/counselors/book', icon: Clock }
+      ] : [
+        { name: 'Browse Counselors', path: '/counselor/directory', icon: Users },
+        { name: 'Select Counselors', path: '/counselor/select', icon: Star },
+        { name: 'Become a Counselor', path: '/counselor/register', icon: User }
+      ]
+    }
+  ]
+
+  // Add student-specific menu items if student is authenticated
+  if (isLoggedIn && isStudent) {
+    menuItems.push(
+      {
+        id: 'my-profile',
+        name: 'My Profile',
+        path: '/student/profile',
+        icon: User,
+        badge: null
+      },
+      {
+        id: 'student-dashboard',
+        name: 'My Dashboard',
+        path: '/student/dashboard',
+        icon: BarChart3,
+        badge: null
+      },
+      {
+        id: 'choose-counselor',
+        name: 'Choose Counselor',
+        path: '/student/choose-counselor',
+        icon: UserCheck,
+        badge: null
+      },
+      {
+        id: 'my-connections',
+        name: 'My Connections',
+        path: '/student/connections',
+        icon: MessageCircle,
+        badge: '0'
+      },
+      {
+        id: 'student-forums',
+        name: 'Student Forums',
+        path: '/student-forums',
+        icon: Users,
+        badge: '24'
+      },
+      {
+        id: 'alumni-network',
+        name: 'Alumni Network',
+        path: '/alumni-network',
+        icon: Users,
+        badge: null
+      },
+      {
+        id: 'travel-help',
+        name: 'Travel Help',
+        path: '/travel-help',
+        icon: Plane,
+        badge: null
+      },
+      {
+        id: 'accommodation-help',
+        name: 'Accommodation Help',
+        path: '/accommodation-help',
+        icon: Building2,
+        badge: null
+      }
+    );
+  }
+
+  // Add counselor-specific menu items if counselor is authenticated
+  if (isLoggedIn && isCounselor) {
+    menuItems.push(
       {
         id: 'counselor-dashboard',
         name: 'My Dashboard',
@@ -130,72 +218,12 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         icon: BookOpen,
         badge: null
       }
-    ] : []),
-    // Student-related items (when student is authenticated)
-    ...(isAuthenticated() && !isCounselor ? [
-      {
-        id: 'student-dashboard',
-        name: 'My Dashboard',
-        path: '/student/dashboard',
-        icon: BarChart3,
-        badge: null
-      },
-      {
-        id: 'my-profile',
-        name: 'My Profile',
-        path: '/student/profile',
-        icon: User,
-        badge: null
-      },
-      {
-        id: 'my-connections',
-        name: 'My Connections',
-        path: '/student/connections',
-        icon: MessageCircle,
-        badge: '2'
-      },
-      {
-        id: 'student-forums',
-        name: 'Student Forums',
-        path: '/student-forums',
-        icon: Users,
-        badge: '24'
-      },
-      {
-        id: 'alumni-network',
-        name: 'Alumni Network',
-        path: '/alumni-network',
-        icon: Users,
-        badge: null
-      },
-      {
-        id: 'travel-help',
-        name: 'Travel Help',
-        path: '/travel-help',
-        icon: Plane,
-        badge: null
-      },
-      {
-        id: 'accommodation-help',
-        name: 'Accommodation Help',
-        path: '/accommodation-help',
-        icon: Home,
-        badge: null
-      }
-    ] : []),
-    // Show Counselor Connect menu for students only
-    ...(isAuthenticated() && !isCounselor ? [{
-      id: 'counselor-connect',
-      name: 'Counselor Connect',
-      icon: User,
-      badge: null,
-      submenu: [
-        { name: 'Find Counselors', path: '/counselor/directory' },
-        { name: 'Select Counselor', path: '/counselor/select' },
-        { name: 'Become a Counselor', path: '/counselor/register' }
-      ]
-    }] : []),
-    // Global Education - Parent menu for Universities, Pathways, and Courses by Country
+    );
+  }
+
+  // Add remaining menu items
+  menuItems.push(
+    // Global Education - Always visible
     {
       id: 'global-education',
       name: 'Global Education',
@@ -288,21 +316,6 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         }
       ]
     },
-    // Find Counselors - Always visible for all users, positioned after Courses
-    {
-      id: 'find-counselors',
-      name: 'Find Counselors',
-      icon: User,
-      badge: null,
-      submenu: [
-        { name: 'Browse Counselors', path: '/counselor/directory' },
-        { name: 'Select Counselor', path: '/counselor/select' },
-        ...(isCounselor ? [
-          { name: 'Counselor Dashboard', path: '/counselor/dashboard' },
-          { name: 'My Students', path: '/counselor/students' }
-        ] : [])
-      ]
-    },
     {
       id: 'career-insights',
       name: 'Career Insights',
@@ -354,7 +367,7 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         { name: 'Tutorials and Guides', path: '/help-resources/tutorials-guides' }
       ]
     }
-  ]
+  );
 
   const isActive = (path) => {
     if (path === '/') {
