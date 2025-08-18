@@ -4,10 +4,10 @@ A comprehensive platform connecting students with educational counselors worldwi
 
 ## 🌟 Live Demo
 
-**Production URL:** https://cjvpmofj.manus.space
+**Production URL:** https://studentkonnect-working.surge.sh
 
 - **Main Website:** Complete university finder and pathway builder
-- **Admin Portal:** https://cjvpmofj.manus.space/admin
+- **Admin Portal:** https://studentkonnect-working.surge.sh/admin
 - **Admin Credentials:** admin@yourunipathway.com / admin123
 
 ## 🚀 Features
@@ -18,6 +18,10 @@ A comprehensive platform connecting students with educational counselors worldwi
 - **Counselor Matching:** Connect with experienced education counselors
 - **Career Pathways:** Explore Medicine, Engineering, Business, and Law pathways
 - **Scholarship Assistance:** Find financial aid opportunities
+- **GTE Visa Statement Builder:** Complete visa statement creation tool
+- **Reference Letter Toolkit:** Professional reference letter management
+- **FAQ with StudentKonnect Branding:** Updated FAQ reflecting 8-country coverage
+- **Consistent Purple Gradient Branding:** Professional visual identity throughout
 - **Professional Design:** Modern, responsive interface
 
 ### Admin Portal
