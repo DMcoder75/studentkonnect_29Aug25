@@ -402,8 +402,8 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-white via-purple-50/30 to-cyan-50/30 border-r border-gray-200 transition-all duration-300 h-screen backdrop-blur-sm">
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <aside className="desktop-sidebar hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-white via-purple-50/30 to-cyan-50/30 border-r border-gray-200 transition-all duration-300 h-screen backdrop-blur-sm">
         <div className="p-6 flex-1 overflow-y-auto">
           <div 
             className="flex items-center mb-6 cursor-pointer hover:opacity-80 transition-opacity"
@@ -528,14 +528,12 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
                 </div>
                 <span className="text-xl font-bold text-gray-800">StudentKonnect</span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={onMobileMenuClose}
-                className="p-2"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X className="h-6 w-6" />
-              </Button>
+              </button>
             </div>
 
             {/* Mobile Menu Content */}

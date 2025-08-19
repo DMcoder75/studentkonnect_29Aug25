@@ -31,19 +31,36 @@ const Header = () => {
       // Fetch countries for Study Destinations
       const countriesResult = await realDatabaseService.getAllCountries()
       if (countriesResult.data) {
-        setCountries(countriesResult.data.slice(0, 8)) // Limit to 8 countries
+        const formattedCountries = countriesResult.data.map(country => ({
+          id: country.country_id,
+          name: country.country_name,
+          flag: country.flag_url || '🌍'
+        }))
+        setCountries(formattedCountries.slice(0, 8)) // Limit to 8 countries
       }
 
       // Fetch universities
       const universitiesResult = await realDatabaseService.getAllUniversities()
       if (universitiesResult.data) {
-        setUniversities(universitiesResult.data.slice(0, 10)) // Limit to 10 universities
+        const formattedUniversities = universitiesResult.data.map(uni => ({
+          id: uni.university_id,
+          name: uni.university_name,
+          location: uni.location || uni.country_name || 'Global',
+          logo: uni.logo_url
+        }))
+        setUniversities(formattedUniversities.slice(0, 5)) // Limit to 5 universities
       }
 
       // Fetch courses
       const coursesResult = await realDatabaseService.getAllCourses()
       if (coursesResult.data) {
-        setCourses(coursesResult.data.slice(0, 10)) // Limit to 10 courses
+        const formattedCourses = coursesResult.data.map(course => ({
+          id: course.course_id,
+          name: course.course_name,
+          category: course.category || 'General',
+          duration: course.duration
+        }))
+        setCourses(formattedCourses.slice(0, 5)) // Limit to 5 courses
       }
 
       // Featured items (mix of top universities and courses)
@@ -136,7 +153,7 @@ const Header = () => {
                           onClick={() => handleCountryClick(country)}
                           className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 text-sm transition-colors"
                         >
-                          🌍 {country.name}
+                          {country.flag} {country.name}
                         </button>
                       ))
                     )}

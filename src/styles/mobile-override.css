@@ -1,0 +1,93 @@
+/* Mobile Override Styles - Force mobile layout */
+
+/* Hide mobile header by default, show only on mobile */
+.mobile-header-only {
+  display: none !important;
+}
+
+.mobile-menu-overlay {
+  display: none !important;
+}
+
+/* Mobile-specific overrides using JavaScript detection */
+.js-mobile .mobile-header-only {
+  display: flex !important;
+}
+
+.js-mobile .mobile-menu-overlay {
+  display: block !important;
+}
+
+/* Force mobile styles when js-mobile class is present */
+.js-mobile .grid.grid-cols-2.md\:grid-cols-5 {
+  display: none !important;
+}
+
+.js-mobile .space-x-4 {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+}
+
+.js-mobile .space-x-4 > * {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.js-mobile .grid.grid-cols-1.md\:grid-cols-3 {
+  display: flex !important;
+  overflow-x: auto !important;
+  gap: 1rem !important;
+  padding-bottom: 1rem !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-snap-type: x mandatory !important;
+}
+
+.js-mobile .grid.grid-cols-1.md\:grid-cols-3 > * {
+  flex: 0 0 280px !important;
+  min-width: 280px !important;
+  scroll-snap-align: start !important;
+}
+
+/* Hide desktop elements on mobile */
+.js-mobile .bg-gradient-to-r.from-indigo-600.via-purple-600.to-pink-600,
+.js-mobile .bg-gradient-to-r.from-purple-600.via-purple-700.to-pink-600,
+.js-mobile .bg-white.shadow-sm.border-b.border-gray-200 {
+  display: none !important;
+}
+
+.js-mobile .w-64.bg-white.border-r,
+.js-mobile .w-64.bg-white.border-r.border-gray-200,
+.js-mobile aside {
+  display: none !important;
+}
+
+/* Mobile body adjustments */
+.js-mobile body {
+  padding-top: 64px !important;
+  overflow-x: hidden !important;
+}
+
+/* Mobile content adjustments */
+.js-mobile .flex > .flex-1,
+.js-mobile .flex > .w-full,
+.js-mobile main {
+  width: 100% !important;
+  margin-left: 0 !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Mobile form optimizations */
+.js-mobile input,
+.js-mobile select,
+.js-mobile textarea,
+.js-mobile button {
+  font-size: 16px !important;
+}
+
+.js-mobile .container {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, ChevronDown, Search, Target, Building, Globe } from 'lucide-react'
 import Sidebar from './Sidebar'
+import MobileHeader from './MobileHeader'
+import MobileMenu from './MobileMenu'
 import { globalEducationService } from '../services/globalEducationService'
 import { statisticsService } from '../services/statisticsService'
 
@@ -58,8 +60,9 @@ const customStyles = `
   }
 `
 
-export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
+export default function HomePage({ isMobileMenuOpen, onMobileMenuClose, onMobileMenuOpen }) {
   const navigate = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [universities, setUniversities] = useState([])
   const [pathways, setPathways] = useState([])
   const [favorites, setFavorites] = useState([])
@@ -186,8 +189,17 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
       {/* Inject Custom CSS */}
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
       
+      {/* Mobile Header */}
+      <MobileHeader onMobileMenuOpen={() => setMobileMenuOpen(true)} />
+      
+      {/* Mobile Menu */}
+      <MobileMenu 
+        isOpen={mobileMenuOpen} 
+        onClose={() => setMobileMenuOpen(false)} 
+      />
+      
       {/* Hero Section - Full Width, No Sidebar */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-4 w-full h-[320px] flex items-center mt-12 sm:mt-0">
+      <section className="hero-section relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-4 w-full h-[320px] flex items-center mt-12 md:mt-0">
         {/* Background Image Overlay with 70% transparency */}
         <div 
           className="absolute inset-0 opacity-30"
@@ -237,9 +249,9 @@ export default function HomePage({ isMobileMenuOpen, onMobileMenuClose }) {
       <div className="flex">
         <Sidebar isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={onMobileMenuClose} />
         
-        {/* Main Content */}
-        <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen bg-gray-50">
-          <div className="container mx-auto px-6 py-8">
+        {/* Main Content - Full width on mobile */}
+        <main className="main-content flex-1 w-full transition-all duration-300 min-h-screen bg-gray-50">
+          <div className="container mx-auto px-4 md:px-6 py-8">
             
             {/* Global Statistics Section */}
             <section id="statistics" className="mb-16">

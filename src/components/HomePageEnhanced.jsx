@@ -5,8 +5,8 @@ import {
   ArrowRight, TrendingUp, Users, BookOpen, GraduationCap, Star, Heart, 
   Globe, Target, Building, Search, ChevronDown, Mail, Phone, MapPin 
 } from 'lucide-react'
-import GlobalSidebarManager from './GlobalSidebarManager'
 import Footer from './Footer'
+import GlobalSidebarManager from './GlobalSidebarManager'
 import { globalEducationService } from '../services/globalEducationService'
 
 // Custom CSS for animations
@@ -52,7 +52,7 @@ const customStyles = `
   }
 `
 
-export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }) {
+export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, isMobile, hideDesktopHeader }) {
   const navigate = useNavigate()
   const { user, isAdmin } = useAuth()
   const [universities, setUniversities] = useState([])
@@ -323,18 +323,19 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
         </div>
       </section>
 
-      {/* Main Content with Sidebar */}
-      <div className="flex">
-        <GlobalSidebarManager 
-          isMobileMenuOpen={isMobileMenuOpen} 
-          onMobileMenuClose={onMobileMenuClose}
-          isHomepage={true}
-        />
-        
-        <main className="flex-1 w-full md:w-auto transition-all duration-300 min-h-screen">
+      {/* Content with Sidebar Layout - Desktop Only */}
+      {!isMobile ? (
+        <div className="flex">
+          {/* Left Sidebar */}
+          <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
+            <GlobalSidebarManager />
+          </div>
           
-          {/* Global Statistics Section */}
-          <section className="py-12 bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-100 relative overflow-hidden">
+          {/* Main Content */}
+          <div className="flex-1 bg-gradient-to-br from-purple-50 via-white to-cyan-50">
+            
+            {/* Global Statistics Section */}
+            <section className="py-12 bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-100 relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-10 left-10 w-32 h-32 bg-purple-500 rounded-full animate-pulse"></div>
               <div className="absolute top-20 right-20 w-24 h-24 bg-cyan-500 rounded-full animate-bounce"></div>
@@ -685,8 +686,81 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose }
             </div>
           </section>
 
-        </main>
+        </div>
       </div>
+      ) : (
+        /* Mobile Layout - No Sidebar */
+        <div className="bg-gradient-to-br from-purple-50 via-white to-cyan-50">
+          
+          {/* Global Statistics Section */}
+          <section className="py-12 bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-100 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-10 left-10 w-32 h-32 bg-purple-500 rounded-full animate-pulse"></div>
+              <div className="absolute top-20 right-20 w-24 h-24 bg-cyan-500 rounded-full animate-bounce"></div>
+              <div className="absolute bottom-10 left-1/4 w-20 h-20 bg-pink-500 rounded-full animate-ping"></div>
+              <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-yellow-500 rounded-full animate-pulse"></div>
+            </div>
+            <div className="container mx-auto px-6 relative z-10">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 bg-clip-text text-transparent mb-4">
+                  🌟 Global Education at Your Fingertips 🌟
+                </h2>
+                <p className="text-base text-gray-700 font-medium">Discover endless possibilities across the world</p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                <div className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:rotate-2">
+                  <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-green-300 transition-all duration-300 animate-pulse">
+                    <Globe className="h-10 w-10" />
+                  </div>
+                  <div className="text-3xl font-black bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalCountries}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-base group-hover:text-green-700 transition-colors duration-200">Countries</div>
+                </div>
+                <div className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:-rotate-2">
+                  <div className="bg-gradient-to-br from-purple-500 to-violet-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-purple-300 transition-all duration-300 animate-bounce">
+                    <GraduationCap className="h-10 w-10" />
+                  </div>
+                  <div className="text-3xl font-black bg-gradient-to-r from-purple-600 to-violet-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalUniversities}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-base group-hover:text-purple-700 transition-colors duration-200">Universities</div>
+                </div>
+                <div className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:rotate-2">
+                  <div className="bg-gradient-to-br from-pink-500 to-rose-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-pink-300 transition-all duration-300 animate-pulse">
+                    <BookOpen className="h-10 w-10" />
+                  </div>
+                  <div className="text-3xl font-black bg-gradient-to-r from-pink-600 to-rose-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalCourses}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-base group-hover:text-pink-700 transition-colors duration-200">Courses</div>
+                </div>
+                <div className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:-rotate-2">
+                  <div className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-cyan-300 transition-all duration-300 animate-bounce">
+                    <TrendingUp className="h-10 w-10" />
+                  </div>
+                  <div className="text-3xl font-black bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    {stats.totalPathways}+
+                  </div>
+                  <div className="text-gray-700 font-bold text-base group-hover:text-cyan-700 transition-colors duration-200">Pathways</div>
+                </div>
+                <div className="text-center cursor-pointer group transform hover:scale-110 transition-all duration-300 hover:rotate-2">
+                  <div className="bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:shadow-2xl group-hover:shadow-yellow-300 transition-all duration-300 animate-pulse">
+                    <Users className="h-10 w-10" />
+                  </div>
+                  <div className="text-3xl font-black bg-gradient-to-r from-yellow-600 to-orange-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-all duration-300 font-mono tracking-wider">
+                    +
+                  </div>
+                  <div className="text-gray-700 font-bold text-base group-hover:text-yellow-700 transition-colors duration-200">Career Paths</div>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          {/* Continue with rest of mobile content... */}
+          
+        </div>
+      )}
       
       {/* Footer */}
       <Footer />

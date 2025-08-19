@@ -1,0 +1,180 @@
+/* MOBILE-ONLY CSS - Only affects actual mobile devices */
+/* Uses proper media queries that won't affect desktop */
+
+@media only screen and (max-width: 768px) and (pointer: coarse) {
+  /* This targets actual mobile devices with touch screens */
+  
+  /* HIDE ALL DESKTOP HEADERS on mobile only */
+  .bg-gradient-to-r,
+  .bg-white.shadow-sm,
+  .bg-white.border-b,
+  header:not(.mobile-header-only),
+  nav:not(.mobile-nav) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* HIDE ALL DESKTOP SIDEBARS on mobile only */
+  .w-64,
+  aside,
+  .sidebar {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* SHOW MOBILE HEADER on mobile only */
+  .mobile-header-only {
+    display: flex !important;
+    visibility: visible !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: white !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 0.75rem 1rem !important;
+  }
+  
+  /* HIDE MODAL ON MOBILE only */
+  .modal,
+  .popup,
+  [role="dialog"],
+  .fixed.inset-0 {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* 1. HIDE ENTIRE STATS SECTION on mobile only */
+  .grid.grid-cols-2.md\:grid-cols-5 {
+    display: none !important;
+  }
+  
+  /* Hide stats section parent containers on mobile only */
+  section:has(.grid.grid-cols-2.md\:grid-cols-5) {
+    display: none !important;
+  }
+  
+  /* 2. FORM FIELDS VERTICAL on mobile only */
+  .space-x-4 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .space-x-4 > * {
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* 3. COUNSELOR CARDS HORIZONTAL SCROLL on mobile only */
+  .grid.grid-cols-1.md\:grid-cols-3 {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory !important;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-3 > * {
+    flex: 0 0 280px !important;
+    min-width: 280px !important;
+    scroll-snap-align: start !important;
+  }
+  
+  /* MOBILE BODY ADJUSTMENTS */
+  body {
+    padding-top: 64px !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* MOBILE CONTENT FULL WIDTH */
+  .flex > .flex-1,
+  .flex > .w-full,
+  main,
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    flex: none !important;
+  }
+  
+  /* MOBILE FORM OPTIMIZATIONS */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px !important;
+  }
+}
+
+/* Additional mobile detection for devices that might not have pointer: coarse */
+@media only screen and (max-width: 768px) and (orientation: portrait) {
+  /* This targets mobile devices in portrait mode */
+  
+  /* Apply same styles as above */
+  .bg-gradient-to-r,
+  .bg-white.shadow-sm,
+  .bg-white.border-b,
+  header:not(.mobile-header-only),
+  nav:not(.mobile-nav) {
+    display: none !important;
+  }
+  
+  .w-64,
+  aside,
+  .sidebar {
+    display: none !important;
+  }
+  
+  .mobile-header-only {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: white !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 0.75rem 1rem !important;
+  }
+  
+  .grid.grid-cols-2.md\:grid-cols-5 {
+    display: none !important;
+  }
+  
+  .space-x-4 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-3 {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-3 > * {
+    flex: 0 0 280px !important;
+    min-width: 280px !important;
+  }
+  
+  body {
+    padding-top: 64px !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* Desktop protection - ensure desktop styles are preserved */
+@media only screen and (min-width: 769px) {
+  /* This ensures desktop view is never affected */
+  .mobile-header-only {
+    display: none !important;
+  }
+}
+

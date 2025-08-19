@@ -1,0 +1,113 @@
+/* Simple CSS-only mobile solution */
+@media (max-width: 768px) {
+  /* Hide all desktop headers */
+  header:not(.mobile-header-fixed),
+  .bg-gradient-to-r:not(.mobile-header-fixed),
+  .bg-white.shadow-sm,
+  .bg-white.border-b:not(.mobile-header-fixed) {
+    display: none !important;
+  }
+  
+  /* Hide sidebar completely */
+  .w-64,
+  aside,
+  nav:not(.mobile-nav) {
+    display: none !important;
+  }
+  
+  /* Show mobile header */
+  .mobile-header-fixed {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: white !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 1rem !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  
+  /* Add body padding for mobile header */
+  body {
+    padding-top: 64px !important;
+  }
+  
+  /* Force full width content */
+  main,
+  .container,
+  .flex > .flex-1 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 1rem !important;
+  }
+  
+  /* Hide stats section completely */
+  .grid.grid-cols-2.md\:grid-cols-5 {
+    display: none !important;
+  }
+  
+  /* Hide stats section title */
+  h2:has(+ * .grid.grid-cols-2.md\:grid-cols-5),
+  h3:has(+ * .grid.grid-cols-2.md\:grid-cols-5) {
+    display: none !important;
+  }
+  
+  /* Force form fields vertical */
+  .space-x-4 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .space-x-4 > * {
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Counselor cards horizontal scroll */
+  .grid.grid-cols-1.md\:grid-cols-3 {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-3 > * {
+    flex: 0 0 280px !important;
+    min-width: 280px !important;
+  }
+  
+  /* University cards horizontal scroll */
+  .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > * {
+    flex: 0 0 250px !important;
+    min-width: 250px !important;
+  }
+  
+  /* Pathway cards horizontal scroll */
+  .grid.grid-cols-1.md\:grid-cols-2:not(.lg\:grid-cols-3) {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-2:not(.lg\:grid-cols-3) > * {
+    flex: 0 0 280px !important;
+    min-width: 280px !important;
+  }
+}
+
