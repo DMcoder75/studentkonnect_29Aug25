@@ -6,8 +6,8 @@ const SimpleAdminPortal = () => {
   
   const stats = {
     totalUsers: 1247,
-    totalUniversities: 866,
-    totalCourses: 1000,
+    totalUniversities: 850,
+    totalCourses: 8500,
     totalApplications: 523,
     totalCounselors: 45,
     monthlyGrowth: 12.5,

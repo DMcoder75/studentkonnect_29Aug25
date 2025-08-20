@@ -289,7 +289,7 @@ export default function Sidebar({ isOpen, onClose, isHomepage, isMobileMenuOpen,
         {
           name: 'Pathways',
           path: '/pathways',
-          badge: '2400+',
+          badge: '5000+',
           submenu: [
             { name: 'All Pathways', path: '/pathways' },
             { name: 'Business & Finance', path: '/pathways?category=business' },

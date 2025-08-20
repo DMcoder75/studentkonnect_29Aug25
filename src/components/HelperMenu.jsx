@@ -236,11 +236,11 @@ export default function HelperMenu() {
               </div>
               <div className="flex items-center space-x-1">
                 <GraduationCap className="h-4 w-4" />
-                <span>866+ Universities</span>
+                <span>850+ Universities</span>
               </div>
               <div className="flex items-center space-x-1">
                 <BookOpen className="h-4 w-4" />
-                <span>1000+ Courses</span>
+                <span>8500+ Courses</span>
               </div>
             </div>
           </div>

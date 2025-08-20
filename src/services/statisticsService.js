@@ -117,8 +117,8 @@ export const statisticsService = {
       return {
         totalStudents: 2847,
         activeCounselors: 89,
-        totalUniversities: 866,
-        totalCourses: 1000,
+        totalUniversities: 850,
+        totalCourses: 8500,
         totalCountries: 8,
         successRate: 58.6,
         totalRevenue: 125750

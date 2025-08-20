@@ -182,7 +182,7 @@ const Header = () => {
                       <path d="M22 10v6"></path>
                       <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
                     </svg>
-                    <span>866+ Universities</span>
+                    <span>850+ Universities</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-chevron-down h-3 w-3 transition-transform duration-200 ${dropdownStates.universities ? 'rotate-180' : ''}`} aria-hidden="true">
                       <path d="m6 9 6 6 6-6"></path>
                     </svg>
@@ -238,7 +238,7 @@ const Header = () => {
                       <path d="M12 7v14"></path>
                       <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
                     </svg>
-                    <span>1000+ Courses</span>
+                    <span>8500+ Courses</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-chevron-down h-3 w-3 transition-transform duration-200 ${dropdownStates.courses ? 'rotate-180' : ''}`} aria-hidden="true">
                       <path d="m6 9 6 6 6-6"></path>
                     </svg>

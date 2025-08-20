@@ -8,10 +8,10 @@ export default function HomePageExact() {
   const navigate = useNavigate()
   const [stats, setStats] = useState({
     totalCountries: 8,
-    totalUniversities: 866,
-    totalCourses: 1000,
-    totalPathways: 2400,
-    totalCareerPaths: 450
+    totalUniversities: 850,
+    totalCourses: 8500,
+    totalPathways: 5000,
+    totalCareerPaths: 100
   })
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function HomePageExact() {
           totalUniversities: data.universities || 866,
           totalCourses: data.courses || 1000,
           totalPathways: data.pathways || 2400,
-          totalCareerPaths: 450
+          totalCareerPaths: 100
         })
       } catch (error) {
         console.error('Error fetching stats:', error)

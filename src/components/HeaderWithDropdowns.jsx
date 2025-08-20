@@ -165,7 +165,7 @@ const HeaderWithDropdowns = () => {
                     className="flex items-center space-x-1 hover:text-white transition-colors cursor-pointer"
                   >
                     <GraduationCap className="h-4 w-4" />
-                    <span>866+ Universities</span>
+                    <span>850+ Universities</span>
                     <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${dropdownStates.universities ? 'rotate-180' : ''}`} />
                   </button>
                   
@@ -212,7 +212,7 @@ const HeaderWithDropdowns = () => {
                     className="flex items-center space-x-1 hover:text-white transition-colors cursor-pointer"
                   >
                     <BookOpen className="h-4 w-4" />
-                    <span>1000+ Courses</span>
+                    <span>8500+ Courses</span>
                     <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${dropdownStates.courses ? 'rotate-180' : ''}`} />
                   </button>
                   

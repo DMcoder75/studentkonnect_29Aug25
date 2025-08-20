@@ -242,7 +242,7 @@ const SidebarNew = ({ onMobileMenuClose }) => {
         badge: null,
         submenu: [
           { name: 'Universities', path: '/universities', badge: '850+' },
-          { name: 'Pathways', path: '/pathways', badge: '2400+' },
+          { name: 'Pathways', path: '/pathways', badge: '5000+' },
           { name: 'Courses', path: '/courses', badge: '12500+' },
           { name: 'ATAR Calculator', path: '/atar-calculator' }
         ]

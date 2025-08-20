@@ -58,10 +58,10 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
   const [universities, setUniversities] = useState([])
   const [stats, setStats] = useState({
     totalCountries: 8,
-    totalUniversities: 866,
-    totalCourses: 1000,
-    totalPathways: 2400,
-    totalCareerPaths: 450
+    totalUniversities: 850,
+    totalCourses: 8500,
+    totalPathways: 5000,
+    totalCareerPaths: 100
   })
   const [loading, setLoading] = useState(true)
   const [selectedProfession, setSelectedProfession] = useState('')
