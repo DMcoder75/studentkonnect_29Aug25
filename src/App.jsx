@@ -5,7 +5,13 @@ import Header from './components/Header'
 import HomePageEnhanced from './components/HomePageEnhanced'
 import OnboardingModal from './components/OnboardingModal'
 import useEngagementTimer from './hooks/useEngagementTimer'
-import MobileLayout from './components/mobile/MobileLayout'
+import MobileLayoutEnhanced from './components/mobile/MobileLayoutEnhanced'
+
+// Import mobile-specific components
+import MobileSignIn from './components/mobile/MobileSignIn'
+import MobileStudentDashboard from './components/mobile/MobileStudentDashboard'
+import MobileCounselorDashboard from './components/mobile/MobileCounselorDashboard'
+import MobileRouteHandler from './components/mobile/MobileRouteHandler'
 
 // Import all the pages
 import GlobalUniversitiesPage from './components/GlobalUniversitiesPage'
@@ -72,7 +78,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <MobileLayout>
+        <MobileLayoutEnhanced>
           <div className="min-h-screen">
             {/* Desktop Header - appears on every page */}
             <Header />
@@ -108,9 +114,28 @@ function App() {
         {/* Database Cleanup Route */}
         <Route path="/database-cleanup" element={<DatabaseCleanupComponent />} />
         
-        {/* Authentication Routes */}
-        <Route path="/signin" element={<SignInForm />} />
-        <Route path="/login" element={<SignInForm />} />
+        {/* Authentication Routes - Mobile-aware */}
+        <Route path="/signin" element={
+          <MobileRouteHandler 
+            desktopComponent={SignInForm} 
+            mobileComponent={MobileSignIn} 
+          />
+        } />
+        <Route path="/login" element={
+          <MobileRouteHandler 
+            desktopComponent={SignInForm} 
+            mobileComponent={MobileSignIn} 
+          />
+        } />
+        
+        {/* Mobile-specific Routes - These will be handled by MobileLayoutEnhanced */}
+        <Route path="/mobile/signin" element={<MobileSignIn />} />
+        <Route path="/mobile/student-dashboard" element={<MobileStudentDashboard />} />
+        <Route path="/mobile/counselor-dashboard" element={<MobileCounselorDashboard />} />
+        
+        {/* Enhanced Mobile Routes (will redirect to mobile versions on mobile devices) */}
+        <Route path="/student-dashboard" element={<MobileStudentDashboard />} />
+        <Route path="/counselor-dashboard" element={<MobileCounselorDashboard />} />
         
         {/* Tools & Utilities */}
         <Route path="/career-insights" element={<CareerInsightsPage />} />
@@ -174,7 +199,7 @@ function App() {
         </div>
       )}
     </div>
-    </MobileLayout>
+    </MobileLayoutEnhanced>
     </Router>
     </AuthProvider>
   )
