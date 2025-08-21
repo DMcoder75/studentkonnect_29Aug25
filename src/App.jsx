@@ -10,9 +10,12 @@ import MobileLayout from './components/mobile/MobileLayout'
 // Import all the pages
 import GlobalUniversitiesPage from './components/GlobalUniversitiesPage'
 import GlobalCoursesPage from './components/GlobalCoursesPage'
-import CounselorDirectory from './components/CounselorDirectory'
+import CounselorDirectorySimple from './components/CounselorDirectorySimple'
+import CounselorBooking from './components/CounselorBooking'
+import StudentSessions from './components/StudentSessions'
 import CounselorSelectionPage from './components/CounselorSelectionPage'
-import CounselorDashboard from './components/CounselorDashboard'
+import CounselorStudents from './components/CounselorStudentsReal'
+import CounselorDashboard from './components/CounselorDashboardReal'
 import CounselorProfile from './components/CounselorProfile'
 import CounselorRegistration from './components/CounselorRegistration'
 import CareerInsightsPage from './components/CareerInsightsPage'
@@ -29,10 +32,11 @@ import SimpleAdminPortal from './components/SimpleAdminPortal'
 import PathwaysPage from './components/PathwaysPage'
 import UniversitiesPage from './components/UniversitiesPage'
 import CoursesPage from './components/CoursesPage'
-import StudentDashboard from './components/StudentDashboard'
+import StudentDashboard from './components/StudentDashboardReal'
 import StudentForums from './components/StudentForums'
 import StudentProfileDashboard from './components/StudentProfileDashboard'
 import SignInPage from './components/SignInPage'
+import DatabaseCleanupComponent from './components/DatabaseCleanupComponent'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import TermsOfServicePage from './components/TermsOfServicePage'
 import TravelHelp from './components/TravelHelp'
@@ -41,6 +45,7 @@ import AccommodationHelp from './components/AccommodationHelp'
 // Import new student components
 import StudentProfile from './components/StudentProfile'
 import SignInForm from './components/SignInForm'
+import StudentConnectionsPage from './components/StudentConnectionsPage'
 
 function App() {
   const [user, setUser] = useState(null) // Track user state
@@ -84,7 +89,9 @@ function App() {
         <Route path="/university/:id" element={<UniversityDetailPage />} />
         
         {/* Counselor Routes */}
-        <Route path="/counselor/directory" element={<CounselorDirectory />} />
+        <Route path="/counselor/directory" element={<CounselorDirectorySimple />} />
+        <Route path="/counselors/book" element={<CounselorBooking />} />
+        <Route path="/counselor/students" element={<CounselorStudents />} />
         <Route path="/counselor/select" element={<CounselorSelectionPage />} />
         <Route path="/counselor/selection" element={<CounselorSelectionPage />} />
         <Route path="/counselor/dashboard" element={<CounselorDashboard />} />
@@ -94,7 +101,12 @@ function App() {
         {/* Student Routes */}
         <Route path="/student/dashboard" element={<StudentDashboard />} />
         <Route path="/student/profile" element={<StudentProfile />} />
+        <Route path="/student/connections" element={<StudentConnectionsPage />} />
+        <Route path="/student/sessions" element={<StudentSessions />} />
         <Route path="/student/forums" element={<StudentForums />} />
+        
+        {/* Database Cleanup Route */}
+        <Route path="/database-cleanup" element={<DatabaseCleanupComponent />} />
         
         {/* Authentication Routes */}
         <Route path="/signin" element={<SignInForm />} />

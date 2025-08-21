@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { counselorConnectionService } from '../services/counselorConnectionService'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Checkbox } from '../components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { 
   Search,
   Filter,
@@ -44,7 +45,7 @@ import Sidebar from './Sidebar'
 
 export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user, userRole } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilters, setSelectedFilters] = useState({
     counselorType: '',
@@ -57,6 +58,138 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
   })
   const [sortBy, setSortBy] = useState('credibility')
   const [viewMode, setViewMode] = useState('grid') // grid or list
+  const [connectionStates, setConnectionStates] = useState({}) // Track connection states per counselor
+  const [studentConnections, setStudentConnections] = useState([]) // Student's existing connections
+  const [loading, setLoading] = useState(false)
+
+  // Load student connections on component mount
+  useEffect(() => {
+    if (isAuthenticated() && userRole === 'student' && user?.id) {
+      loadStudentConnections()
+    }
+  }, [isAuthenticated, userRole, user])
+
+  const loadStudentConnections = async () => {
+    try {
+      const result = await counselorConnectionService.getStudentConnections(user.id)
+      if (result.success) {
+        setStudentConnections(result.connections)
+      }
+    } catch (error) {
+      console.error('Error loading student connections:', error)
+    }
+  }
+
+  // Handle counselor connection
+  const handleConnect = async (counselor) => {
+    if (!isAuthenticated()) {
+      navigate('/signin')
+      return
+    }
+
+    if (userRole !== 'student') {
+      alert('Only students can connect with counselors')
+      return
+    }
+
+    setLoading(true)
+    setConnectionStates(prev => ({ ...prev, [counselor.id]: 'connecting' }))
+
+    try {
+      const result = await counselorConnectionService.createConnectionRequest(
+        user.id,
+        user.name || user.email,
+        user.email,
+        counselor.id,
+        counselor.name,
+        `Student interested in connecting with ${counselor.name} for ${counselor.specializations.join(', ')} guidance`
+      )
+
+      if (result.success) {
+        setConnectionStates(prev => ({ ...prev, [counselor.id]: 'pending' }))
+        await loadStudentConnections() // Refresh connections
+        alert(result.message)
+      } else {
+        setConnectionStates(prev => ({ ...prev, [counselor.id]: 'error' }))
+        if (result.existingRequest) {
+          // Show option to cancel existing request
+          const shouldCancel = window.confirm(
+            `${result.error}\n\nWould you like to cancel your existing request and create a new one with ${counselor.name}?`
+          )
+          if (shouldCancel) {
+            await handleCancelAndConnect(result.existingRequest.id, counselor)
+          }
+        } else {
+          alert(result.error)
+        }
+      }
+    } catch (error) {
+      setConnectionStates(prev => ({ ...prev, [counselor.id]: 'error' }))
+      alert('Failed to create connection request. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelAndConnect = async (existingConnectionId, newCounselor) => {
+    try {
+      // Cancel existing request
+      const cancelResult = await counselorConnectionService.cancelConnectionRequest(existingConnectionId, user.id)
+      if (cancelResult.success) {
+        // Create new request
+        await handleConnect(newCounselor)
+      } else {
+        alert('Failed to cancel existing request')
+      }
+    } catch (error) {
+      alert('Failed to process request')
+    }
+  }
+
+  // Get connection status for a counselor
+  const getConnectionStatus = (counselorId) => {
+    const connection = studentConnections.find(conn => conn.counselorId === counselorId)
+    if (connection) {
+      return connection.status
+    }
+    return connectionStates[counselorId] || 'none'
+  }
+
+  // Get connection button text and style
+  const getConnectionButton = (counselor) => {
+    const status = getConnectionStatus(counselor.id)
+    
+    switch (status) {
+      case 'pending':
+        return {
+          text: 'Connection Pending',
+          variant: 'outline',
+          disabled: true,
+          icon: Clock
+        }
+      case 'approved':
+        return {
+          text: 'Connected',
+          variant: 'default',
+          disabled: true,
+          icon: CheckCircle2
+        }
+      case 'connecting':
+        return {
+          text: 'Connecting...',
+          variant: 'outline',
+          disabled: true,
+          icon: Clock
+        }
+      default:
+        return {
+          text: 'Connect',
+          variant: 'default',
+          disabled: false,
+          icon: Users
+        }
+    }
+  }
 
   // Sample counselor data with comprehensive performance metrics
   const [counselors] = useState([
@@ -475,12 +608,26 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
               <p className="text-xs text-gray-600">{counselor.yearsExperience} years experience</p>
             </div>
             <div className="flex space-x-2">
+              {/* Connect Button - Only for students */}
+              {userRole === 'student' && (
+                <Button 
+                  size="sm"
+                  variant={getConnectionButton(counselor).variant}
+                  disabled={getConnectionButton(counselor).disabled}
+                  onClick={() => handleConnect(counselor)}
+                >
+                  {React.createElement(getConnectionButton(counselor).icon, { className: "h-4 w-4 mr-1" })}
+                  {getConnectionButton(counselor).text}
+                </Button>
+              )}
+              
+              {/* Message Button - Available for all authenticated users */}
               <Button 
                 size="sm" 
                 variant="outline"
                 onClick={() => {
                   if (!isAuthenticated()) {
-                    navigate('/sign-in')
+                    navigate('/signin')
                   } else {
                     // Handle message functionality for authenticated users
                     console.log('Message counselor:', counselor.name)
@@ -490,11 +637,13 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
                 <MessageSquare className="h-4 w-4 mr-1" />
                 Message
               </Button>
+              
+              {/* Book Call Button - Available for all authenticated users */}
               <Button 
                 size="sm"
                 onClick={() => {
                   if (!isAuthenticated()) {
-                    navigate('/sign-in')
+                    navigate('/signin')
                   } else {
                     // Handle book call functionality for authenticated users
                     console.log('Book call with counselor:', counselor.name)

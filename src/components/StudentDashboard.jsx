@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { realDatabaseService } from '../services/realDatabaseService'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,6 +29,7 @@ export default function StudentDashboard({ isMobileMenuOpen, onMobileMenuClose }
   const navigate = useNavigate()
   const { user } = useAuth()
   const [studentData, setStudentData] = useState(null)
+  const [assignedCounselor, setAssignedCounselor] = useState(null)
   const [recentActivity, setRecentActivity] = useState([])
   const [upcomingSessions, setUpcomingSessions] = useState([])
   const [recommendations, setRecommendations] = useState([])

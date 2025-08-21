@@ -108,10 +108,11 @@ export const globalEducationService = {
   // Global Statistics (alias for getStatistics)
   async getGlobalStatistics() {
     return {
-      totalCountries: mockData.countries.length,
-      totalUniversities: mockData.universities.length,
-      totalCourses: mockData.courses.length,
-      totalPathways: mockData.pathways.length
+      totalCountries: 8,
+      totalUniversities: 850,
+      totalCourses: 8500,
+      totalPathways: 5000,
+      totalCareerPaths: 100
     };
   },
 

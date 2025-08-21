@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { counselorConnectionService } from '../services/counselorConnectionService'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -17,7 +19,8 @@ import {
   Globe,
   Calendar,
   TrendingUp,
-  BookOpen
+  BookOpen,
+  Loader2
 } from 'lucide-react'
 import Sidebar from './Sidebar'
 import ContactCounselorModal from './ContactCounselorModal'
@@ -26,13 +29,105 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
   const [searchQuery, setSearchQuery] = useState('')
   const [contactModalOpen, setContactModalOpen] = useState(false)
   const [selectedCounselor, setSelectedCounselor] = useState(null)
+  const [connectionStates, setConnectionStates] = useState({})
+  const [studentConnections, setStudentConnections] = useState([])
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { isAuthenticated, user, userRole } = useAuth()
+
+  // Load student connections on component mount
+  useEffect(() => {
+    if (isAuthenticated() && userRole === 'student' && user?.email) {
+      loadStudentConnections()
+    }
+  }, [isAuthenticated, userRole, user])
+
+  const loadStudentConnections = async () => {
+    try {
+      const result = await counselorConnectionService.getStudentConnections(user.email)
+      if (result.success) {
+        setStudentConnections(result.connections)
+      }
+    } catch (error) {
+      console.error('Error loading student connections:', error)
+    }
+  }
+
+  // Handle counselor connection
+  const handleConnect = async (counselor) => {
+    if (!isAuthenticated()) {
+      navigate('/signin')
+      return
+    }
+
+    if (userRole !== 'student') {
+      alert('Only students can connect with counselors')
+      return
+    }
+
+    setLoading(true)
+    setConnectionStates(prev => ({ ...prev, [counselor.id]: 'connecting' }))
+
+    try {
+      const result = await counselorConnectionService.createConnectionRequest(
+        user.id,
+        user.full_name || user.email,
+        user.email,
+        counselor.email,
+        counselor.name,
+        `Student interested in connecting with ${counselor.name} for ${counselor.specializations.join(', ')} guidance`
+      )
+
+      if (result.success) {
+        setConnectionStates(prev => ({ ...prev, [counselor.id]: 'pending' }))
+        await loadStudentConnections()
+        alert(result.message)
+      } else {
+        setConnectionStates(prev => ({ ...prev, [counselor.id]: 'error' }))
+        if (result.existingRequest) {
+          const shouldCancel = window.confirm(
+            `${result.error}\n\nWould you like to cancel your existing request and create a new one with ${counselor.name}?`
+          )
+          if (shouldCancel) {
+            await handleCancelAndConnect(result.existingRequest.id, counselor)
+          }
+        } else {
+          alert(result.error)
+        }
+      }
+    } catch (error) {
+      setConnectionStates(prev => ({ ...prev, [counselor.id]: 'error' }))
+      alert('Failed to create connection request. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelAndConnect = async (existingConnectionId, newCounselor) => {
+    try {
+      const cancelResult = await counselorConnectionService.cancelConnectionRequest(existingConnectionId, user.id)
+      if (cancelResult.success) {
+        await handleConnect(newCounselor)
+      } else {
+        alert('Failed to cancel existing request')
+      }
+    } catch (error) {
+      alert('Failed to process request')
+    }
+  }
+
+  // Get connection status for a counselor
+  const getConnectionStatus = (counselorEmail) => {
+    const connection = studentConnections.find(conn => conn.counselor_id === counselorEmail)
+    return connection ? connection.status : null
+  }
 
   // Enhanced counselor data with comprehensive professional information
   const counselors = [
     {
       id: 1,
       name: 'Dr. Sarah Chen',
+      email: 'sarah.chen@studentkonnect.com',
       title: 'Senior Migration Counselor',
       rank: 'Expert Level',
       location: 'Sydney, NSW',
@@ -90,6 +185,7 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
     {
       id: 2,
       name: 'Michael Thompson',
+      email: 'michael.thompson@studentkonnect.com',
       title: 'University Admissions Specialist',
       rank: 'Senior Level',
       location: 'Melbourne, VIC',
@@ -147,6 +243,7 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
     {
       id: 3,
       name: 'Prof. Rajesh Kumar',
+      email: 'rajesh.kumar@studentkonnect.com',
       title: 'Academic Excellence Advisor',
       rank: 'Master Level',
       location: 'Perth, WA',
@@ -204,6 +301,7 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
     {
       id: 4,
       name: 'Emma Williams',
+      email: 'emma.williams@studentkonnect.com',
       title: 'Student Support Coordinator',
       rank: 'Professional Level',
       location: 'Brisbane, QLD',
@@ -261,6 +359,7 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
     {
       id: 5,
       name: 'Dr. James Mitchell',
+      email: 'james.mitchell@studentkonnect.com',
       title: 'Business & MBA Specialist',
       rank: 'Expert Level',
       location: 'Adelaide, SA',
@@ -579,6 +678,39 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
                         >
                           View Profile
                         </Button>
+                        
+                        {/* Connect Button - Only for students */}
+                        {userRole === 'student' && (
+                          <Button 
+                            variant="default"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                            disabled={!counselor.isAvailable || loading}
+                            onClick={() => handleConnect(counselor)}
+                          >
+                            {connectionStates[counselor.id] === 'connecting' ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                Connecting...
+                              </>
+                            ) : getConnectionStatus(counselor.email) === 'pending' ? (
+                              <>
+                                <Clock className="h-4 w-4 mr-1" />
+                                Pending
+                              </>
+                            ) : getConnectionStatus(counselor.email) === 'approved' ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 mr-1" />
+                                Connected
+                              </>
+                            ) : (
+                              <>
+                                <Users className="h-4 w-4 mr-1" />
+                                Connect
+                              </>
+                            )}
+                          </Button>
+                        )}
+                        
                         <Button 
                           variant="outline" 
                           className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"

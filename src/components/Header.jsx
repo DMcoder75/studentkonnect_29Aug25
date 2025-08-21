@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Search, User, Settings, Globe, GraduationCap, BookOpen, Star, ChevronDown } from 'lucide-react'
+import { Search, User, Settings, Globe, GraduationCap, BookOpen, Star, ChevronDown, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { realDatabaseService } from '../services/realDatabaseService'
 
 const Header = () => {
   const navigate = useNavigate()
+  const { isAuthenticated, user, userRole, logout } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [dropdownStates, setDropdownStates] = useState({
     destinations: false,
@@ -23,6 +25,11 @@ const Header = () => {
   useEffect(() => {
     fetchDropdownData()
   }, [])
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
 
   const fetchDropdownData = async () => {
     try {
@@ -391,13 +398,32 @@ const Header = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => navigate('/signin')}
-              className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
-            >
-              <User className="w-5 h-5" />
-              <span>Sign In</span>
-            </button>
+            {isAuthenticated() ? (
+              <div className="flex items-center space-x-4">
+                {/* User Greeting */}
+                <div className="flex items-center space-x-2 text-purple-600 font-medium">
+                  <User className="w-5 h-5" />
+                  <span>Hi {user?.name || user?.email?.split('@')[0] || 'User'}</span>
+                </div>
+                
+                {/* Logout Button */}
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-all duration-300"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => navigate('/signin')}
+                className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
+              >
+                <User className="w-5 h-5" />
+                <span>Sign In</span>
+              </button>
+            )}
             
             <button 
               onClick={() => navigate('/admin')}

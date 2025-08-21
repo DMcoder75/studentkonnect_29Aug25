@@ -8,37 +8,56 @@ export const authService = {
     try {
       console.log('Authenticating user:', email);
       
-      // Try demo credentials first for testing
-      const demoResult = this.authenticateDemoUser(email, password);
-      if (demoResult.success) {
-        console.log('Demo authentication successful:', demoResult.user.full_name);
-        return demoResult;
-      }
-      
-      // Call the working database API as fallback
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password })
+      // Use real Supabase authentication
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
       });
-      
-      const result = await response.json();
-      
-      if (result.success && result.user) {
-        console.log('Database authentication successful:', result.user.full_name);
-        return {
-          success: true,
-          user: result.user
-        };
-      } else {
-        console.log('Authentication failed:', result.error);
+
+      if (error) {
+        console.log('Supabase authentication failed:', error.message);
         return {
           success: false,
-          error: result.error || 'Invalid credentials'
+          error: error.message
         };
       }
+
+      if (data.user) {
+        // Get user profile from database
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .single();
+
+        if (profileError) {
+          console.log('Profile fetch failed:', profileError.message);
+          return {
+            success: false,
+            error: 'User profile not found'
+          };
+        }
+
+        const user = {
+          id: profile.id,
+          email: profile.email,
+          full_name: profile.first_name + ' ' + profile.last_name,
+          firstName: profile.first_name,
+          role: profile.role_id === 1 ? 'student' : profile.role_id === 15 ? 'counselor' : 'admin',
+          profile: profile
+        };
+
+        console.log('Database authentication successful:', user.full_name);
+        return {
+          success: true,
+          user: user
+        };
+      }
+
+      return {
+        success: false,
+        error: 'Authentication failed'
+      };
       
     } catch (error) {
       console.error('Authentication service error:', error);

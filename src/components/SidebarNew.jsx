@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import realDatabaseService from '../services/realDatabaseService'
 import {
   Home,
   Users,
@@ -26,16 +27,44 @@ import {
 } from 'lucide-react'
 
 const SidebarNew = ({ onMobileMenuClose }) => {
-  const { user, userRole, isAuthenticated } = useAuth()
+  const { user, userRole, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [expandedItems, setExpandedItems] = useState({})
+  const [realCounts, setRealCounts] = useState({
+    students: 0,
+    meetings: 0,
+    applications: 0,
+    forums: 0
+  })
 
   // Derive authentication states from the correct context properties
   const isLoggedIn = isAuthenticated()
   const isStudent = userRole === 'student'
   const isCounselor = userRole === 'counselor'
   const isAdmin = userRole === 'admin'
+
+  // Load real counts from database
+  useEffect(() => {
+    const loadRealCounts = async () => {
+      if (isCounselor && user?.email) {
+        try {
+          // Get counselor's real student count
+          const counselorStudents = await realDatabaseService.getCounselorStudents(user.email)
+          setRealCounts(prev => ({
+            ...prev,
+            students: counselorStudents?.length || 0
+          }))
+        } catch (error) {
+          console.error('Error loading real counts:', error)
+        }
+      }
+    }
+
+    if (isLoggedIn) {
+      loadRealCounts()
+    }
+  }, [isCounselor, user?.email, isLoggedIn])
 
   // Toggle submenu expansion
   const toggleExpanded = (itemId) => {
@@ -55,7 +84,14 @@ const SidebarNew = ({ onMobileMenuClose }) => {
 
   // Handle menu item click
   const handleItemClick = (item) => {
-    if (item.submenu) {
+    if (item.action === 'logout') {
+      // Handle logout
+      logout()
+      navigate('/')
+      if (onMobileMenuClose) {
+        onMobileMenuClose()
+      }
+    } else if (item.submenu) {
       toggleExpanded(item.id)
     } else if (item.path) {
       navigate(item.path)
@@ -123,11 +159,30 @@ const SidebarNew = ({ onMobileMenuClose }) => {
           badge: null
         },
         {
-          id: 'choose-counselor',
-          name: 'Choose Counselor',
-          path: '/student/choose-counselor',
+          id: 'find-counselor',
+          name: 'Find Counselor',
           icon: UserCheck,
-          badge: null
+          badge: null,
+          submenu: [
+            {
+              id: 'browse-counselors',
+              name: 'Browse Counselors',
+              path: '/counselor/directory',
+              icon: Users
+            },
+            {
+              id: 'select-counselors',
+              name: 'Select Counselors',
+              path: '/counselor/selection',
+              icon: UserCheck
+            },
+            {
+              id: 'become-counselor',
+              name: 'Become a Counselor',
+              path: '/counselor/register',
+              icon: GraduationCap
+            }
+          ]
         },
         {
           id: 'my-connections',
@@ -141,7 +196,7 @@ const SidebarNew = ({ onMobileMenuClose }) => {
           name: 'Student Forums',
           path: '/student-forums',
           icon: Users,
-          badge: '24'
+          badge: realCounts.forums > 0 ? realCounts.forums.toString() : null
         },
         {
           id: 'alumni-network',
@@ -163,6 +218,14 @@ const SidebarNew = ({ onMobileMenuClose }) => {
           path: '/accommodation-help',
           icon: Building2,
           badge: null
+        },
+        {
+          id: 'logout',
+          name: 'Logout',
+          action: 'logout',
+          icon: User,
+          badge: null,
+          className: 'text-red-600 hover:text-red-700 hover:bg-red-50'
         }
       )
     }
@@ -182,7 +245,7 @@ const SidebarNew = ({ onMobileMenuClose }) => {
           name: 'My Students',
           path: '/counselor/students',
           icon: Users,
-          badge: '18'
+          badge: realCounts.students > 0 ? realCounts.students.toString() : null
         },
         {
           id: 'counselor-profile',
@@ -196,14 +259,14 @@ const SidebarNew = ({ onMobileMenuClose }) => {
           name: 'Meetings & Schedule',
           path: '/counselor/meetings',
           icon: MessageCircle,
-          badge: '3'
+          badge: realCounts.meetings > 0 ? realCounts.meetings.toString() : null
         },
         {
           id: 'student-applications',
           name: 'Student Applications',
           path: '/counselor/applications',
           icon: FileText,
-          badge: '12'
+          badge: realCounts.applications > 0 ? realCounts.applications.toString() : null
         },
         {
           id: 'counselor-network',
