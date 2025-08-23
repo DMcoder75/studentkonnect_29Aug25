@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase configuration
+// Supabase configuration for browser/SPA (Vite injects these at build time)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || import.meta.env.REACT_APP_SUPABASE_URL || "https://xududbaqaaffcaejwuix.supabase.co"
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || import.meta.env.REACT_APP_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZHVkYmFxYWFmZmNhZWp3dWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTE4OTQsImV4cCI6MjA2Njg2Nzg5NH0.rMPZCHgDfyho4sUOXNcA1PF4yZ3GFBJxXya_SPcq8fA"
 
@@ -163,4 +163,5 @@ export const scholarshipService = {
 }
 
 export default supabase
+
 

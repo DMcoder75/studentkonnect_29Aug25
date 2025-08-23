@@ -78,21 +78,24 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <MobileLayoutEnhanced>
-          <div className="min-h-screen">
-            {/* Desktop Header - appears on every page */}
-            <Header />
-            
-            <Routes>
-              <Route path="/" element={<HomePageEnhanced />} />
-        
-        {/* Global Education Routes */}
-        <Route path="/global/universities" element={<GlobalUniversitiesPage />} />
-        <Route path="/global/courses" element={<GlobalCoursesPage />} />
-        <Route path="/universities" element={<UniversitiesPage />} />
-        <Route path="/courses" element={<CoursesPage />} />
-        <Route path="/pathways" element={<PathwaysPage />} />
-        <Route path="/university/:id" element={<UniversityDetailPage />} />
+        <div className="min-h-screen">
+          {/* Desktop Header - appears on every page */}
+          <Header />
+          
+          <Routes>
+            <Route path="/" element={
+              <MobileLayoutEnhanced>
+                <HomePageEnhanced />
+              </MobileLayoutEnhanced>
+            } />
+      
+      {/* Global Education Routes */}
+      <Route path="/global/universities" element={<GlobalUniversitiesPage />} />
+      <Route path="/global/courses" element={<GlobalCoursesPage />} />
+      <Route path="/universities" element={<UniversitiesPage />} />
+      <Route path="/courses" element={<CoursesPage />} />
+      <Route path="/pathways" element={<PathwaysPage />} />
+      <Route path="/university/:id" element={<UniversityDetailPage />} />
         
         {/* Counselor Routes */}
         <Route path="/counselor/directory" element={<CounselorDirectorySimple />} />
@@ -199,7 +202,6 @@ function App() {
         </div>
       )}
     </div>
-    </MobileLayoutEnhanced>
     </Router>
     </AuthProvider>
   )

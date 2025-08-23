@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowRight, Search, Filter, Route, BookOpen } from 'lucide-react'
+import { ArrowRight, Search, Filter, Route, BookOpen, ArrowLeft } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
@@ -220,6 +220,28 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
 
   return (
     <div className="w-full">
+      {/* Floating Back Button for Mobile - Always Visible */}
+      <div className="fixed top-20 left-4 z-50 block md:hidden">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center bg-white text-gray-700 px-3 py-2 rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
+
+      {/* Mobile Back Button */}
+      <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          <span className="font-medium">Back to Home</span>
+        </button>
+      </div>
+
       {/* Reduced Height Hero Section - Full Width */}
       <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-12 w-full">
         <div className="absolute inset-0 bg-black/20"></div>

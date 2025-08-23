@@ -32,7 +32,7 @@ export class CounselorService {
           )
         `)
         .eq('status', 'active')
-        .order('average_rating', { ascending: false });
+        .order("average_rating", { ascending: false });
 
       if (error) throw error;
 

@@ -122,8 +122,8 @@ const Header = () => {
 
   return (
     <>
-      {/* Top Navigation Bar - Purple Gradient with Dropdowns - EXACT IMPLEMENTATION */}
-      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-2 shadow-lg relative z-[10000]">
+      {/* Top Navigation Bar - Purple Gradient with Dropdowns - Hidden on Mobile */}
+      <div className="hidden md:block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-2 shadow-lg relative z-[10000]">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-6">
@@ -380,8 +380,8 @@ const Header = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-2xl mx-8">
-            <div className="relative">
+          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+            <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
@@ -397,11 +397,11 @@ const Header = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1 md:space-x-4">
             {isAuthenticated() ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1 md:space-x-4">
                 {/* User Greeting */}
-                <div className="flex items-center space-x-2 text-purple-600 font-medium">
+                <div className="hidden lg:flex items-center space-x-2 text-purple-600 font-medium">
                   <User className="w-5 h-5" />
                   <span>Hi {user?.name || user?.email?.split('@')[0] || 'User'}</span>
                 </div>
@@ -409,28 +409,28 @@ const Header = () => {
                 {/* Logout Button */}
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-all duration-300"
+                  className="flex items-center space-x-1 md:space-x-2 text-red-600 hover:text-red-700 font-medium px-1 md:px-4 py-2 rounded-lg hover:bg-red-50 transition-all duration-300 text-xs md:text-sm"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span>Logout</span>
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden md:inline">Logout</span>
                 </button>
               </div>
             ) : (
               <button 
                 onClick={() => navigate('/signin')}
-                className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300"
+                className="flex items-center space-x-1 md:space-x-2 text-purple-600 hover:text-purple-700 font-medium px-1 md:px-4 py-2 rounded-lg hover:bg-purple-50 transition-all duration-300 text-xs md:text-sm"
               >
-                <User className="w-5 h-5" />
-                <span>Sign In</span>
+                <User className="w-4 h-4" />
+                <span className="hidden md:inline">Sign In</span>
               </button>
             )}
             
             <button 
               onClick={() => navigate('/admin')}
-              className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors shadow-md"
+              className="flex items-center space-x-1 md:space-x-2 bg-purple-600 text-white px-1 md:px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors shadow-md text-xs md:text-sm"
             >
               <Settings className="w-4 h-4" />
-              <span>Admin</span>
+              <span className="hidden md:inline">Admin</span>
             </button>
           </div>
         </div>

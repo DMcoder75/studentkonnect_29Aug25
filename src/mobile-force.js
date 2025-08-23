@@ -45,18 +45,7 @@ function forceMobileLayout() {
       mainContent.style.marginLeft = '0';
     }
     
-    // Hide navigation buttons in content
-    const navButtons = document.querySelectorAll('button');
-    navButtons.forEach(button => {
-      const text = button.textContent;
-      if (text.includes('Home') || text.includes('Find Counselors') || 
-          text.includes('Global Education') || text.includes('Australia Process') ||
-          text.includes('Career Insights') || text.includes('Smart Apply') ||
-          text.includes('Scholarships Assist') || text.includes('Visa & International') ||
-          text.includes('Help & Resources')) {
-        button.style.display = 'none';
-      }
-    });
+
     
     console.log('Mobile layout forced');
   }

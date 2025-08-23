@@ -1,12 +1,22 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { supabase } from './src/lib/supabase.js'
 import fs from 'fs'
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function setupDatabase() {
-  console.log('Setting up Supabase database...')
+  console.log("Setting up Supabase database...")
   
   try {
     // Read the SQL schema file
-    const schemaSQL = fs.readFileSync('/home/ubuntu/supabase_schema.sql', 'utf8')
+    const schemaSQL = fs.readFileSync(
+      path.join(__dirname, 'database_setup.sql'),
+      'utf8'
+    );
     
     // Split the schema into individual statements
     const statements = schemaSQL
@@ -33,31 +43,7 @@ async function setupDatabase() {
     
     console.log('Database schema setup completed!')
     
-    // Now insert the data
-    console.log('Inserting data...')
-    
-    const dataSQL = fs.readFileSync('/home/ubuntu/supabase_data_inserts.sql', 'utf8')
-    const dataStatements = dataSQL
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'))
-    
-    console.log(`Executing ${dataStatements.length} data insertion statements...`)
-    
-    for (let i = 0; i < dataStatements.length; i++) {
-      const statement = dataStatements[i]
-      console.log(`Executing data statement ${i + 1}/${dataStatements.length}`)
-      
-      const { error } = await supabase.rpc('exec_sql', { sql: statement })
-      
-      if (error) {
-        console.error(`Error executing data statement ${i + 1}:`, error)
-      } else {
-        console.log(`Data statement ${i + 1} executed successfully`)
-      }
-    }
-    
-    console.log('Database setup and data insertion completed!')
+
     
   } catch (error) {
     console.error('Error setting up database:', error)
@@ -130,6 +116,7 @@ async function setupDatabaseDirect() {
 if (process.argv[2] === 'direct') {
   setupDatabaseDirect()
 } else {
-  setupDatabase()
+  setupDatabaseDirect()
 }
+
 

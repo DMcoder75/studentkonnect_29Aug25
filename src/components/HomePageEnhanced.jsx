@@ -8,6 +8,7 @@ import {
 import Footer from './Footer'
 import GlobalSidebarManager from './GlobalSidebarManager'
 import { globalEducationService } from '../services/globalEducationService'
+import { counselorService } from '../services/counselorService'
 
 // Custom CSS for animations
 const customStyles = `
@@ -68,54 +69,11 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
   const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedUniversity, setSelectedUniversity] = useState('')
 
+  // Mobile detection state
+  const [isMobileView, setIsMobileView] = useState(false)
+
   // Sample data for enhanced sections
-  const counselors = [
-    {
-      id: 1,
-      name: "Dr. Sarah Chen",
-      type: "Academic Counselor",
-      experience: "8y exp",
-      rating: 4.9,
-      reviews: 18,
-      specializations: ["Computer Science", "Engineering"],
-      description: "Experienced Computer Science counselor specializing in AI and Software Engineering. Passionate about helping students achieve their academic goals in technology fields.",
-      studentsHelped: 23,
-      successRate: 95,
-      languages: ["English", "Mandarin"],
-      price: 150,
-      currency: "AUD"
-    },
-    {
-      id: 2,
-      name: "Dr. Emma Wilson",
-      type: "Academic Counselor",
-      experience: "10y exp",
-      rating: 4.8,
-      reviews: 12,
-      specializations: ["Medicine", "Health Sciences"],
-      description: "Medical education specialist with a decade of experience in health sciences. Dedicated to guiding aspiring healthcare professionals through their academic journey.",
-      studentsHelped: 15,
-      successRate: 93,
-      languages: ["English"],
-      price: 180,
-      currency: "AUD"
-    },
-    {
-      id: 3,
-      name: "Michael Kumar",
-      type: "Career Counselor",
-      experience: "6y exp",
-      rating: 4.7,
-      reviews: 15,
-      specializations: ["Business", "Finance"],
-      description: "Business and Finance expert with extensive experience in MBA programs and career guidance. Helping students navigate their path to business success.",
-      studentsHelped: 18,
-      successRate: 89,
-      languages: ["English", "Hindi"],
-      price: 120,
-      currency: "AUD"
-    }
-  ]
+  const [counselors, setCounselors] = useState([])
 
   const featuredUniversities = [
     {
@@ -225,22 +183,46 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
         setLoading(true)
         
         // Fetch real data from Supabase
-        const [universitiesData, statsData] = await Promise.all([
+        const [universitiesData, statsData, counselorsData] = await Promise.all([
           globalEducationService.getAllUniversities(),
-          globalEducationService.getGlobalStatistics()
+          globalEducationService.getGlobalStatistics(),
+          counselorService.getAllCounselors()
         ])
+
+        console.log("Fetched universitiesData:", universitiesData);
+        console.log("Fetched statsData:", statsData);
+        console.log("Fetched counselorsData:", counselorsData);
 
         setUniversities(universitiesData || [])
         setStats(statsData || stats)
+        setCounselors(counselorsData || [])
         
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error("Error fetching data:", error)
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
+  }, [])
+
+  // Mobile detection useEffect
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobileView(mobile)
+      console.log('Mobile detection:', mobile, 'Width:', window.innerWidth, 'UserAgent mobile:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    }
+
+    // Check on mount
+    checkMobile()
+
+    // Add resize listener
+    window.addEventListener('resize', checkMobile)
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   const scrollToSection = (sectionId) => {
@@ -324,7 +306,7 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
       </section>
 
       {/* Content with Sidebar Layout - Desktop Only */}
-      {!isMobile ? (
+      {!isMobileView ? (
         <div className="flex">
           {/* Left Sidebar */}
           <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
@@ -518,9 +500,9 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
                 </p>
               </div>
               
-              <div className="grid md:grid-cols-3 gap-4 max-w-6xl mx-auto">
+              <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide max-w-6xl mx-auto">
                 {counselors.map((counselor) => (
-                  <div key={counselor.id} className="rounded-lg border bg-white text-card-foreground shadow-sm group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg bg-white">
+                  <div key={counselor.id} className="flex-none w-80 rounded-lg border bg-white text-card-foreground shadow-sm group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg bg-white">
                     <div className="flex flex-col space-y-1.5 p-6 pb-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-orange-100 text-orange-700">
@@ -540,33 +522,33 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
                     
                     <div className="p-6 pt-0">
                       <div className="space-y-4">
-                        <div className="flex flex-wrap gap-1">
-                          {counselor.specializations.map((spec) => (
-                            <div key={spec} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-gray-700 border-gray-300 text-xs">
-                              {spec}
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <p className="text-gray-600 text-sm line-clamp-3">
-                          {counselor.description}
-                        </p>
-                        
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div className="flex items-center text-gray-600">
-                            <Users className="h-4 w-4 mr-1" />
-                            {counselor.studentsHelped} helped
-                          </div>
-                          <div className="flex items-center text-green-600">
-                            <TrendingUp className="h-4 w-4 mr-1" />
-                            {counselor.successRate}% success
-                          </div>
-                        </div>
-                        
-                        <div className="text-sm text-gray-600">
-                          <span className="font-medium">Languages: </span>
-                          {counselor.languages.join(', ')}
-                        </div>
+              <div className="flex flex-wrap gap-1">
+                {(counselor.specializations || []).map((spec, idx) => (
+                  <div key={idx} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-gray-700 border-gray-300 text-xs">
+                    {spec}
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-gray-600 text-sm line-clamp-3">
+                {counselor.description}
+              </p>
+              
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center text-gray-600">
+                  <Users className="h-4 w-4 mr-1" />
+                  {counselor.studentsHelped} helped
+                </div>
+                <div className="flex items-center text-green-600">
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  {counselor.successRate}% success
+                </div>
+              </div>
+              
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Languages: </span>
+                {(counselor.languages || []).join(", ")}
+              </div>
                         
                         <div className="flex space-x-2 pt-2">
                           <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 h-9 rounded-md px-3 flex-1">
@@ -756,11 +738,260 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
               </div>
             </div>
           </section>
-          
-          {/* Continue with rest of mobile content... */}
+
+          {/* Find Your Perfect Counselor Section - Mobile */}
+          <section className="py-12 bg-white">
+            <div className="container mx-auto px-6">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">Find Your Perfect Counselor</h2>
+                <p className="text-lg text-gray-600">
+                  Connect with expert counselors who understand your journey
+                </p>
+              </div>
+              
+              {counselors.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">Failed to load counselors</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <div className="flex space-x-4 pb-4" style={{ width: 'max-content' }}>
+                    {counselors.map((counselor) => (
+                      <div key={counselor.id} className="flex-shrink-0 w-72 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+                        <div className="p-4">
+                          <div className="flex items-center space-x-3 mb-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                              {counselor.name?.charAt(0) || 'C'}
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 text-sm">{counselor.name}</h3>
+                              <p className="text-gray-600 text-xs">{counselor.title}</p>
+                            </div>
+                            <div className="flex items-center text-yellow-500">
+                              <Star className="h-4 w-4 fill-current" />
+                              <span className="text-sm font-semibold ml-1">{counselor.rating}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="flex flex-wrap gap-1">
+                              {(counselor.specializations || []).map((spec, idx) => (
+                                <div key={idx} className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold text-gray-700 border-gray-300">
+                                  {spec}
+                                </div>
+                              ))}
+                            </div>
+                            
+                            <p className="text-gray-600 text-xs line-clamp-2">
+                              {counselor.description}
+                            </p>
+                            
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div className="flex items-center text-gray-600">
+                                <Users className="h-3 w-3 mr-1" />
+                                {counselor.studentsHelped} helped
+                              </div>
+                              <div className="flex items-center text-green-600">
+                                <TrendingUp className="h-3 w-3 mr-1" />
+                                {counselor.successRate}% success
+                              </div>
+                            </div>
+                            
+                            <div className="text-xs text-gray-600">
+                              <span className="font-medium">Languages: </span>
+                              {(counselor.languages || []).join(", ")}
+                            </div>
+                            
+                            <div className="flex space-x-2 pt-2">
+                              <button className="flex-1 px-3 py-2 text-xs font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-md">
+                                Message
+                              </button>
+                              <button className="flex-1 px-3 py-2 text-xs font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-md">
+                                Connect
+                              </button>
+                            </div>
+                            
+                            {isAdmin && (
+                              <div className="text-center pt-2 border-t">
+                                <span className="text-sm font-bold text-gray-900">
+                                  ${counselor.price}
+                                </span>
+                                <span className="text-xs text-gray-600 ml-1">
+                                  /{counselor.currency}/hour
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-center mt-6">
+                <button 
+                  onClick={() => navigate('/counselor/directory')}
+                  className="inline-flex items-center rounded-full border px-6 py-3 text-sm font-semibold border-orange-300 text-orange-700 hover:bg-orange-50"
+                >
+                  View All Counselors →
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Featured Universities Section - Mobile */}
+          <section className="py-12 bg-gray-50">
+            <div className="container mx-auto px-6">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">Featured Universities</h2>
+                <p className="text-lg text-gray-600">
+                  Explore top-ranked universities worldwide
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6">
+                {featuredUniversities.slice(0, 3).map((university) => (
+                  <div key={university.id} className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700">
+                          {university.category}
+                        </div>
+                        <div className="flex items-center text-yellow-600">
+                          <Star className="h-4 w-4 mr-1 fill-current" />
+                          <span className="text-sm font-semibold">{university.globalRanking}</span>
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">{university.name}</h3>
+                      <p className="text-gray-600 mb-4">{university.description}</p>
+                      
+                      <button 
+                        onClick={() => navigate(`/university/${university.id}`)}
+                        className="w-full inline-flex items-center justify-center rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 h-9 px-3"
+                      >
+                        View Courses →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="text-center mt-6">
+                <button 
+                  onClick={() => navigate('/universities')}
+                  className="inline-flex items-center rounded-full border px-6 py-3 text-sm font-semibold border-purple-300 text-purple-700 hover:bg-purple-50"
+                >
+                  View All Universities →
+                </button>
+              </div>
+            </div>
+          </section>
           
         </div>
       )}
+      
+      {/* CSS-based Mobile Counselor Section - Always rendered, shown only on mobile */}
+      <div className="block md:hidden bg-white py-12">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Find Your Perfect Counselor</h2>
+            <p className="text-lg text-gray-600">
+              Connect with expert counselors who understand your journey
+            </p>
+          </div>
+          
+          {counselors.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Failed to load counselors</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <div className="flex space-x-4 pb-4" style={{ width: 'max-content' }}>
+                {counselors.map((counselor) => (
+                  <div key={counselor.id} className="flex-shrink-0 w-72 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+                    <div className="p-4">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                          {counselor.name?.charAt(0) || 'C'}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 text-sm">{counselor.name}</h3>
+                          <p className="text-gray-600 text-xs">{counselor.title}</p>
+                        </div>
+                        <div className="flex items-center text-yellow-500">
+                          <Star className="h-4 w-4 fill-current" />
+                          <span className="text-sm font-semibold ml-1">{counselor.rating}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-1">
+                          {(counselor.specializations || []).map((spec, idx) => (
+                            <div key={idx} className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold text-gray-700 border-gray-300">
+                              {spec}
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <p className="text-gray-600 text-xs line-clamp-2">
+                          {counselor.description}
+                        </p>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="flex items-center text-gray-600">
+                            <Users className="h-3 w-3 mr-1" />
+                            {counselor.studentsHelped} helped
+                          </div>
+                          <div className="flex items-center text-green-600">
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            {counselor.successRate}% success
+                          </div>
+                        </div>
+                        
+                        <div className="text-xs text-gray-600">
+                          <span className="font-medium">Languages: </span>
+                          {(counselor.languages || []).join(", ")}
+                        </div>
+                        
+                        <div className="flex space-x-2 pt-2">
+                          <button className="flex-1 px-3 py-2 text-xs font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-md">
+                            Message
+                          </button>
+                          <button className="flex-1 px-3 py-2 text-xs font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-md">
+                            Connect
+                          </button>
+                        </div>
+                        
+                        {isAdmin && (
+                          <div className="text-center pt-2 border-t">
+                            <span className="text-sm font-bold text-gray-900">
+                              ${counselor.price}
+                            </span>
+                            <span className="text-xs text-gray-600 ml-1">
+                              /{counselor.currency}/hour
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <div className="text-center mt-6">
+            <button 
+              onClick={() => navigate('/counselor/directory')}
+              className="inline-flex items-center rounded-full border px-6 py-3 text-sm font-semibold border-orange-300 text-orange-700 hover:bg-orange-50"
+            >
+              View All Counselors →
+            </button>
+          </div>
+        </div>
+      </div>
       
       {/* Footer */}
       <Footer />

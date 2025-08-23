@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import MobileAuthHeader from './MobileAuthHeader';
 import MobilePathwayFormReal from './MobilePathwayFormReal';
 import MobileCounselorCardsReal from './MobileCounselorCardsReal';
@@ -31,6 +31,8 @@ const MobileLayoutEnhanced = ({ children }) => {
   if (!isMobile) {
     return children;
   }
+
+  // Mobile home page layout with enhanced components
 
   // Handle quick actions
   const handleQuickAction = (action) => {
@@ -71,14 +73,13 @@ const MobileLayoutEnhanced = ({ children }) => {
     }
   };
 
+  // Mobile home page layout with enhanced components
+
   // Mobile layout with enhanced components
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Header with Authentication */}
-      <MobileAuthHeader />
-      
-      {/* Mobile Content */}
-      <div className="pt-16">
+      {/* Mobile Content - No separate mobile header to avoid white space */}
+      <div className="">
         {/* Hero Section - Enhanced with user-specific content */}
         <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white">
           <div className="px-4 py-12 text-center">

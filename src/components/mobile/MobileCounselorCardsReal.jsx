@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { realDatabaseService } from '../../services/realDatabaseService';
+import { counselorService } from '../../services/counselorService';
 
 const MobileCounselorCardsReal = () => {
   const [counselors, setCounselors] = useState([]);
@@ -18,29 +18,36 @@ const MobileCounselorCardsReal = () => {
   const loadCounselors = async () => {
     try {
       setLoading(true);
-      const result = await realDatabaseService.getAllCounselors();
+      const result = await counselorService.getAllCounselors();
       
-      if (result.success && result.data) {
-        // Transform data for mobile display
-        const transformedCounselors = result.data.map(counselor => ({
+      console.log('Mobile counselors loaded:', result);
+      
+      if (result && Array.isArray(result)) {
+        // Transform data for mobile display - use the actual data structure
+        const transformedCounselors = result.map(counselor => ({
           id: counselor.id,
-          name: `${counselor.users?.first_name || ''} ${counselor.users?.last_name || ''}`.trim() || 'Counselor',
-          email: counselor.users?.email || '',
-          title: getTitle(counselor.specialization),
-          experience: `${counselor.experience_years || 0}y exp`,
-          specialization: counselor.specialization ? counselor.specialization.split(',').map(s => s.trim()) : [],
-          rating: counselor.rating || 4.5,
-          reviews: Math.floor(Math.random() * 30) + 10, // Mock reviews count
-          description: counselor.bio || `Experienced ${counselor.specialization} counselor with ${counselor.experience_years} years of expertise.`,
-          helped: Math.floor(Math.random() * 50) + 10, // Mock helped count
-          successRate: Math.floor(Math.random() * 20) + 80, // Mock success rate
-          languages: ['English'], // Default languages
-          avatar: getAvatarUrl(counselor.users?.first_name, counselor.users?.last_name),
-          isAvailable: true
+          name: `${counselor.first_name || ''} ${counselor.last_name || ''}`.trim() || counselor.display_name || 'Counselor',
+          email: counselor.email || '',
+          title: counselor.display_name || 'Academic Counselor',
+          experience: `${counselor.years_experience || 0}y exp`,
+          specializations: counselor.specializations || [],
+          rating: counselor.average_rating || 4.5,
+          reviews: counselor.total_reviews || 0,
+          description: counselor.bio || `Experienced counselor with ${counselor.years_experience || 0} years of expertise in ${(counselor.specializations || []).join(', ')}.`,
+          studentsHelped: counselor.total_students_helped || 0,
+          successRate: counselor.success_rate || 85,
+          languages: counselor.languages_spoken || ['English'],
+          avatar: getAvatarUrl(counselor.first_name || counselor.display_name),
+          isAvailable: counselor.is_available || true,
+          price: counselor.hourly_rate || 50,
+          currency: counselor.currency || 'USD'
         }));
         
+        console.log('Transformed mobile counselors:', transformedCounselors);
         setCounselors(transformedCounselors);
+        setError('');
       } else {
+        console.log('Invalid counselor data format:', result);
         setError('Failed to load counselors');
       }
     } catch (err) {
@@ -59,8 +66,7 @@ const MobileCounselorCardsReal = () => {
     return 'Academic Counselor';
   };
 
-  const getAvatarUrl = (firstName, lastName) => {
-    const name = `${firstName || ''} ${lastName || ''}`.trim();
+  const getAvatarUrl = (name) => {
     if (!name) return 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
     
     // Generate different avatar based on name
@@ -213,7 +219,7 @@ const MobileCounselorCardsReal = () => {
 
                 {/* Specializations */}
                 <div className="flex flex-wrap gap-2 mt-4">
-                  {counselor.specialization.slice(0, 3).map((spec, index) => (
+                  {(counselor.specializations || []).slice(0, 3).map((spec, index) => (
                     <span
                       key={index}
                       className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium"
@@ -221,9 +227,9 @@ const MobileCounselorCardsReal = () => {
                       {spec}
                     </span>
                   ))}
-                  {counselor.specialization.length > 3 && (
+                  {(counselor.specializations || []).length > 3 && (
                     <span className="text-xs bg-gray-50 text-gray-600 px-3 py-1 rounded-full font-medium">
-                      +{counselor.specialization.length - 3} more
+                      +{(counselor.specializations || []).length - 3} more
                     </span>
                   )}
                 </div>
@@ -238,7 +244,7 @@ const MobileCounselorCardsReal = () => {
                 {/* Stats */}
                 <div className="flex justify-between items-center mb-4">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-purple-600">{counselor.helped}</div>
+                    <div className="text-lg font-bold text-purple-600">{counselor.studentsHelped}</div>
                     <div className="text-xs text-gray-500">helped</div>
                   </div>
                   <div className="text-center">
