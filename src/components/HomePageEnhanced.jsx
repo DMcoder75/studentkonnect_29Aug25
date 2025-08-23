@@ -292,9 +292,9 @@ export default function HomePageEnhanced({ isMobileMenuOpen, onMobileMenuClose, 
                   >
                     Explore Pathways <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
-                  <button 
+                  <button
                     className="bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-purple-600 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
-                    onClick={() => scrollToSection('universities')}
+                    onClick={() => navigate('/universities')}
                   >
                     Browse Universities
                   </button>

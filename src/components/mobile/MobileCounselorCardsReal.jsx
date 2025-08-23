@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { counselorService } from '../../services/counselorService';
@@ -6,18 +6,24 @@ import { counselorService } from '../../services/counselorService';
 const MobileCounselorCardsReal = () => {
   const [counselors, setCounselors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
   const [error, setError] = useState('');
   const [connectingId, setConnectingId] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const ITEMS_PER_PAGE = 4;
 
   useEffect(() => {
-    loadCounselors();
+    loadCounselors(1, false);
   }, []);
 
-  const loadCounselors = async () => {
+  const loadCounselors = async (pageNum = 1, append = false) => {
     try {
-      setLoading(true);
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
+      
       const result = await counselorService.getAllCounselors();
       
       console.log('Mobile counselors loaded:', result);
@@ -44,7 +50,20 @@ const MobileCounselorCardsReal = () => {
         }));
         
         console.log('Transformed mobile counselors:', transformedCounselors);
-        setCounselors(transformedCounselors);
+        
+        // Implement pagination
+        const startIndex = (pageNum - 1) * ITEMS_PER_PAGE;
+        const endIndex = pageNum * ITEMS_PER_PAGE;
+        const pageData = transformedCounselors.slice(startIndex, endIndex);
+        
+        if (append) {
+          setCounselors(prev => [...prev, ...pageData]);
+        } else {
+          setCounselors(pageData);
+        }
+        
+        // Check if there are more items
+        setHasMore(endIndex < transformedCounselors.length);
         setError('');
       } else {
         console.log('Invalid counselor data format:', result);
@@ -55,8 +74,36 @@ const MobileCounselorCardsReal = () => {
       setError('Failed to load counselors. Please try again.');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
+
+  // Scroll event handler for infinite scroll
+  const handleScroll = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+
+    const container = document.querySelector('.mobile-counselor-container');
+    if (!container) return;
+
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+
+    // Load more when user is near the end of horizontal scroll
+    if (scrollLeft + clientWidth >= scrollWidth - 100) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadCounselors(nextPage, true);
+    }
+  }, [loadingMore, hasMore, page]);
+
+  useEffect(() => {
+    const container = document.querySelector('.mobile-counselor-container');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
 
   const getTitle = (specialization) => {
     if (!specialization) return 'Academic Counselor';

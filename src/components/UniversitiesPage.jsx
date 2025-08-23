@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowRight, Star, Heart, Search, Filter, GraduationCap } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Button } from './ui/button'
+import { Badge } from './ui/badge'
+import { Input } from './ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { ArrowRight, Star, Heart, Search, Filter, GraduationCap, ArrowLeft } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function UniversitiesPage({ favorites, setFavorites, isMobileMenuOpen, onMobileMenuClose }) {
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [universities, setUniversities] = useState([])
   const [filteredUniversities, setFilteredUniversities] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -246,6 +247,17 @@ export default function UniversitiesPage({ favorites, setFavorites, isMobileMenu
 
   return (
     <div className="w-full">
+      {/* Mobile Back Button - Only visible on mobile */}
+      <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          <span className="font-medium">Back to Home</span>
+        </button>
+      </div>
+
       {/* Reduced Height Hero Section - Full Width */}
       <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-500 text-white py-12 w-full">
         <div className="absolute inset-0 bg-black/20"></div>

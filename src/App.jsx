@@ -16,6 +16,8 @@ import MobileRouteHandler from './components/mobile/MobileRouteHandler'
 // Import all the pages
 import GlobalUniversitiesPage from './components/GlobalUniversitiesPage'
 import GlobalCoursesPage from './components/GlobalCoursesPage'
+import UniversitiesPageSimple from './components/UniversitiesPageSimple'
+import UniversityDetailMobile from './components/UniversityDetailMobile'
 import CounselorDirectorySimple from './components/CounselorDirectorySimple'
 import CounselorBooking from './components/CounselorBooking'
 import StudentSessions from './components/StudentSessions'
@@ -92,7 +94,8 @@ function App() {
       {/* Global Education Routes */}
       <Route path="/global/universities" element={<GlobalUniversitiesPage />} />
       <Route path="/global/courses" element={<GlobalCoursesPage />} />
-      <Route path="/universities" element={<UniversitiesPage />} />
+      <Route path="/universities" element={<UniversitiesPageSimple />} />
+      <Route path="/university-detail/:id" element={<UniversityDetailMobile />} />
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/pathways" element={<PathwaysPage />} />
       <Route path="/university/:id" element={<UniversityDetailPage />} />
