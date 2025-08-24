@@ -553,9 +553,46 @@ class RealDatabaseService {
         .single();
 
       if (error) throw error;
-      return { success: true, data, error: null };
+      return { success: true, data };
     } catch (error) {
       console.error('Error fetching user by email:', error);
+      return { success: false, data: null, error };
+    }
+  }
+
+  // Get student profile by email
+  async getStudentByEmail(email) {
+    try {
+      // First get the user by email
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (userError) throw userError;
+
+      // Then get the student profile using user_id
+      const { data: profile, error: profileError } = await supabase
+        .from('student_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError) {
+        // If no profile found, return user data only
+        return { success: true, data: { users: user } };
+      }
+
+      // Combine user and profile data
+      const combinedData = {
+        ...profile,
+        users: user
+      };
+
+      return { success: true, data: combinedData };
+    } catch (error) {
+      console.error('Error fetching student profile by email:', error);
       return { success: false, data: null, error };
     }
   }

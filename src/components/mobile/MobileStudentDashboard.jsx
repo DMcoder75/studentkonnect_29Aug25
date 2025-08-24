@@ -369,7 +369,7 @@ const MobileStudentDashboard = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                        <p className="text-gray-900">{studentData?.phone || 'Not specified'}</p>
+                        <p className="text-gray-900">{studentData?.users?.phone || 'Not specified'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
@@ -377,7 +377,7 @@ const MobileStudentDashboard = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Current Location</label>
-                        <p className="text-gray-900">{studentData?.current_location || 'Not specified'}</p>
+                        <p className="text-gray-900">{studentData?.current_country || 'Not specified'}</p>
                       </div>
                     </div>
                   )}
@@ -389,16 +389,16 @@ const MobileStudentDashboard = () => {
                         <p className="text-gray-900">{studentData?.current_institution || 'Not specified'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Current Education Level</label>
-                        <p className="text-gray-900">{studentData?.current_education_level || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Study Level</label>
+                        <p className="text-gray-900">{studentData?.study_level || 'Not specified'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Expected Graduation Year</label>
-                        <p className="text-gray-900">{studentData?.expected_graduation_year || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Graduation Year</label>
+                        <p className="text-gray-900">{studentData?.graduation_year || 'Not specified'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Current GPA/Grade</label>
-                        <p className="text-gray-900">{studentData?.current_gpa || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">GPA</label>
+                        <p className="text-gray-900">{studentData?.gpa || 'Not specified'}</p>
                       </div>
                     </div>
                   )}
@@ -406,20 +406,16 @@ const MobileStudentDashboard = () => {
                   {profileTab === 'goals' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Intended Field of Study</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
                         <p className="text-gray-900">{studentData?.field_of_study || 'Not specified'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Study Level</label>
-                        <p className="text-gray-900">{studentData?.intended_study_level || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Interested Degree</label>
+                        <p className="text-gray-900">{studentData?.interested_degree || 'Not specified'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Career Interests</label>
-                        <p className="text-gray-900">{studentData?.career_interests || 'Not specified'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Start Date</label>
-                        <p className="text-gray-900">{studentData?.preferred_start_date || 'Not specified'}</p>
+                        <p className="text-gray-900">{studentData?.career_interests ? studentData.career_interests.join(', ') : 'Not specified'}</p>
                       </div>
                     </div>
                   )}
@@ -427,16 +423,12 @@ const MobileStudentDashboard = () => {
                   {profileTab === 'preferences' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Target Countries</label>
-                        <p className="text-gray-900">{studentData?.target_country || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Location</label>
+                        <p className="text-gray-900">{studentData?.preferred_location || 'Not specified'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Target Universities</label>
-                        <p className="text-gray-900">{studentData?.target_universities || 'Not specified'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Interested Programs</label>
-                        <p className="text-gray-900">{studentData?.interested_programs || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">University Preferences</label>
+                        <p className="text-gray-900">{studentData?.university_preferences ? studentData.university_preferences.join(', ') : 'Not specified'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
@@ -449,15 +441,11 @@ const MobileStudentDashboard = () => {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
-                        <p className="text-gray-900">{studentData?.languages || 'Not specified'}</p>
+                        <p className="text-gray-900">{studentData?.languages ? studentData.languages.join(', ') : 'Not specified'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Communication Style</label>
                         <p className="text-gray-900">{studentData?.communication_style || 'Not specified'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
-                        <p className="text-gray-900">{studentData?.timezone || 'Not specified'}</p>
                       </div>
                     </div>
                   )}
@@ -479,11 +467,11 @@ const MobileStudentDashboard = () => {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Extracurricular Activities</label>
-                        <p className="text-gray-900">{studentData?.extracurricular_activities || 'Not specified'}</p>
+                        <p className="text-gray-900">{studentData?.extracurricular_activities ? studentData.extracurricular_activities.join(', ') : 'Not specified'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Academic Achievements</label>
-                        <p className="text-gray-900">{studentData?.academic_achievements || 'Not specified'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Achievements</label>
+                        <p className="text-gray-900">{studentData?.achievements ? studentData.achievements.join(', ') : 'Not specified'}</p>
                       </div>
                     </div>
                   )}
