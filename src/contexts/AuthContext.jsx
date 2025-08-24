@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { authService } from '../services/authService'
+import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext()
 
@@ -17,16 +18,61 @@ export const AuthProvider = ({ children }) => {
 
   // Check for existing session on app load
   useEffect(() => {
-    const savedUser = localStorage.getItem('user')
-    if (savedUser) {
+    const initializeAuth = async () => {
       try {
-        setUser(JSON.parse(savedUser))
+        // Check localStorage first
+        const savedUser = localStorage.getItem('user')
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser)
+          
+          // Validate the session is still valid by checking with Supabase
+          const { data: { session }, error } = await supabase.auth.getSession()
+          
+          if (session && session.user) {
+            // Session is valid, keep the user logged in
+            setUser(parsedUser)
+          } else {
+            // Session expired, clear localStorage
+            localStorage.removeItem('user')
+            setUser(null)
+          }
+        } else {
+          // No saved user, check if there's an active Supabase session
+          const { data: { session }, error } = await supabase.auth.getSession()
+          
+          if (session && session.user) {
+            // There's an active session but no saved user, restore from database
+            const { data: profile, error: profileError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('email', session.user.email)
+              .single()
+            
+            if (profile && !profileError) {
+              const user = {
+                id: profile.id,
+                email: profile.email,
+                full_name: profile.first_name + ' ' + profile.last_name,
+                firstName: profile.first_name,
+                role: profile.role_id === 1 ? 'student' : profile.role_id === 15 ? 'counselor' : 'admin',
+                profile: profile
+              }
+              
+              setUser(user)
+              localStorage.setItem('user', JSON.stringify(user))
+            }
+          }
+        }
       } catch (error) {
-        console.error('Error parsing saved user:', error)
+        console.error('Error initializing auth:', error)
         localStorage.removeItem('user')
+        setUser(null)
+      } finally {
+        setLoading(false)
       }
     }
-    setLoading(false)
+
+    initializeAuth()
   }, [])
 
   const login = async (email, password) => {
@@ -52,9 +98,20 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user')
+  const logout = async () => {
+    try {
+      // Sign out from Supabase
+      await supabase.auth.signOut()
+      
+      // Clear local state and storage
+      setUser(null)
+      localStorage.removeItem('user')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Still clear local state even if Supabase logout fails
+      setUser(null)
+      localStorage.removeItem('user')
+    }
   }
 
   const isAuthenticated = () => {

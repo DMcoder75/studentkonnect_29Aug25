@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import StudentProfileForm from './StudentProfileForm'
 import Sidebar from './Sidebar'
+import realDatabaseService from '../services/realDatabaseService'
 
 export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenuClose }) {
   const { user } = useAuth()
@@ -39,134 +40,123 @@ export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenu
       }
 
       try {
-        console.log('=== PROFILE DEBUG INFO ===')
-        console.log('User object:', user)
-        console.log('User student_data:', user.student_data)
-        console.log('User profile_data:', user.profile_data)
+        console.log('🔄 Loading student profile for user:', user.email)
         
-        // Always create profile data to ensure view mode is shown
+        // Fetch student profile from database
+        const { data: studentProfile, error } = await realDatabaseService.supabase
+          .from('student_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single()
+
+        let profileFromDB = null
+        if (!error && studentProfile) {
+          profileFromDB = studentProfile
+          console.log('✅ Found student profile in database:', profileFromDB)
+        } else {
+          console.log('❌ No student profile found, using basic user data')
+        }
+        
+        // Create comprehensive profile data
         const data = {
-          // Basic info from users table (always available)
+          // Basic info from users table
           firstName: user.first_name || '',
           lastName: user.last_name || '',
           email: user.email || '',
           phone: user.phone || '',
           
-          // Set defaults for all other fields
-          currentEducationLevel: '',
-          intendedFieldOfStudy: '',
-          studyLevel: '',
-          nationality: '',
-          location: '',
-          preferredCountries: [],
+          // Profile data from student_profiles table
+          currentInstitution: profileFromDB?.current_institution || '',
+          studyLevel: profileFromDB?.study_level || '',
+          intendedFieldOfStudy: profileFromDB?.field_of_study || '',
+          graduationYear: profileFromDB?.graduation_year || '',
+          gpa: profileFromDB?.gpa || '',
+          preferredLocation: profileFromDB?.preferred_location || '',
+          currentLocation: profileFromDB?.current_country || '',
+          budgetRange: profileFromDB?.budget_range || '',
+          interestedDegree: profileFromDB?.interested_degree || '',
+          
+          // Parse JSON arrays safely
+          universityPreferences: profileFromDB?.university_preferences || [],
+          careerInterests: profileFromDB?.career_interests || [],
+          extracurricularActivities: profileFromDB?.extracurricular_activities || [],
+          achievements: profileFromDB?.achievements || [],
+          languages: profileFromDB?.languages || ['English'],
+          
+          // Additional fields
+          communicationStyle: profileFromDB?.communication_style || '',
+          
+          // Legacy compatibility fields
+          currentEducationLevel: profileFromDB?.study_level || '',
+          preferredCountries: profileFromDB?.preferred_location ? [profileFromDB.preferred_location] : [],
+          counselingAreas: profileFromDB?.career_interests || [],
+          englishProficiency: 'Advanced',
+          nationality: 'International',
+          studentType: '',
+          yearLevel: '',
+          profilePictureUrl: '',
+          location: profileFromDB?.current_country || '',
           targetUniversity: '',
-          budgetRange: '',
           timeline: '',
-          gpa: '',
           ieltsScore: '',
           toeflScore: '',
           satScore: '',
           greScore: '',
           gmatScore: '',
-          englishProficiency: '',
           scholarshipInterest: false,
           applicationStatus: '',
           intakePreference: '',
-          currentInstitution: '',
-          graduationYear: '',
-          preferredLocation: '',
-          universityPreferences: '',
-          careerInterests: '',
-          extracurricularActivities: '',
-          achievements: '',
-          counselingAreas: [],
           additionalInfo: ''
         }
 
-        // Override with actual data from students table if available
-        if (user.student_data) {
-          Object.assign(data, {
-            nationality: user.student_data.nationality || 'International',
-            studentType: user.student_data.student_type || '',
-            yearLevel: user.student_data.year_level || '',
-            profilePictureUrl: user.student_data.profile_picture_url || ''
-          })
-        }
-
-        // Override with actual data from student_profiles table if available
-        if (user.profile_data) {
-          Object.assign(data, {
-            currentInstitution: user.profile_data.current_institution || '',
-            studyLevel: user.profile_data.study_level || '',
-            intendedFieldOfStudy: user.profile_data.field_of_study || '',
-            graduationYear: user.profile_data.graduation_year || '',
-            gpa: user.profile_data.gpa || '',
-            preferredLocation: user.profile_data.preferred_location || '',
-            currentLocation: user.profile_data.current_country || 'India',
-            budgetRange: user.profile_data.budget_range || '',
-            languages: user.profile_data.languages || ['English', 'Hindi'],
-            communicationStyle: user.profile_data.communication_style || 'Direct & Structured',
-            universityPreferences: user.profile_data.university_preferences || [],
-            careerInterests: user.profile_data.career_interests || [],
-            extracurricularActivities: user.profile_data.extracurricular_activities || [],
-            achievements: user.profile_data.achievements || '',
-            
-            // Map to display fields
-            currentEducationLevel: user.profile_data.study_level || '',
-            location: user.profile_data.current_country || 'India',
-            preferredCountries: user.profile_data.preferred_location ? [user.profile_data.preferred_location] : []
-          })
-        }
-
-        // Calculate timezone based on current country
-        const getTimezoneFromCountry = (country) => {
-          const timezoneMap = {
-            'India': 'Asia/Kolkata',
-            'Australia': 'Australia/Sydney',
-            'Canada': 'America/Toronto',
-            'United States': 'America/New_York',
-            'United Kingdom': 'Europe/London',
-            'Germany': 'Europe/Berlin',
-            'France': 'Europe/Paris',
-            'Netherlands': 'Europe/Amsterdam',
-            'Sweden': 'Europe/Stockholm',
-            'New Zealand': 'Pacific/Auckland',
-            'Singapore': 'Asia/Singapore',
-            'Japan': 'Asia/Tokyo',
-            'China': 'Asia/Shanghai',
-            'South Korea': 'Asia/Seoul'
-          }
-          return timezoneMap[country] || 'UTC'
-        }
-
-        data.timezone = getTimezoneFromCountry(data.currentLocation || data.location || 'India')
-
-        // Map counseling areas from field of study and career interests
-        data.counselingAreas = [
-          ...(data.intendedFieldOfStudy ? [data.intendedFieldOfStudy] : []),
-          ...(data.careerInterests && typeof data.careerInterests === 'string' ? 
-              data.careerInterests.split(',').map(s => s.trim()) : [])
-        ].filter(Boolean)
-
-        console.log('=== FINAL MAPPED DATA ===')
-        console.log('Final data object:', data)
-        console.log('Location:', data.location)
-        console.log('Current Education Level:', data.currentEducationLevel)
-        console.log('GPA:', data.gpa)
-        console.log('Field of Study:', data.intendedFieldOfStudy)
-        console.log('Budget Range:', data.budgetRange)
-        console.log('Scholarship Interest:', data.scholarshipInterest)
-
-        // Always set profileData so view mode is shown
+        console.log('📊 Final profile data:', data)
         setProfileData(data)
-        calculateCompletion(data)
+        setCompletionPercentage(calculateCompletion(data))
       } catch (error) {
-        console.error('Error fetching profile data:', error)
-        // Fallback to localStorage
-        const savedProfile = localStorage.getItem('studentProfile')
-        if (savedProfile) {
-          const data = JSON.parse(savedProfile)
-          setProfileData(data)
+        console.error('❌ Error loading profile:', error)
+        // Set basic profile data on error
+        setProfileData({
+          firstName: user.first_name || '',
+          lastName: user.last_name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          currentInstitution: '',
+          studyLevel: '',
+          intendedFieldOfStudy: '',
+          graduationYear: '',
+          gpa: '',
+          preferredLocation: '',
+          currentLocation: '',
+          budgetRange: '',
+          universityPreferences: [],
+          careerInterests: [],
+          extracurricularActivities: [],
+          achievements: [],
+          languages: ['English']
+        })
+        setCompletionPercentage(0)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfileData()
+  }, [user])
+
+  const calculateCompletion = (data) => {
+    const requiredFields = [
+      'firstName', 'lastName', 'email', 'currentEducationLevel',
+      'intendedFieldOfStudy', 'studyLevel', 'preferredCountries',
+      'counselingAreas', 'englishProficiency'
+    ]
+    
+    const completedFields = requiredFields.filter(field => {
+      const value = data[field]
+      return value && value !== '' && (!Array.isArray(value) || value.length > 0)
+    })
+    
+    return Math.round((completedFields.length / requiredFields.length) * 100)
+  }
           calculateCompletion(data)
         }
       } finally {

@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // Direct PostgreSQL connection configuration
 const supabaseUrl = 'https://xududbaqaaffcaejwuix.supabase.co'
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZHVkYmFxYWFmZmNhZWp3dWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1MjI5NjIsImV4cCI6MjA1MDA5ODk2Mn0.placeholder'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZHVkYmFxYWFmZmNhZWp3dWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTE4OTQsImV4cCI6MjA2Njg2Nzg5NH0.rMPZCHgDfyho4sUOXNcA1PF4yZ3GFBJxXya_SPcq8fA'
 
 // Create Supabase client for direct database access
 const supabase = createClient(supabaseUrl, supabaseKey)
@@ -346,9 +346,17 @@ class RealDatabaseService {
     try {
       const { data, error } = await supabase
         .from('counselors')
-        .select('*')
+        .select(`
+          *,
+          users (
+            id,
+            first_name,
+            last_name,
+            email
+          )
+        `)
         .eq('is_available', true)
-        .order('display_name', { ascending: true });
+        .order('id', { ascending: true });
 
       if (error) throw error;
       return { data, error: null };

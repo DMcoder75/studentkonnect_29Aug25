@@ -18,7 +18,7 @@ import GlobalUniversitiesPage from './components/GlobalUniversitiesPage'
 import GlobalCoursesPage from './components/GlobalCoursesPage'
 import UniversitiesPageSimple from './components/UniversitiesPageSimple'
 import UniversityDetailMobile from './components/UniversityDetailMobile'
-import CounselorDirectorySimple from './components/CounselorDirectorySimple'
+import CounselorDirectoryFixed from './components/CounselorDirectoryFixed'
 import CounselorBooking from './components/CounselorBooking'
 import StudentSessions from './components/StudentSessions'
 import CounselorSelectionPage from './components/CounselorSelectionPage'
@@ -42,7 +42,7 @@ import UniversitiesPage from './components/UniversitiesPage'
 import CoursesPage from './components/CoursesPage'
 import StudentDashboard from './components/StudentDashboardReal'
 import StudentForums from './components/StudentForums'
-import StudentProfileDashboard from './components/StudentProfileDashboard'
+import StudentProfileDashboardFixed from './components/StudentProfileDashboardFixed'
 import SignInPage from './components/SignInPage'
 import DatabaseCleanupComponent from './components/DatabaseCleanupComponent'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
@@ -101,7 +101,7 @@ function App() {
       <Route path="/university/:id" element={<UniversityDetailPage />} />
         
         {/* Counselor Routes */}
-        <Route path="/counselor/directory" element={<CounselorDirectorySimple />} />
+        <Route path="/counselor/directory" element={<CounselorDirectoryFixed />} />
         <Route path="/counselors/book" element={<CounselorBooking />} />
         <Route path="/counselor/students" element={<CounselorStudents />} />
         <Route path="/counselor/select" element={<CounselorSelectionPage />} />

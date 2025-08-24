@@ -6,6 +6,7 @@ import MobileAuthHeader from './MobileAuthHeader';
 
 const MobileStudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [profileTab, setProfileTab] = useState('personal');
   const [studentData, setStudentData] = useState(null);
   const [connections, setConnections] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -328,42 +329,164 @@ const MobileStudentDashboard = () => {
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-gray-900">My Profile</h2>
 
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Email</label>
-                    <div className="mt-1 p-3 bg-gray-50 rounded-lg text-gray-900">
-                      {user.email}
+              {/* Profile-specific tabs */}
+              <div className="mb-6">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {[
+                    { id: 'personal', label: 'Personal' },
+                    { id: 'academic', label: 'Academic' },
+                    { id: 'goals', label: 'Goals' },
+                    { id: 'preferences', label: 'Preferences' },
+                    { id: 'communication', label: 'Communication' },
+                    { id: 'counseling', label: 'Counseling' },
+                    { id: 'activities', label: 'Activities' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setProfileTab(tab.id)}
+                      className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                        profileTab === tab.id
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Profile tab content */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                  {profileTab === 'personal' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <p className="text-gray-900">{studentData?.users?.first_name} {studentData?.users?.last_name}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <p className="text-gray-900">{user.email}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <p className="text-gray-900">{studentData?.phone || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                        <p className="text-gray-900">{studentData?.current_country || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Current Location</label>
+                        <p className="text-gray-900">{studentData?.current_location || 'Not specified'}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Name</label>
-                    <div className="mt-1 p-3 bg-gray-50 rounded-lg text-gray-900">
-                      {studentData?.users?.first_name} {studentData?.users?.last_name}
+                  {profileTab === 'academic' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Current Institution</label>
+                        <p className="text-gray-900">{studentData?.current_institution || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Current Education Level</label>
+                        <p className="text-gray-900">{studentData?.current_education_level || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Expected Graduation Year</label>
+                        <p className="text-gray-900">{studentData?.expected_graduation_year || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Current GPA/Grade</label>
+                        <p className="text-gray-900">{studentData?.current_gpa || 'Not specified'}</p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Field of Study</label>
-                    <div className="mt-1 p-3 bg-gray-50 rounded-lg text-gray-900">
-                      {studentData?.field_of_study || 'Not specified'}
+                  )}
+                  
+                  {profileTab === 'goals' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Intended Field of Study</label>
+                        <p className="text-gray-900">{studentData?.field_of_study || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Study Level</label>
+                        <p className="text-gray-900">{studentData?.intended_study_level || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Career Interests</label>
+                        <p className="text-gray-900">{studentData?.career_interests || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Start Date</label>
+                        <p className="text-gray-900">{studentData?.preferred_start_date || 'Not specified'}</p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Target Country</label>
-                    <div className="mt-1 p-3 bg-gray-50 rounded-lg text-gray-900">
-                      {studentData?.target_country || 'Not specified'}
+                  )}
+                  
+                  {profileTab === 'preferences' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Target Countries</label>
+                        <p className="text-gray-900">{studentData?.target_country || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Target Universities</label>
+                        <p className="text-gray-900">{studentData?.target_universities || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Interested Programs</label>
+                        <p className="text-gray-900">{studentData?.interested_programs || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                        <p className="text-gray-900">{studentData?.budget_range || 'Not specified'}</p>
+                      </div>
                     </div>
-                  </div>
-
-                  <button
-                    onClick={() => navigate('/student-profile')}
-                    className="w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors"
-                  >
-                    Edit Profile
-                  </button>
+                  )}
+                  
+                  {profileTab === 'communication' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
+                        <p className="text-gray-900">{studentData?.languages || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Communication Style</label>
+                        <p className="text-gray-900">{studentData?.communication_style || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+                        <p className="text-gray-900">{studentData?.timezone || 'Not specified'}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {profileTab === 'counseling' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Areas of Support</label>
+                        <p className="text-gray-900">{studentData?.support_areas || 'University Selection, Application Process, Visa Guidance'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Urgency Level</label>
+                        <p className="text-gray-900">{studentData?.urgency_level || 'Medium Priority'}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {profileTab === 'activities' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Extracurricular Activities</label>
+                        <p className="text-gray-900">{studentData?.extracurricular_activities || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Academic Achievements</label>
+                        <p className="text-gray-900">{studentData?.academic_achievements || 'Not specified'}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
