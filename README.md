@@ -9,7 +9,7 @@ A comprehensive university counseling platform with complete action-based databa
 
 ## 🌐 Live Demo
 
-**Production URL:** [https://wllkaoqx.manus.space](https://wllkaoqx.manus.space)
+**Production URL:** [https://studentkonnect24aug.web.app](https://studentkonnect24aug.web.app)
 
 ### Demo Credentials
 - **Student:** priya.dubey@email.com / password123
@@ -18,28 +18,35 @@ A comprehensive university counseling platform with complete action-based databa
 
 ## 🚀 Complete System Overview
 
-### ✅ Phase 1: Student Connection Workflow
+### ✅ Phase 1: Custom Email Verification System
+- **Mandatory Email Verification:** Users cannot access platform without email confirmation
+- **Firebase Functions Integration:** Custom email sending via Gmail SMTP
+- **Professional Email Templates:** Branded verification emails with clear instructions
+- **Token-based Security:** Secure verification tokens with database storage
+- **Clean User Experience:** Professional error messages and success feedback
+
+### ✅ Phase 2: Student Connection Workflow
 - **Professional Interface:** Clean, intuitive student dashboard
 - **Counselor Discovery:** Browse and connect with expert counselors
 - **Real-time Database:** Instant storage of connection requests
 - **Dynamic UI:** Button state management and user feedback
 - **Form Validation:** Complete input validation and error handling
 
-### ✅ Phase 2: Admin Approval Workflow
+### ✅ Phase 3: Admin Approval Workflow
 - **Professional Admin Portal:** Comprehensive sidebar navigation
 - **Request Management:** Real-time connection request handling
 - **Approval System:** One-click approve/reject functionality
 - **Live Statistics:** Connection metrics and status tracking
 - **Status Synchronization:** Real-time updates across all interfaces
 
-### ✅ Phase 3: Counselor Dashboard & Student Management
+### ✅ Phase 4: Counselor Dashboard & Student Management
 - **Beautiful Sidebar:** Professional navigation with badges
 - **Student Profiles:** Complete student information display
 - **Search Functionality:** Filter students by name, email, field of study
 - **Real-time Data:** Live synchronization with database
 - **Professional UI:** Responsive design for all devices
 
-### ✅ Phase 4: Session Booking System
+### ✅ Phase 5: Session Booking System
 - **Professional Modal:** Clean, intuitive booking interface
 - **Session Types:** Multiple consultation types available
 - **Date/Time Pickers:** Professional scheduling interface
@@ -57,9 +64,10 @@ A comprehensive university counseling platform with complete action-based databa
 
 ### Backend & Database
 - **Supabase** - PostgreSQL database with real-time features
+- **Firebase Functions** - Serverless email processing with Gmail SMTP
 - **Row Level Security** - Secure data access patterns
 - **Real-time Subscriptions** - Live data synchronization
-- **Authentication** - Secure user management
+- **Authentication** - Secure user management with custom email verification
 
 ### Key Features
 - **Responsive Design** - Mobile and desktop optimized
@@ -77,6 +85,7 @@ A comprehensive university counseling platform with complete action-based databa
 - **counselors** - Counselor profiles and specializations
 - **counselor_requests** - Connection requests between students and counselors
 - **sessions** - Scheduled meetings and consultations
+- **email_verifications** - Custom email verification tokens and status
 
 ### Key Relationships
 - Students → Counselor Requests → Counselors
