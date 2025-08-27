@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Button } from './ui/button'
+import { Badge } from './ui/badge'
+import { Progress } from './ui/progress'
 import { 
   User, 
   GraduationCap, 
@@ -18,20 +18,20 @@ import {
   Calendar,
   Award,
   Languages,
-  MapPin
+  MapPin,
+  TrendingUp
 } from 'lucide-react'
 import StudentProfileForm from './StudentProfileForm'
 import Sidebar from './Sidebar'
 import realDatabaseService from '../services/realDatabaseService'
 
-export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenuClose }) {
+export default function StudentProfileDashboardFixed({ isMobileMenuOpen, onMobileMenuClose }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [profileData, setProfileData] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [completionPercentage, setCompletionPercentage] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('personal')
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -43,90 +43,21 @@ export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenu
       try {
         console.log('🔄 Loading student profile for user:', user.email)
         
-        // Fetch student profile from database
-        const { data: studentProfile, error } = await realDatabaseService.supabase
-          .from('student_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
-
-        let profileFromDB = null
-        if (!error && studentProfile) {
-          profileFromDB = studentProfile
-          console.log('✅ Found student profile in database:', profileFromDB)
+        // Fetch student profile from database using the same method as mobile
+        const studentResult = await realDatabaseService.getStudentByEmail(user.email)
+        console.log('📊 Student data result:', studentResult)
+        
+        if (studentResult.success && studentResult.data) {
+          console.log('✅ Profile data loaded:', studentResult.data)
+          setProfileData(studentResult.data)
+          setCompletionPercentage(calculateCompletion(studentResult.data))
         } else {
-          console.log('❌ No student profile found, using basic user data')
+          console.log('❌ No student data found or error:', studentResult)
         }
         
-        // Create comprehensive profile data
-        const data = {
-          // Basic info from users table
-          firstName: user.first_name || '',
-          lastName: user.last_name || '',
-          email: user.email || '',
-          phone: user.phone || '',
-          
-          // Profile data from student_profiles table
-          currentInstitution: profileFromDB?.current_institution || '',
-          studyLevel: profileFromDB?.study_level || '',
-          intendedFieldOfStudy: profileFromDB?.field_of_study || '',
-          graduationYear: profileFromDB?.graduation_year || '',
-          gpa: profileFromDB?.gpa || '',
-          preferredLocation: profileFromDB?.preferred_location || '',
-          currentLocation: profileFromDB?.current_country || '',
-          budgetRange: profileFromDB?.budget_range || '',
-          interestedDegree: profileFromDB?.interested_degree || '',
-          
-          // Parse JSON arrays safely
-          universityPreferences: profileFromDB?.university_preferences || [],
-          careerInterests: profileFromDB?.career_interests || [],
-          extracurricularActivities: profileFromDB?.extracurricular_activities || [],
-          achievements: profileFromDB?.achievements || [],
-          languages: profileFromDB?.languages || ['English'],
-          
-          // Additional fields
-          communicationStyle: profileFromDB?.communication_style || '',
-          
-          // Legacy compatibility fields
-          currentEducationLevel: profileFromDB?.study_level || '',
-          preferredCountries: profileFromDB?.preferred_location ? [profileFromDB.preferred_location] : [],
-          counselingAreas: profileFromDB?.career_interests || [],
-          englishProficiency: 'Advanced',
-          nationality: profileFromDB?.current_country || profileFromDB?.nationality || 'India'
-        }
-
-        console.log('📊 Final profile data:', data)
-        console.log('🔍 Nationality debug:', {
-          current_country: profileFromDB?.current_country,
-          nationality_set: data.nationality,
-          profileFromDB: profileFromDB
-        })
-        setProfileData(data)
-        setCompletionPercentage(calculateCompletion(data))
+        setLoading(false)
       } catch (error) {
-        console.error('❌ Error loading profile:', error)
-        // Set basic profile data on error
-        setProfileData({
-          firstName: user.first_name || '',
-          lastName: user.last_name || '',
-          email: user.email || '',
-          phone: user.phone || '',
-          currentInstitution: '',
-          studyLevel: '',
-          intendedFieldOfStudy: '',
-          graduationYear: '',
-          gpa: '',
-          preferredLocation: '',
-          currentLocation: '',
-          budgetRange: '',
-          universityPreferences: [],
-          careerInterests: [],
-          extracurricularActivities: [],
-          achievements: [],
-          languages: ['English']
-        })
-        setCompletionPercentage(0)
-      } finally {
+        console.error('❌ Error in fetchProfileData:', error)
         setLoading(false)
       }
     }
@@ -135,18 +66,21 @@ export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenu
   }, [user])
 
   const calculateCompletion = (data) => {
-    const requiredFields = [
-      'firstName', 'lastName', 'email', 'currentEducationLevel',
-      'intendedFieldOfStudy', 'studyLevel', 'preferredCountries',
-      'counselingAreas', 'englishProficiency'
+    if (!data) return 0
+    
+    const fields = [
+      'full_name', 'email', 'phone', 'current_country', 'current_location',
+      'current_institution', 'study_level', 'graduation_year', 'gpa',
+      'preferred_countries', 'preferred_programs', 'budget_range',
+      'languages', 'communication_style', 'timezone', 'areas_of_support',
+      'urgency_level', 'extracurricular_activities', 'academic_achievements'
     ]
     
-    const completedFields = requiredFields.filter(field => {
+    const completedFields = fields.filter(field => {
       const value = data[field]
-      return value && value !== '' && (!Array.isArray(value) || value.length > 0)
+      return value && value !== '' && value !== null && value !== undefined
     })
-    
-    return Math.round((completedFields.length / requiredFields.length) * 100)
+    return Math.round((completedFields.length / fields.length) * 100)
   }
 
   if (loading) {
@@ -162,13 +96,13 @@ export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenu
 
   if (isEditing) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="w-full">
         <div className="flex">
           <Sidebar 
             isMobileMenuOpen={isMobileMenuOpen} 
             onMobileMenuClose={onMobileMenuClose}
           />
-          <div className="flex-1 lg:ml-64">
+          <main className="flex-1">
             <StudentProfileForm 
               initialData={profileData}
               onSave={(updatedData) => {
@@ -178,365 +112,363 @@ export default function StudentProfileDashboard({ isMobileMenuOpen, onMobileMenu
               }}
               onCancel={() => setIsEditing(false)}
             />
-          </div>
+          </main>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full">
+      {/* Hero Section - Full Width */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 text-white py-12 w-full">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative w-full px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold">P</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold">Welcome back, {profileData?.users?.first_name && profileData?.users?.last_name 
+                    ? `${profileData.users.first_name} ${profileData.users.last_name}` 
+                    : 'Student'}</h1>
+                  <p className="text-purple-100">Student Profile</p>
+                  <div className="flex items-center mt-2">
+                    <span className="text-sm">📈 {completionPercentage}% Complete</span>
+                    <div className="flex ml-2">
+                      {[1,2,3,4,5].map(i => (
+                        <Star key={i} className={`w-4 h-4 ${i <= Math.floor(completionPercentage/20) ? 'text-yellow-400 fill-current' : 'text-white/50'}`} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex space-x-8 text-center">
+                <div>
+                  <div className="text-2xl font-bold">12</div>
+                  <div className="text-sm text-purple-100">Connections</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-sm text-purple-100">Applications</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-sm text-purple-100">Documents</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="text-sm text-purple-100 mb-2">Profile Completion</div>
+              <div className="w-full bg-white/20 rounded-full h-2">
+                <div className="bg-yellow-400 h-2 rounded-full" style={{width: `${completionPercentage}%`}}></div>
+              </div>
+              <div className="text-right text-sm text-purple-100 mt-1">{completionPercentage}%</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content with Sidebar */}
       <div className="flex">
         <Sidebar 
           isMobileMenuOpen={isMobileMenuOpen} 
           onMobileMenuClose={onMobileMenuClose}
         />
-        <div className="flex-1 lg:ml-64">
-          {/* Desktop View - Keep existing layout */}
-          <div className="hidden md:block p-6">
-            <div className="max-w-4xl mx-auto">
-              {/* Header */}
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-                <p className="text-gray-600">Manage your personal information and preferences</p>
+        <main className="flex-1">
+          <div className="px-6 py-8">
+            <div className="max-w-7xl">
+              
+              {/* Edit Profile Button */}
+              <div className="flex justify-end mb-6">
+                <Button onClick={() => setIsEditing(true)} className="bg-purple-600 hover:bg-purple-700">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
               </div>
 
-              {/* Profile Completion */}
-              <Card className="mb-6">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Profile Completion</h3>
-                      <p className="text-sm text-gray-600">Complete your profile to get better recommendations</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-purple-600">{completionPercentage}%</div>
-                      <div className="text-sm text-gray-500">Complete</div>
-                    </div>
-                  </div>
-                  <Progress value={completionPercentage} className="h-2" />
-                </CardContent>
-              </Card>
-
-              {/* Basic Information */}
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="flex items-center">
+              {/* Profile Sections Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                
+                {/* Personal Information */}
+                <Card>
+                  <CardHeader className="bg-blue-50">
+                    <CardTitle className="flex items-center text-blue-700">
                       <User className="h-5 w-5 mr-2" />
-                      Basic Information
-                    </span>
-                    <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      Personal Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-6">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Email</label>
-                      <p className="text-gray-900">{profileData?.email || 'Not specified'}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Name</label>
-                      <p className="text-gray-900">
-                        {profileData?.firstName && profileData?.lastName 
-                          ? `${profileData.firstName} ${profileData.lastName}` 
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Full Name</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.users?.first_name && profileData?.users?.last_name 
+                          ? `${profileData.users.first_name} ${profileData.users.last_name}` 
                           : 'Not specified'}
-                      </p>
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Nationality</label>
-                      <p className="text-gray-900">{profileData?.nationality || 'Not specified'}</p>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Nationality</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.current_country || 'Not specified'}
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Phone</label>
-                      <p className="text-gray-900">{profileData?.phone || 'Not specified'}</p>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Current Location</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg flex items-center">
+                        <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                        {profileData?.current_location || 'Not specified'}
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Field of Study</label>
-                      <p className="text-gray-900">{profileData?.intendedFieldOfStudy || 'Not specified'}</p>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Phone</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.users?.phone || 'Not specified'}
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Target Country</label>
-                      <p className="text-gray-900">{profileData?.preferredLocation || 'Not specified'}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              {/* Academic Information */}
-              {(profileData?.currentInstitution || profileData?.gpa || profileData?.graduationYear) && (
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
+                {/* Academic Background */}
+                <Card>
+                  <CardHeader className="bg-green-50">
+                    <CardTitle className="flex items-center text-green-700">
                       <GraduationCap className="h-5 w-5 mr-2" />
-                      Academic Information
+                      Academic Background
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {profileData?.currentInstitution && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">Current Institution</label>
-                          <p className="text-gray-900">{profileData.currentInstitution}</p>
-                        </div>
-                      )}
-                      {profileData?.gpa && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">GPA</label>
-                          <p className="text-gray-900">{profileData.gpa}</p>
-                        </div>
-                      )}
-                      {profileData?.graduationYear && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">Graduation Year</label>
-                          <p className="text-gray-900">{profileData.graduationYear}</p>
-                        </div>
-                      )}
-                      {profileData?.studyLevel && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">Study Level</label>
-                          <p className="text-gray-900">{profileData.studyLevel}</p>
-                        </div>
-                      )}
+                  <CardContent className="p-6 space-y-6">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Current Institution</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.current_institution || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Current Education Level</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.study_level || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Expected Graduation Year</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.graduation_year || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-2 block">Current GPA/Grade</label>
+                      <div className="text-base text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                        {profileData?.gpa || 'Not specified'}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-              )}
 
-              {/* Preferences */}
-              {(profileData?.universityPreferences?.length > 0 || profileData?.careerInterests?.length > 0) && (
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
+                {/* Study Goals */}
+                <Card>
+                  <CardHeader className="bg-orange-50">
+                    <CardTitle className="flex items-center text-orange-700">
                       <Target className="h-5 w-5 mr-2" />
-                      Preferences & Interests
+                      Study Goals
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {profileData?.universityPreferences?.length > 0 && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">University Preferences</label>
-                        <div className="flex flex-wrap gap-2">
-                          {profileData.universityPreferences.map((uni, index) => (
-                            <Badge key={index} variant="secondary">{uni}</Badge>
-                          ))}
-                        </div>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Intended Field of Study</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.preferred_programs || 'Not specified'}
                       </div>
-                    )}
-                    {profileData?.careerInterests?.length > 0 && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Career Interests</label>
-                        <div className="flex flex-wrap gap-2">
-                          {profileData.careerInterests.map((interest, index) => (
-                            <Badge key={index} variant="outline">{interest}</Badge>
-                          ))}
-                        </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Study Level</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.study_level || 'Not specified'}
                       </div>
-                    )}
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Career Interests</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.career_interests || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Preferred Start Date</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.preferred_start_date || 'Not specified'}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
-              )}
-            </div>
-          </div>
 
-          {/* Mobile View - Add tabs */}
-          <div className="block md:hidden p-4">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">My Profile</h1>
-              <Button onClick={() => setIsEditing(true)} className="w-full mb-4">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
-            </div>
+                {/* Study Preferences */}
+                <Card>
+                  <CardHeader className="bg-purple-50">
+                    <CardTitle className="flex items-center text-purple-700">
+                      <Globe className="h-5 w-5 mr-2" />
+                      Study Preferences
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Target Countries</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.preferred_countries || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Target Universities</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.target_universities || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Interested Programs</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.preferred_programs || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Budget Range</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.budget_range || 'Not specified'}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Mobile Tabs */}
-            <div className="mb-6">
-              <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-                <button
-                  onClick={() => setActiveTab('personal')}
-                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'personal'
-                      ? 'bg-white text-purple-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Personal
-                </button>
-                <button
-                  onClick={() => setActiveTab('academic')}
-                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'academic'
-                      ? 'bg-white text-purple-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Academic
-                </button>
-                <button
-                  onClick={() => setActiveTab('preferences')}
-                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'preferences'
-                      ? 'bg-white text-purple-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Goals
-                </button>
+                {/* Communication */}
+                <Card>
+                  <CardHeader className="bg-blue-50">
+                    <CardTitle className="flex items-center text-blue-700">
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      Communication
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Languages</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.languages || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Communication Style</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.communication_style || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Timezone</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.timezone || 'Not specified'}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Counseling Needs */}
+                <Card>
+                  <CardHeader className="bg-yellow-50">
+                    <CardTitle className="flex items-center text-yellow-700">
+                      <Star className="h-5 w-5 mr-2" />
+                      Counseling Needs
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Areas of Support</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.areas_of_support || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Urgency Level</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border">
+                        {profileData?.urgency_level || 'Not specified'}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
               </div>
+
+              {/* Activities & Achievements - Full Width */}
+              <Card className="mb-8">
+                <CardHeader className="bg-purple-50">
+                  <CardTitle className="flex items-center text-purple-700">
+                    <Award className="h-5 w-5 mr-2" />
+                    Activities & Achievements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Extracurricular Activities</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border min-h-[100px]">
+                        {profileData?.extracurricular_activities || 'Not specified'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Academic Achievements</label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border min-h-[100px]">
+                        {profileData?.academic_achievements || 'Not specified'}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Action Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                  <CardContent className="p-6 text-center">
+                    <Star className="h-12 w-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2">Find Counselors</h3>
+                    <p className="text-purple-100 mb-4">Get matched with counselors based on your profile</p>
+                    <Button 
+                      onClick={() => navigate('/counselors')}
+                      className="bg-white text-gray-800 hover:bg-gray-100 w-full font-semibold"
+                    >
+                      Start Matching
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                  <CardContent className="p-6 text-center">
+                    <Calendar className="h-12 w-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2">My Sessions</h3>
+                    <p className="text-blue-100 mb-4">View upcoming and past counseling sessions</p>
+                    <Button 
+                      onClick={() => navigate('/student/sessions')}
+                      className="bg-white text-gray-800 hover:bg-gray-100 w-full font-semibold"
+                    >
+                      View Sessions
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+                  <CardContent className="p-6 text-center">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2">Track Progress</h3>
+                    <p className="text-green-100 mb-4">Monitor your application and goal progress</p>
+                    <Button 
+                      onClick={() => navigate('/student/progress')}
+                      className="bg-white text-gray-800 hover:bg-gray-100 w-full font-semibold"
+                    >
+                      View Progress
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
             </div>
-
-            {/* Mobile Tab Content */}
-            {activeTab === 'personal' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="h-5 w-5 mr-2" />
-                    Personal Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Full Name</label>
-                    <p className="text-gray-900 mt-1">
-                      {profileData?.firstName && profileData?.lastName 
-                        ? `${profileData.firstName} ${profileData.lastName}` 
-                        : 'Not specified'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Email</label>
-                    <p className="text-gray-900 mt-1">{profileData?.email || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Phone</label>
-                    <p className="text-gray-900 mt-1">{profileData?.phone || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Nationality</label>
-                    <p className="text-gray-900 mt-1">{profileData?.nationality || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Current Location</label>
-                    <p className="text-gray-900 mt-1">{profileData?.currentLocation || 'Not specified'}</p>
-                  </div>
-                  {profileData?.languages?.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Languages</label>
-                      <div className="flex flex-wrap gap-2">
-                        {profileData.languages.map((lang, index) => (
-                          <Badge key={index} variant="outline">{lang}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {activeTab === 'academic' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <GraduationCap className="h-5 w-5 mr-2" />
-                    Academic Background
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Current Institution</label>
-                    <p className="text-gray-900 mt-1">{profileData?.currentInstitution || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Current Education Level</label>
-                    <p className="text-gray-900 mt-1">{profileData?.studyLevel || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Expected Graduation Year</label>
-                    <p className="text-gray-900 mt-1">{profileData?.graduationYear || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Current GPA/Grade</label>
-                    <p className="text-gray-900 mt-1">{profileData?.gpa || 'Not specified'}</p>
-                  </div>
-                  {profileData?.achievements?.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Achievements</label>
-                      <div className="flex flex-wrap gap-2">
-                        {profileData.achievements.map((achievement, index) => (
-                          <Badge key={index} variant="secondary">{achievement}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {profileData?.extracurricularActivities?.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Extracurricular Activities</label>
-                      <div className="flex flex-wrap gap-2">
-                        {profileData.extracurricularActivities.map((activity, index) => (
-                          <Badge key={index} variant="outline">{activity}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {activeTab === 'preferences' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Target className="h-5 w-5 mr-2" />
-                    Study Goals & Preferences
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Intended Field of Study</label>
-                    <p className="text-gray-900 mt-1">{profileData?.intendedFieldOfStudy || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Study Level</label>
-                    <p className="text-gray-900 mt-1">{profileData?.interestedDegree || profileData?.studyLevel || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Target Countries</label>
-                    <p className="text-gray-900 mt-1">{profileData?.preferredLocation || 'Not specified'}</p>
-                  </div>
-                  {profileData?.universityPreferences?.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Target Universities</label>
-                      <div className="flex flex-wrap gap-2">
-                        {profileData.universityPreferences.map((uni, index) => (
-                          <Badge key={index} variant="secondary">{uni}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {profileData?.careerInterests?.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Career Interests</label>
-                      <div className="flex flex-wrap gap-2">
-                        {profileData.careerInterests.map((interest, index) => (
-                          <Badge key={index} variant="outline">{interest}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {profileData?.budgetRange && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Budget Range</label>
-                      <p className="text-gray-900 mt-1">{profileData.budgetRange}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   )

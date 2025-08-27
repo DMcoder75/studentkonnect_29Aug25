@@ -59,7 +59,7 @@ export default function CounselorBooking() {
   ]
 
   const handleBookSession = () => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated) {
       navigate('/signin')
       return
     }
@@ -290,7 +290,7 @@ export default function CounselorBooking() {
                     Book Session
                   </Button>
                   
-                  {!isAuthenticated() && (
+                  {!isAuthenticated && (
                     <p className="text-sm text-gray-500 text-center">
                       You'll need to sign in to complete the booking
                     </p>

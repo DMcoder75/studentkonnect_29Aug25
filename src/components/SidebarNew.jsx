@@ -39,7 +39,7 @@ const SidebarNew = ({ onMobileMenuClose }) => {
   })
 
   // Derive authentication states from the correct context properties
-  const isLoggedIn = isAuthenticated()
+  const isLoggedIn = isAuthenticated
   const isStudent = userRole === 'student'
   const isCounselor = userRole === 'counselor'
   const isAdmin = userRole === 'admin'

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,19 +20,46 @@ import Sidebar from './Sidebar'
 
 export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
   const navigate = useNavigate()
-  const { login } = useAuth()
-  const [isSignUp, setIsSignUp] = useState(false)
+  const { login, user, loading: authLoading } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: ''
+    password: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // Auto-redirect if user is already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      // User is already logged in, redirect to appropriate dashboard
+      if (user.role === 'student') {
+        navigate('/student-dashboard', { replace: true })
+      } else if (user.role === 'counselor') {
+        navigate('/counselor-dashboard', { replace: true })
+      } else {
+        navigate('/dashboard', { replace: true })
+      }
+    }
+  }, [user, authLoading, navigate])
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render login form if user is already logged in
+  if (user) {
+    return null
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -49,26 +76,9 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
       return false
     }
 
-    if (!formData.email.includes('@')) {
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
       setError('Please enter a valid email address')
       return false
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long')
-      return false
-    }
-
-    if (isSignUp) {
-      if (!formData.firstName || !formData.lastName) {
-        setError('First name and last name are required')
-        return false
-      }
-
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match')
-        return false
-      }
     }
 
     return true
@@ -83,50 +93,27 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
     setError('')
 
     try {
-      if (isSignUp) {
-        // For demo purposes, show available demo accounts
-        setSuccess(`Account creation is disabled in demo mode. Please use one of these demo accounts:
+      // Use the AuthContext login function properly
+      const result = await login(formData.email, formData.password)
+      
+      if (!result.success) {
+        setError(result.error || 'Authentication failed')
+        return
+      }
+      
+      if (result.user) {
+        setSuccess(`Welcome back, ${result.user.firstName || result.user.first_name}! Redirecting to your dashboard...`)
         
-        priya.dubey@email.com / student123
-        tanvi.kulkarni@email.com / student123
-        pranav.joshi@email.com / student123
-        rohit.gupta@email.com / student123
-        
-        And 16 more student accounts with password: student123`)
-        setIsSignUp(false)
-        setFormData({
-          email: 'priya.dubey@email.com',
-          password: '',
-          confirmPassword: '',
-          firstName: '',
-          lastName: ''
-        })
+        setTimeout(() => {
+          // Redirect based on user role
+          if (result.user.role === 'counselor') {
+            navigate('/counselor/dashboard')
+          } else {
+            navigate('/student/profile')
+          }
+        }, 1500)
       } else {
-        // Import and use database authentication
-        const { authService } = await import('../services/authService')
-        const result = await authService.authenticateUser(formData.email, formData.password)
-        
-        if (result.error) {
-          setError(result.error)
-          return
-        }
-        
-        if (result.user) {
-          // Use the login function from auth context
-          login(result.user)
-          setSuccess(`Welcome back, ${result.user.first_name || result.user.firstName}! Redirecting to your dashboard...`)
-          
-          setTimeout(() => {
-            // Redirect based on user role
-            if (result.user.role === 'counselor') {
-              navigate('/counselor/dashboard')
-            } else {
-              navigate('/student/profile')
-            }
-          }, 1500)
-        } else {
-          setError('Invalid credentials')
-        }
+        setError('Invalid credentials')
       }
     } catch (err) {
       console.error('Authentication error:', err)
@@ -134,19 +121,6 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
     } finally {
       setLoading(false)
     }
-  }
-
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp)
-    setError('')
-    setSuccess('')
-    setFormData({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      firstName: '',
-      lastName: ''
-    })
   }
 
   return (
@@ -166,14 +140,11 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
             </Button>
             
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
-                {isSignUp ? 'Create Your Account' : 'Welcome Back'}
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                Welcome Back
               </h1>
               <p className="text-lg md:text-xl text-purple-100 max-w-2xl mx-auto">
-                {isSignUp 
-                  ? 'Join thousands of students discovering their perfect university pathway'
-                  : 'Sign in to continue your educational journey'
-                }
+                Sign in to continue your educational journey
               </p>
             </div>
           </div>
@@ -198,10 +169,10 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
               <Card className="shadow-xl border-0">
                 <CardHeader className="text-center pb-6">
                   <div className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    {isSignUp ? <UserPlus className="h-8 w-8" /> : <LogIn className="h-8 w-8" />}
+                    <LogIn className="h-8 w-8" />
                   </div>
                   <CardTitle className="text-2xl font-bold text-gray-800">
-                    {isSignUp ? 'Create Account' : 'Sign In'}
+                    Sign In
                   </CardTitle>
                 </CardHeader>
                 
@@ -223,44 +194,6 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
                   )}
 
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    {isSignUp && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name</Label>
-                          <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input
-                              id="firstName"
-                              name="firstName"
-                              type="text"
-                              placeholder="John"
-                              value={formData.firstName}
-                              onChange={handleInputChange}
-                              className="pl-10"
-                              required={isSignUp}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input
-                              id="lastName"
-                              name="lastName"
-                              type="text"
-                              placeholder="Doe"
-                              value={formData.lastName}
-                              onChange={handleInputChange}
-                              className="pl-10"
-                              required={isSignUp}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <div className="relative">
@@ -304,25 +237,6 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
                       </div>
                     </div>
 
-                    {isSignUp && (
-                      <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm Password</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="••••••••"
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            className="pl-10"
-                            required={isSignUp}
-                          />
-                        </div>
-                      </div>
-                    )}
-
                     <Button 
                       type="submit" 
                       className="w-full bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600"
@@ -331,12 +245,12 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
                       {loading ? (
                         <div className="flex items-center">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                          Signing In...
                         </div>
                       ) : (
                         <>
-                          {isSignUp ? <UserPlus className="mr-2 h-4 w-4" /> : <LogIn className="mr-2 h-4 w-4" />}
-                          {isSignUp ? 'Create Account' : 'Sign In'}
+                          <LogIn className="mr-2 h-4 w-4" />
+                          Sign In
                         </>
                       )}
                     </Button>
@@ -344,28 +258,26 @@ export default function SignInPage({ isMobileMenuOpen, onMobileMenuClose }) {
 
                   <div className="mt-6 text-center">
                     <p className="text-sm text-gray-600">
-                      {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                      Don't have an account?
                     </p>
                     <Button
                       variant="link"
-                      onClick={toggleMode}
+                      onClick={() => navigate('/signup')}
                       className="text-purple-600 hover:text-purple-700 p-0 h-auto font-semibold"
                     >
-                      {isSignUp ? 'Sign in here' : 'Create one here'}
+                      Create one here
                     </Button>
                   </div>
 
-                  {!isSignUp && (
-                    <div className="mt-4 text-center">
-                      <Button
-                        variant="link"
-                        className="text-sm text-gray-500 hover:text-gray-700 p-0 h-auto"
-                        onClick={() => setError('Password reset functionality coming soon!')}
-                      >
-                        Forgot your password?
-                      </Button>
-                    </div>
-                  )}
+                  <div className="mt-4 text-center">
+                    <Button
+                      variant="link"
+                      className="text-sm text-gray-500 hover:text-gray-700 p-0 h-auto"
+                      onClick={() => setError('Password reset functionality coming soon!')}
+                    >
+                      Forgot your password?
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 

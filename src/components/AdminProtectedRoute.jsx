@@ -32,7 +32,7 @@ export default function AdminProtectedRoute({
   }
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated()) {
+  if (!isAuthenticated) {
     return <Navigate to={fallbackPath} state={{ from: location }} replace />
   }
 

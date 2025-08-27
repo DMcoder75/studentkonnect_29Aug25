@@ -4,6 +4,7 @@ import { counselorConnectionService } from '../services/counselorConnectionServi
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
+import Sidebar from './Sidebar'
 import { 
   CheckCircle2, 
   XCircle, 
@@ -15,10 +16,11 @@ import {
   AlertCircle,
   RefreshCw,
   Phone,
-  Video
+  Video,
+  Users
 } from 'lucide-react'
 
-export default function StudentConnectionsPage() {
+export default function StudentConnectionsPage({ isMobileMenuOpen, onMobileMenuClose }) {
   const { user, userRole } = useAuth()
   const [connections, setConnections] = useState([])
   const [loading, setLoading] = useState(false)
@@ -120,7 +122,7 @@ export default function StudentConnectionsPage() {
     }
   }
 
-  if (userRole !== 'student') {
+  if (userRole && userRole !== 'student') {
     return (
       <div className="p-6">
         <Card>
@@ -133,44 +135,110 @@ export default function StudentConnectionsPage() {
       </div>
     )
   }
-
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Connections</h1>
-          <p className="text-gray-600">View and manage your counselor connection requests</p>
+    <div className="w-full">
+      {/* Hero Section - Full Width */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 text-white py-12 w-full">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative w-full px-6">
+          <div className="max-w-6xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-pink-200 bg-clip-text text-transparent">
+              My Connections
+            </h1>
+            <p className="text-lg md:text-xl text-purple-100 max-w-3xl mx-auto">
+              View and manage your counselor connection requests and approved connections.
+            </p>
+          </div>
         </div>
-        <Button onClick={loadConnections} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
-      </div>
+      </section>
 
-      {/* Connections List */}
-      <div className="space-y-4">
-        {loading ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Loading your connections...</p>
-            </CardContent>
-          </Card>
-        ) : connections.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Connections Yet</h3>
-              <p className="text-gray-600 mb-4">
-                You haven't made any counselor connection requests yet. Browse our counselor directory to find the perfect match for your needs.
-              </p>
-              <Button onClick={() => window.location.href = '/counselor/directory'}>
-                Find Counselors
+      {/* Two-Column Layout */}
+      <div className="flex">
+        {/* Sidebar */}
+        <Sidebar 
+          isOpen={true}
+          onClose={() => {}}
+          isHomepage={false}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onMobileMenuClose={onMobileMenuClose}
+        />
+
+        {/* Main Content Area */}
+        <main className="flex-1 w-full md:w-auto transition-all duration-300">
+          <div className="container mx-auto px-6 py-12">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Connection Requests</h2>
+                <p className="text-gray-600">Track the status of your counselor connections</p>
+              </div>
+              <Button onClick={loadConnections} disabled={loading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600 mb-1 text-center">{connections.length}</div>
+                  <div className="text-sm text-gray-600 text-center">Total Requests</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle2 className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-green-600 mb-1 text-center">
+                    {connections.filter(c => c.status === 'approved').length}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">Approved</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-yellow-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-yellow-600 mb-1 text-center">
+                    {connections.filter(c => c.status === 'pending').length}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">Pending</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Connections List */}
+            <div className="space-y-6">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                </div>
+              ) : connections.length === 0 ? (
+                <Card className="shadow-lg border-0">
+                  <CardContent className="p-12 text-center">
+                    <MessageSquare className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Connections Yet</h3>
+                    <p className="text-gray-600 mb-6">
+                      You haven't made any counselor connection requests yet. Browse our counselor directory to find the perfect match for your needs.
+                    </p>
+                    <Button 
+                      className="bg-purple-600 hover:bg-purple-700"
+                      onClick={() => window.location.href = '/counselor/directory'}
+                    >
+                      Find Counselors
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
           connections.map((connection) => {
             const statusInfo = getStatusMessage(connection)
             return (
@@ -290,6 +358,9 @@ export default function StudentConnectionsPage() {
             )
           })
         )}
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   )

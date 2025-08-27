@@ -64,7 +64,7 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
 
   // Load student connections on component mount
   useEffect(() => {
-    if (isAuthenticated() && userRole === 'student' && user?.id) {
+    if (isAuthenticated && userRole === 'student' && user?.id) {
       loadStudentConnections()
     }
   }, [isAuthenticated, userRole, user])
@@ -82,7 +82,7 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
 
   // Handle counselor connection
   const handleConnect = async (counselor) => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated) {
       navigate('/signin')
       return
     }
@@ -626,7 +626,7 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
                 size="sm" 
                 variant="outline"
                 onClick={() => {
-                  if (!isAuthenticated()) {
+                  if (!isAuthenticated) {
                     navigate('/signin')
                   } else {
                     // Handle message functionality for authenticated users
@@ -642,7 +642,7 @@ export default function CounselorDirectory({ isMobileMenuOpen, onMobileMenuClose
               <Button 
                 size="sm"
                 onClick={() => {
-                  if (!isAuthenticated()) {
+                  if (!isAuthenticated) {
                     navigate('/signin')
                   } else {
                     // Handle book call functionality for authenticated users

@@ -34,7 +34,7 @@ const CounselorStudents = ({ isMobileMenuOpen, onMobileMenuClose }) => {
 
   // Load students from database
   useEffect(() => {
-    if (isAuthenticated() && userRole === 'counselor') {
+    if (isAuthenticated && userRole === 'counselor') {
       loadStudentsFromDB();
     } else if (userRole && userRole !== 'counselor') {
       navigate('/');
@@ -186,7 +186,7 @@ const CounselorStudents = ({ isMobileMenuOpen, onMobileMenuClose }) => {
     );
   }
 
-  if (!isAuthenticated() || userRole !== 'counselor') {
+  if (!isAuthenticated || userRole !== 'counselor') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

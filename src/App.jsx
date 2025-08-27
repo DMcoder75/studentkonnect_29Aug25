@@ -44,6 +44,8 @@ import StudentDashboard from './components/StudentDashboardReal'
 import StudentForums from './components/StudentForums'
 import StudentProfileDashboardFixed from './components/StudentProfileDashboardFixed'
 import SignInPage from './components/SignInPage'
+import SignUpPage from './components/SignUpPage'
+import EmailVerificationPage from './components/EmailVerificationPage'
 import DatabaseCleanupComponent from './components/DatabaseCleanupComponent'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import TermsOfServicePage from './components/TermsOfServicePage'
@@ -85,6 +87,15 @@ function App() {
           <Header />
           
           <Routes>
+            {/* Authentication Routes - High Priority */}
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/sign-up" element={<SignUpPage />} />
+            <Route path="/register" element={<SignUpPage />} />
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/sign-in" element={<SignInPage />} />
+            <Route path="/verify-email" element={<EmailVerificationPage />} />
+            <Route path="/email-verified" element={<EmailVerificationPage />} />
+            
             <Route path="/" element={
               <MobileLayoutEnhanced>
                 <HomePageEnhanced />
@@ -110,12 +121,14 @@ function App() {
         <Route path="/counselor/profile" element={<CounselorProfile />} />
         <Route path="/counselor/register" element={<CounselorRegistration />} />
         
-        {/* Student Routes */}
+        {/* Student Routes - Desktop versions (must come before mobile routes) */}
         <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/student/profile" element={<StudentProfile />} />
-        <Route path="/student/connections" element={<StudentConnectionsPage />} />
-        <Route path="/student/sessions" element={<StudentSessions />} />
-        <Route path="/student/forums" element={<StudentForums />} />
+        <Route path="/student/profile" element={<StudentProfileDashboardFixed isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/student/profile-desktop" element={<StudentProfileDashboardFixed isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/student/connections" element={<StudentConnectionsPage isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/student/sessions" element={<StudentSessions isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/student/forums" element={<StudentForums isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/student-forums" element={<StudentForums isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
         
         {/* Database Cleanup Route */}
         <Route path="/database-cleanup" element={<DatabaseCleanupComponent />} />
@@ -156,6 +169,11 @@ function App() {
         <Route path="/course-finder" element={<CourseFinderPage />} />
         <Route path="/scholarship-finder" element={<ScholarshipFinder />} />
         
+        {/* Scholarship Assist Routes */}
+        <Route path="/scholarships-assist/scholarship-finder" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/scholarships-assist/eligibility-checker" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        <Route path="/scholarships-assist/application-assistance" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+        
         {/* Information Pages */}
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/help-center" element={<HelpCenterPage />} />
@@ -166,10 +184,6 @@ function App() {
         {/* Support Pages */}
         <Route path="/travel-help" element={<TravelHelp />} />
         <Route path="/accommodation-help" element={<AccommodationHelp />} />
-        
-        {/* Authentication */}
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/sign-in" element={<SignInPage />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<SimpleAdminPortal />} />

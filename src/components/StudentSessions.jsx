@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
+import Sidebar from './Sidebar'
 import { 
   Calendar, 
   Clock, 
@@ -16,11 +17,12 @@ import {
   RefreshCw,
   Plus,
   FileText,
-  Download
+  Download,
+  Users
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-export default function StudentSessions() {
+export default function StudentSessions({ isMobileMenuOpen, onMobileMenuClose }) {
   const { isAuthenticated, user, userRole } = useAuth()
   const navigate = useNavigate()
   const [sessions, setSessions] = useState([])
@@ -77,7 +79,7 @@ export default function StudentSessions() {
   ]
 
   useEffect(() => {
-    if (isAuthenticated() && userRole === 'student') {
+    if (isAuthenticated && userRole === 'student') {
       loadSessions()
     }
   }, [isAuthenticated, userRole])
@@ -164,73 +166,152 @@ export default function StudentSessions() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Sessions</h1>
-          <p className="text-gray-600">Manage your counseling sessions and appointments</p>
+    <div className="w-full">
+      {/* Hero Section - Full Width */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 text-white py-12 w-full">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative w-full px-6">
+          <div className="max-w-6xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-pink-200 bg-clip-text text-transparent">
+              My Sessions
+            </h1>
+            <p className="text-lg md:text-xl text-purple-100 max-w-3xl mx-auto">
+              Manage your counseling sessions and appointments with expert counselors.
+            </p>
+          </div>
         </div>
-        <div className="flex space-x-3">
-          <Button onClick={loadSessions} disabled={loading} variant="outline">
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-          <Button onClick={() => navigate('/counselors/book')}>
-            <Plus className="h-4 w-4 mr-2" />
-            Book Session
-          </Button>
-        </div>
-      </div>
+      </section>
 
-      {/* Filters */}
-      <div className="flex space-x-2">
-        {[
-          { key: 'all', label: 'All Sessions' },
-          { key: 'upcoming', label: 'Upcoming' },
-          { key: 'completed', label: 'Completed' },
-          { key: 'cancelled', label: 'Cancelled' }
-        ].map((filterOption) => (
-          <button
-            key={filterOption.key}
-            onClick={() => setFilter(filterOption.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === filterOption.key
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {filterOption.label}
-          </button>
-        ))}
-      </div>
+      {/* Two-Column Layout */}
+      <div className="flex">
+        {/* Sidebar */}
+        <Sidebar 
+          isOpen={true}
+          onClose={() => {}}
+          isHomepage={false}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onMobileMenuClose={onMobileMenuClose}
+        />
 
-      {/* Sessions List */}
-      <div className="space-y-4">
-        {loading ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Loading your sessions...</p>
-            </CardContent>
-          </Card>
-        ) : filteredSessions.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Sessions Found</h3>
-              <p className="text-gray-600 mb-4">
-                {filter === 'all' 
-                  ? "You haven't booked any sessions yet." 
-                  : `No ${filter} sessions found.`}
-              </p>
-              <Button onClick={() => navigate('/counselors/book')}>
-                <Plus className="h-4 w-4 mr-2" />
-                Book Your First Session
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
+        {/* Main Content Area */}
+        <main className="flex-1 w-full md:w-auto transition-all duration-300">
+          <div className="container mx-auto px-6 py-12">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Session Management</h2>
+                <p className="text-gray-600">Track and manage your counseling appointments</p>
+              </div>
+              <div className="flex space-x-3">
+                <Button onClick={loadSessions} disabled={loading} variant="outline">
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Button onClick={() => navigate('/counselors/book')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Book Session
+                </Button>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600 mb-1 text-center">{sessions.length}</div>
+                  <div className="text-sm text-gray-600 text-center">Total Sessions</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle2 className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-green-600 mb-1 text-center">
+                    {sessions.filter(s => s.status === 'completed').length}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">Completed</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-yellow-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-yellow-600 mb-1 text-center">
+                    {sessions.filter(s => isUpcoming(s.date, s.time) && s.status !== 'cancelled').length}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">Upcoming</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-lg border-0">
+                <CardContent className="pt-6">
+                  <div className="bg-red-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                    <XCircle className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-red-600 mb-1 text-center">
+                    {sessions.filter(s => s.status === 'cancelled').length}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">Cancelled</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[
+                { key: 'all', label: 'All Sessions' },
+                { key: 'upcoming', label: 'Upcoming' },
+                { key: 'completed', label: 'Completed' },
+                { key: 'cancelled', label: 'Cancelled' }
+              ].map((filterOption) => (
+                <button
+                  key={filterOption.key}
+                  onClick={() => setFilter(filterOption.key)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    filter === filterOption.key
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {filterOption.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sessions List */}
+            <div className="space-y-6">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                </div>
+              ) : filteredSessions.length === 0 ? (
+                <Card className="shadow-lg border-0">
+                  <CardContent className="p-12 text-center">
+                    <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Sessions Found</h3>
+                    <p className="text-gray-600 mb-6">
+                      {filter === 'all' 
+                        ? "You haven't booked any sessions yet." 
+                        : `No ${filter} sessions found.`}
+                    </p>
+                    <Button 
+                      className="bg-purple-600 hover:bg-purple-700"
+                      onClick={() => navigate('/counselors/book')}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Book Your First Session
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
           filteredSessions.map((session) => (
             <Card key={session.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
@@ -350,6 +431,9 @@ export default function StudentSessions() {
             </Card>
           ))
         )}
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   )

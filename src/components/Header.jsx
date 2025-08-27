@@ -398,12 +398,12 @@ const Header = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-1 md:space-x-4">
-            {isAuthenticated() ? (
+            {isAuthenticated ? (
               <div className="flex items-center space-x-1 md:space-x-4">
                 {/* User Greeting */}
                 <div className="hidden lg:flex items-center space-x-2 text-purple-600 font-medium">
                   <User className="w-5 h-5" />
-                  <span>Hi {user?.name || user?.email?.split('@')[0] || 'User'}</span>
+                  <span>Hi {user?.firstName || user?.name || 'User'}</span>
                 </div>
                 
                 {/* Logout Button */}

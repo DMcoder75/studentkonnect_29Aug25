@@ -13,7 +13,7 @@ const CounselorStudents = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated() && userRole === 'counselor') {
+    if (isAuthenticated && userRole === 'counselor') {
       loadStudents();
     } else if (userRole && userRole !== 'counselor') {
       navigate('/');
@@ -66,7 +66,7 @@ const CounselorStudents = () => {
     student.fieldOfStudy.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (!isAuthenticated() || userRole !== 'counselor') {
+  if (!isAuthenticated || userRole !== 'counselor') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

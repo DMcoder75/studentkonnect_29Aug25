@@ -45,7 +45,7 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
 
   // Load student connections on component mount
   useEffect(() => {
-    if (isAuthenticated() && userRole === 'student' && user?.email) {
+    if (isAuthenticated && userRole === 'student' && user?.email) {
       loadStudentConnections()
     }
   }, [isAuthenticated, userRole, user])
@@ -178,7 +178,7 @@ export default function CounselorDirectorySimple({ isMobileMenuOpen, onMobileMen
 
   // Handle counselor connection
   const handleConnect = async (counselor) => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated) {
       navigate('/signin')
       return
     }

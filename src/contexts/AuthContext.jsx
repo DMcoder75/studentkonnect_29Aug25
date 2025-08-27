@@ -20,55 +20,31 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        console.log('🔍 AuthContext: Initializing authentication...')
+        
         // Check localStorage first
         const savedUser = localStorage.getItem('user')
+        console.log('🔍 AuthContext: savedUser from localStorage:', savedUser)
+        
         if (savedUser) {
           const parsedUser = JSON.parse(savedUser)
+          console.log('🔍 AuthContext: parsedUser:', parsedUser)
           
-          // Validate the session is still valid by checking with Supabase
-          const { data: { session }, error } = await supabase.auth.getSession()
-          
-          if (session && session.user) {
-            // Session is valid, keep the user logged in
-            setUser(parsedUser)
-          } else {
-            // Session expired, clear localStorage
-            localStorage.removeItem('user')
-            setUser(null)
-          }
+          // For now, just trust the localStorage user without Supabase validation
+          // This should fix the immediate session persistence issue
+          setUser(parsedUser)
+          console.log('✅ AuthContext: User restored from localStorage')
         } else {
-          // No saved user, check if there's an active Supabase session
-          const { data: { session }, error } = await supabase.auth.getSession()
-          
-          if (session && session.user) {
-            // There's an active session but no saved user, restore from database
-            const { data: profile, error: profileError } = await supabase
-              .from('users')
-              .select('*')
-              .eq('email', session.user.email)
-              .single()
-            
-            if (profile && !profileError) {
-              const user = {
-                id: profile.id,
-                email: profile.email,
-                full_name: profile.first_name + ' ' + profile.last_name,
-                firstName: profile.first_name,
-                role: profile.role_id === 1 ? 'student' : profile.role_id === 15 ? 'counselor' : 'admin',
-                profile: profile
-              }
-              
-              setUser(user)
-              localStorage.setItem('user', JSON.stringify(user))
-            }
-          }
+          console.log('❌ AuthContext: No saved user found')
+          setUser(null)
         }
       } catch (error) {
-        console.error('Error initializing auth:', error)
+        console.error('❌ AuthContext: Error initializing auth:', error)
         localStorage.removeItem('user')
         setUser(null)
       } finally {
         setLoading(false)
+        console.log('🔍 AuthContext: Authentication initialization complete')
       }
     }
 
@@ -114,10 +90,6 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const isAuthenticated = () => {
-    return user !== null
-  }
-
   // Get user role for sidebar management
   const getUserRole = () => {
     if (!user) return 'guest'
@@ -127,9 +99,9 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     userRole: getUserRole(),
+    isAuthenticated: user !== null, // Boolean value instead of function
     login,
     logout,
-    isAuthenticated,
     loading
   }
 

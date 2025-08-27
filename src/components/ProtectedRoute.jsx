@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children }) {
     )
   }
 
-  if (!isAuthenticated()) {
+  if (!isAuthenticated) { // Fixed: removed () since isAuthenticated is now a boolean
     return <Navigate to="/sign-in" replace />
   }
 
