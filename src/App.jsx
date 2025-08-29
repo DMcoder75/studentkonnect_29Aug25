@@ -38,6 +38,7 @@ import ScholarshipFinder from './components/ScholarshipFinder'
 import UniversityDetailPage from './components/UniversityDetailPage'
 import SimpleAdminPortal from './components/SimpleAdminPortal'
 import PathwaysPage from './components/PathwaysPage'
+import PathwayDetailPageEnhanced from './components/PathwayDetailPageEnhanced'
 import UniversitiesPage from './components/UniversitiesPage'
 import CoursesPage from './components/CoursesPage'
 import StudentDashboard from './components/StudentDashboardReal'
@@ -46,6 +47,7 @@ import StudentProfileDashboardFixed from './components/StudentProfileDashboardFi
 import SignInPage from './components/SignInPage'
 import SignUpPage from './components/SignUpPage'
 import EmailVerificationPage from './components/EmailVerificationPage'
+import CourseDetailPage from './components/CourseDetailPage'
 import DatabaseCleanupComponent from './components/DatabaseCleanupComponent'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import TermsOfServicePage from './components/TermsOfServicePage'
@@ -102,105 +104,108 @@ function App() {
               </MobileLayoutEnhanced>
             } />
       
-      {/* Global Education Routes */}
-      <Route path="/global/universities" element={<GlobalUniversitiesPage />} />
-      <Route path="/global/courses" element={<GlobalCoursesPage />} />
-      <Route path="/universities" element={<UniversitiesPageSimple />} />
-      <Route path="/university-detail/:id" element={<UniversityDetailMobile />} />
-      <Route path="/courses" element={<CoursesPage />} />
-      <Route path="/pathways" element={<PathwaysPage />} />
-      <Route path="/university/:id" element={<UniversityDetailPage />} />
+            {/* Global Education Routes */}
+            <Route path="/global/universities" element={<GlobalUniversitiesPage />} />
+            <Route path="/global/courses" element={<GlobalCoursesPage />} />
+            <Route path="/universities" element={<UniversitiesPageSimple />} />
+            <Route path="/university-detail/:id" element={<UniversityDetailMobile />} />
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/courses/:category/:slug" element={<CourseDetailPage />} />
+            <Route path="/pathways" element={<PathwaysPage />} />
+            <Route path="/pathway/:id" element={<PathwayDetailPageEnhanced />} />
+            <Route path="/pathways/:id" element={<PathwayDetailPageEnhanced />} />
+            <Route path="/university/:id" element={<UniversityDetailPage />} />
         
-        {/* Counselor Routes */}
-        <Route path="/counselor/directory" element={<CounselorDirectoryFixed />} />
-        <Route path="/counselors/book" element={<CounselorBooking />} />
-        <Route path="/counselor/students" element={<CounselorStudents />} />
-        <Route path="/counselor/select" element={<CounselorSelectionPage />} />
-        <Route path="/counselor/selection" element={<CounselorSelectionPage />} />
-        <Route path="/counselor/dashboard" element={<CounselorDashboard />} />
-        <Route path="/counselor/profile" element={<CounselorProfile />} />
-        <Route path="/counselor/register" element={<CounselorRegistration />} />
-        
-        {/* Student Routes - Desktop versions (must come before mobile routes) */}
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/student/profile" element={<StudentProfileDashboardFixed isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/student/profile-desktop" element={<StudentProfileDashboardFixed isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/student/connections" element={<StudentConnectionsPage isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/student/sessions" element={<StudentSessions isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/student/forums" element={<StudentForums isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/student-forums" element={<StudentForums isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        
-        {/* Database Cleanup Route */}
-        <Route path="/database-cleanup" element={<DatabaseCleanupComponent />} />
-        
-        {/* Authentication Routes - Mobile-aware */}
-        <Route path="/signin" element={
-          <MobileRouteHandler 
-            desktopComponent={SignInForm} 
-            mobileComponent={MobileSignIn} 
-          />
-        } />
-        <Route path="/login" element={
-          <MobileRouteHandler 
-            desktopComponent={SignInForm} 
-            mobileComponent={MobileSignIn} 
-          />
-        } />
-        
-        {/* Mobile-specific Routes - These will be handled by MobileLayoutEnhanced */}
-        <Route path="/mobile/signin" element={<MobileSignIn />} />
-        <Route path="/mobile/student-dashboard" element={<MobileStudentDashboard />} />
-        <Route path="/mobile/counselor-dashboard" element={<MobileCounselorDashboard />} />
-        
-        {/* Enhanced Mobile Routes (will redirect to mobile versions on mobile devices) */}
-        <Route path="/student-dashboard" element={<MobileStudentDashboard />} />
-        <Route path="/counselor-dashboard" element={<MobileCounselorDashboard />} />
-        
-        {/* Tools & Utilities */}
-        <Route path="/career-insights" element={<CareerInsightsPage />} />
-        <Route path="/sop-builder" element={<SOPBuilderProper />} />
-        <Route path="/resume-builder" element={<ResumeBuilder />} />
-        
-        {/* Smart Apply Routes */}
-        <Route path="/smart-apply/sop-builder" element={<SOPBuilderProper />} />
-        <Route path="/smart-apply/resume-builder" element={<ResumeBuilder />} />
-        
-        <Route path="/atar-calculator" element={<ATARCalculatorPage />} />
-        <Route path="/course-finder" element={<CourseFinderPage />} />
-        <Route path="/scholarship-finder" element={<ScholarshipFinder />} />
-        
-        {/* Scholarship Assist Routes */}
-        <Route path="/scholarships-assist/scholarship-finder" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/scholarships-assist/eligibility-checker" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        <Route path="/scholarships-assist/application-assistance" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
-        
-        {/* Information Pages */}
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/help-center" element={<HelpCenterPage />} />
-        <Route path="/contact-us" element={<ContactUsPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-        
-        {/* Support Pages */}
-        <Route path="/travel-help" element={<TravelHelp />} />
-        <Route path="/accommodation-help" element={<AccommodationHelp />} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin" element={<SimpleAdminPortal />} />
-        
-        {/* Legacy/Compatibility Routes */}
-        <Route path="/destinations" element={<GlobalUniversitiesPage />} />
-        <Route path="/featured" element={<GlobalUniversitiesPage />} />
-        <Route path="/australia/application" element={<HelpCenterPage />} />
-        <Route path="/australia/visa" element={<HelpCenterPage />} />
-        <Route path="/australia/living" element={<HelpCenterPage />} />
-        <Route path="/smart-apply/tracker" element={<SOPBuilderProper />} />
-        <Route path="/smart-apply/documents" element={<ResumeBuilder />} />
-        <Route path="/smart-apply/calendar" element={<ATARCalculatorPage />} />
-        <Route path="/visa/guide" element={<HelpCenterPage />} />
-        <Route path="/visa/support" element={<ContactUsPage />} />
-        <Route path="/visa/predeparture" element={<HelpCenterPage />} />
-        <Route path="/chat" element={<ContactUsPage />} />
+            {/* Counselor Routes */}
+            <Route path="/counselor/directory" element={<CounselorDirectoryFixed />} />
+            <Route path="/counselors/book" element={<CounselorBooking />} />
+            <Route path="/counselor/students" element={<CounselorStudents />} />
+            <Route path="/counselor/select" element={<CounselorSelectionPage />} />
+            <Route path="/counselor/selection" element={<CounselorSelectionPage />} />
+            <Route path="/counselor/dashboard" element={<CounselorDashboard />} />
+            <Route path="/counselor/profile" element={<CounselorProfile />} />
+            <Route path="/counselor/register" element={<CounselorRegistration />} />
+            
+            {/* Student Routes - Desktop versions (must come before mobile routes) */}
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/student/profile" element={<StudentProfileDashboardFixed isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/student/profile-desktop" element={<StudentProfileDashboardFixed isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/student/connections" element={<StudentConnectionsPage isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/student/sessions" element={<StudentSessions isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/student/forums" element={<StudentForums isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/student-forums" element={<StudentForums isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            
+            {/* Database Cleanup Route */}
+            <Route path="/database-cleanup" element={<DatabaseCleanupComponent />} />
+            
+            {/* Authentication Routes - Mobile-aware */}
+            <Route path="/signin" element={
+              <MobileRouteHandler 
+                desktopComponent={SignInForm} 
+                mobileComponent={MobileSignIn} 
+              />
+            } />
+            <Route path="/login" element={
+              <MobileRouteHandler 
+                desktopComponent={SignInForm} 
+                mobileComponent={MobileSignIn} 
+              />
+            } />
+            
+            {/* Mobile-specific Routes - These will be handled by MobileLayoutEnhanced */}
+            <Route path="/mobile/signin" element={<MobileSignIn />} />
+            <Route path="/mobile/student-dashboard" element={<MobileStudentDashboard />} />
+            <Route path="/mobile/counselor-dashboard" element={<MobileCounselorDashboard />} />
+            
+            {/* Enhanced Mobile Routes (will redirect to mobile versions on mobile devices) */}
+            <Route path="/student-dashboard" element={<MobileStudentDashboard />} />
+            <Route path="/counselor-dashboard" element={<MobileCounselorDashboard />} />
+            
+            {/* Tools & Utilities */}
+            <Route path="/career-insights" element={<CareerInsightsPage />} />
+            <Route path="/sop-builder" element={<SOPBuilderProper />} />
+            <Route path="/resume-builder" element={<ResumeBuilder />} />
+            
+            {/* Smart Apply Routes */}
+            <Route path="/smart-apply/sop-builder" element={<SOPBuilderProper />} />
+            <Route path="/smart-apply/resume-builder" element={<ResumeBuilder />} />
+            
+            <Route path="/atar-calculator" element={<ATARCalculatorPage />} />
+            <Route path="/course-finder" element={<CourseFinderPage />} />
+            <Route path="/scholarship-finder" element={<ScholarshipFinder />} />
+            
+            {/* Scholarship Assist Routes */}
+            <Route path="/scholarships-assist/scholarship-finder" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/scholarships-assist/eligibility-checker" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            <Route path="/scholarships-assist/application-assistance" element={<ScholarshipFinder isMobileMenuOpen={false} onMobileMenuClose={() => {}} />} />
+            
+            {/* Information Pages */}
+            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/help-center" element={<HelpCenterPage />} />
+            <Route path="/contact-us" element={<ContactUsPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+            
+            {/* Support Pages */}
+            <Route path="/travel-help" element={<TravelHelp />} />
+            <Route path="/accommodation-help" element={<AccommodationHelp />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<SimpleAdminPortal />} />
+            
+            {/* Legacy/Compatibility Routes */}
+            <Route path="/destinations" element={<GlobalUniversitiesPage />} />
+            <Route path="/featured" element={<GlobalUniversitiesPage />} />
+            <Route path="/australia/application" element={<HelpCenterPage />} />
+            <Route path="/australia/visa" element={<HelpCenterPage />} />
+            <Route path="/australia/living" element={<HelpCenterPage />} />
+            <Route path="/smart-apply/tracker" element={<SOPBuilderProper />} />
+            <Route path="/smart-apply/documents" element={<ResumeBuilder />} />
+            <Route path="/smart-apply/calendar" element={<ATARCalculatorPage />} />
+            <Route path="/visa/guide" element={<HelpCenterPage />} />
+            <Route path="/visa/support" element={<ContactUsPage />} />
+            <Route path="/visa/predeparture" element={<HelpCenterPage />} />
+            <Route path="/chat" element={<ContactUsPage />} />
       </Routes>
 
       {/* Onboarding Modal */}

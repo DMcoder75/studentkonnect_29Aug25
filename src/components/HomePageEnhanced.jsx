@@ -218,7 +218,7 @@ const HomePageEnhanced = () => {
       id: 3,
       title: "Business & Commerce",
       status: "Popular",
-      growth: "Growing",
+      growth: "Stable",
       description: "Global business pathways covering international finance, marketing, management, and entrepreneurship with worldwide industry connections.",
       trending: false
     },

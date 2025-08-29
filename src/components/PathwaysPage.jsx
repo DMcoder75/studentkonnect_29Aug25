@@ -35,7 +35,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
         // Sample pathways data
         const sampleData = [
           {
-            id: 1,
+            id: 635,
             title: "Medicine & Health Sciences",
             category: "Health",
             description: "Comprehensive pathway to medical careers including medicine, nursing, pharmacy, and allied health professions with multiple entry points and specialization options.",
@@ -47,7 +47,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 45
           },
           {
-            id: 2,
+            id: 636,
             title: "Engineering & Technology",
             category: "Engineering",
             description: "Diverse engineering disciplines from civil to software engineering, preparing students for the future of technology and innovation.",
@@ -59,7 +59,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 38
           },
           {
-            id: 3,
+            id: 637,
             title: "Business & Commerce",
             category: "Business",
             description: "Business pathways covering finance, marketing, management, and entrepreneurship with strong industry connections and practical experience.",
@@ -71,7 +71,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 52
           },
           {
-            id: 4,
+            id: 638,
             title: "Law & Legal Studies",
             category: "Law",
             description: "Legal education pathways from undergraduate law to specialized postgraduate programs in various areas of legal practice.",
@@ -83,7 +83,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 28
           },
           {
-            id: 5,
+            id: 639,
             title: "Education & Teaching",
             category: "Education",
             description: "Teaching pathways for primary, secondary, and tertiary education with specializations in various subjects and age groups.",
@@ -95,7 +95,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 35
           },
           {
-            id: 6,
+            id: 640,
             title: "Arts & Creative Industries",
             category: "Arts",
             description: "Creative pathways including visual arts, performing arts, design, media, and creative writing with industry connections.",
@@ -107,7 +107,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 42
           },
           {
-            id: 7,
+            id: 641,
             title: "Science & Research",
             category: "Science",
             description: "Scientific research pathways covering biology, chemistry, physics, environmental science, and emerging fields.",
@@ -119,7 +119,7 @@ export default function PathwaysPage({ isMobileMenuOpen, onMobileMenuClose }) {
             courses_count: 48
           },
           {
-            id: 8,
+            id: 642,
             title: "Information Technology",
             category: "Technology",
             description: "IT pathways covering software development, cybersecurity, data science, and emerging technologies.",

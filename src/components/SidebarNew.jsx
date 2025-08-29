@@ -218,14 +218,6 @@ const SidebarNew = ({ onMobileMenuClose }) => {
           path: '/accommodation-help',
           icon: Building2,
           badge: null
-        },
-        {
-          id: 'logout',
-          name: 'Logout',
-          action: 'logout',
-          icon: User,
-          badge: null,
-          className: 'text-red-600 hover:text-red-700 hover:bg-red-50'
         }
       )
     }
@@ -363,6 +355,18 @@ const SidebarNew = ({ onMobileMenuClose }) => {
       }
     )
 
+    // Add logout at the bottom for authenticated users
+    if (isLoggedIn) {
+      menuItems.push({
+        id: 'logout',
+        name: 'Logout',
+        action: 'logout',
+        icon: User,
+        badge: null,
+        className: 'text-red-600 hover:text-red-700 hover:bg-red-50'
+      })
+    }
+
     return menuItems
   }
 
@@ -384,14 +388,16 @@ const SidebarNew = ({ onMobileMenuClose }) => {
               <button
                 onClick={() => handleItemClick(item)}
                 className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  item.className || ''
+                } ${
                   isActive(item.path || '#')
                     ? 'bg-purple-100 text-purple-700'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <div className="flex items-center space-x-3">
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.name}</span>
+                <div className="flex items-center space-x-3 text-left">
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-left">{item.name}</span>
                   {item.badge && (
                     <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded-full">
                       {item.badge}
@@ -399,7 +405,7 @@ const SidebarNew = ({ onMobileMenuClose }) => {
                   )}
                 </div>
                 {item.submenu && (
-                  <div className="ml-2">
+                  <div className="ml-2 flex-shrink-0">
                     {expandedItems[item.id] ? (
                       <ChevronDown className="w-4 h-4" />
                     ) : (

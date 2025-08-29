@@ -330,29 +330,47 @@ export default function TravelHelp({ isMobileMenuOpen, onMobileMenuClose }) {
           <Button variant="outline" size="sm">View All</Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                    {booking.student.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{booking.student}</p>
-                    <p className="text-sm text-gray-600">
-                      {booking.service} • {booking.route || booking.country || booking.coverage}
-                    </p>
-                    <p className="text-xs text-gray-500">{booking.date}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Badge className={getStatusColor(booking.status)}>
-                    {booking.status}
-                  </Badge>
-                  <p className="font-semibold text-gray-900">${booking.amount}</p>
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">127</div>
+              <div className="text-sm text-gray-600">This Week</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">98.5%</div>
+              <div className="text-sm text-gray-600">Success Rate</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">$485</div>
+              <div className="text-sm text-gray-600">Avg. Savings</div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600">24</div>
+              <div className="text-sm text-gray-600">Countries</div>
+            </div>
+          </div>
+          
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+              <Plane className="h-8 w-8 text-blue-600 mr-3" />
+              <div>
+                <div className="font-semibold text-gray-900">Flight Bookings</div>
+                <div className="text-sm text-gray-600">89 bookings this week</div>
               </div>
-            ))}
+            </div>
+            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+              <Shield className="h-8 w-8 text-green-600 mr-3" />
+              <div>
+                <div className="font-semibold text-gray-900">Visa Assistance</div>
+                <div className="text-sm text-gray-600">23 applications processed</div>
+              </div>
+            </div>
+            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+              <Luggage className="h-8 w-8 text-purple-600 mr-3" />
+              <div>
+                <div className="font-semibold text-gray-900">Travel Insurance</div>
+                <div className="text-sm text-gray-600">15 policies activated</div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -99,11 +99,12 @@ app.get('/api/universities/:id', async (req, res) => {
 app.get('/api/courses', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT co.*, u.university_name, u.city, u.state_province, c.country_name, c.country_code 
+      SELECT co.*, u.university_name as uni_name, u.city, u.state, c.country_name, c.country_code 
       FROM new_courses co 
-      LEFT JOIN new_universities u ON co.university_id = u.university_id 
+      LEFT JOIN new_universities u ON co.university_id = u.id 
       LEFT JOIN n_countries c ON u.country_id = c.country_id 
       ORDER BY co.program_name
+      LIMIT 1000
     `);
     res.json({ data: result.rows, error: null });
   } catch (error) {
@@ -116,9 +117,9 @@ app.get('/api/courses/university/:universityId', async (req, res) => {
   try {
     const { universityId } = req.params;
     const result = await pool.query(`
-      SELECT co.*, u.university_name, u.city, u.state_province, c.country_name, c.country_code 
+      SELECT co.*, u.university_name as uni_name, u.city, u.state, c.country_name, c.country_code 
       FROM new_courses co 
-      LEFT JOIN new_universities u ON co.university_id = u.university_id 
+      LEFT JOIN new_universities u ON co.university_id = u.id 
       LEFT JOIN n_countries c ON u.country_id = c.country_id 
       WHERE co.university_id = $1 
       ORDER BY co.program_name
@@ -134,11 +135,11 @@ app.get('/api/courses/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(`
-      SELECT co.*, u.university_name, u.city, u.state_province, c.country_name, c.country_code 
+      SELECT co.*, u.university_name as uni_name, u.city, u.state, c.country_name, c.country_code 
       FROM new_courses co 
-      LEFT JOIN new_universities u ON co.university_id = u.university_id 
+      LEFT JOIN new_universities u ON co.university_id = u.id 
       LEFT JOIN n_countries c ON u.country_id = c.country_id 
-      WHERE co.course_id = $1
+      WHERE co.id = $1
     `, [id]);
     res.json({ data: result.rows[0] || null, error: null });
   } catch (error) {
