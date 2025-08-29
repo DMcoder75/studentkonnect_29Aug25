@@ -38,7 +38,7 @@ import ScholarshipFinder from './components/ScholarshipFinder'
 import UniversityDetailPage from './components/UniversityDetailPage'
 import SimpleAdminPortal from './components/SimpleAdminPortal'
 import PathwaysPage from './components/PathwaysPage'
-import PathwayDetailPageEnhanced from './components/PathwayDetailPageEnhanced'
+import PathwayDetailPageClean from './components/PathwayDetailPageClean'
 import UniversitiesPage from './components/UniversitiesPage'
 import CoursesPage from './components/CoursesPage'
 import StudentDashboard from './components/StudentDashboardReal'
@@ -112,8 +112,8 @@ function App() {
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:category/:slug" element={<CourseDetailPage />} />
             <Route path="/pathways" element={<PathwaysPage />} />
-            <Route path="/pathway/:id" element={<PathwayDetailPageEnhanced />} />
-            <Route path="/pathways/:id" element={<PathwayDetailPageEnhanced />} />
+            <Route path="/pathway/:id" element={<PathwayDetailPageClean />} />
+            <Route path="/pathways/:id" element={<PathwayDetailPageClean />} />
             <Route path="/university/:id" element={<UniversityDetailPage />} />
         
             {/* Counselor Routes */}

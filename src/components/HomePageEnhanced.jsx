@@ -6,7 +6,7 @@ import {
   Globe, Target, Building, Search, ChevronDown, Mail, Phone, MapPin 
 } from 'lucide-react'
 import Footer from './Footer'
-import GlobalSidebarManager from './GlobalSidebarManager'
+import UnifiedLeftSidebar from './UnifiedLeftSidebar'
 import { globalEducationService } from '../services/globalEducationService'
 import { counselorService } from '../services/counselorService'
 import { realDatabaseService } from '../services/realDatabaseService';
@@ -459,7 +459,7 @@ const HomePageEnhanced = () => {
         <div className="flex">
           {/* Left Sidebar */}
           <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
-            <GlobalSidebarManager />
+            <UnifiedLeftSidebar />
           </div>
           
           {/* Main Content */}

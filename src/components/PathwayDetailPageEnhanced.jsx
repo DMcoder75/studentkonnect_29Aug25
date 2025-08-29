@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import Sidebar from './Sidebar';
+import UnifiedLeftSidebar from './UnifiedLeftSidebar';
 import { 
   ArrowLeft, 
   ArrowRight,
@@ -407,15 +407,8 @@ const PathwayDetailPageEnhanced = () => {
       <div className="flex">
         {/* Left Sidebar - Only in Content Area */}
         <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
-          <div className="h-full bg-white border-r border-gray-200 overflow-y-auto">
-            <div className="p-4">
-              {/* Logo */}
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">SK</span>
-                </div>
-                <span className="font-semibold text-gray-900">StudentKonnect</span>
-              </div>
+          <UnifiedLeftSidebar />
+        </div>
               
               {/* Navigation Menu */}
               <nav className="space-y-1">
